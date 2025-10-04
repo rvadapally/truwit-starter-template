@@ -1,7 +1,10 @@
 {
-  "name": "truwit-starter-template",
-  "description": "Truwit - Where Provenance Meets Proof. Redefining trust in the age of AI.",
+  "name": "truwit-site",
+  "version": "0.1.0",
   "private": true,
+  "description": "Truwit — Where Provenance Meets Proof. Redefining trust in the age of AI.",
+  "author": "Truwit",
+  "license": "UNLICENSED",
   "cloudflare": {
     "label": "Truwit Website",
     "products": [

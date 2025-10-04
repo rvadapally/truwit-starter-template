@@ -8,6 +8,7 @@ import cloudflare from "@astrojs/cloudflare";
 // https://astro.build/config
 export default defineConfig({
   site: "https://truwit.ai",
+  trailingSlash: "never",
   integrations: [mdx(), sitemap()],
   adapter: cloudflare({
     platformProxy: {

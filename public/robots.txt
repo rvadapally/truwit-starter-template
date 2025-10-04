@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://truwit.ai/sitemap-index.xml
