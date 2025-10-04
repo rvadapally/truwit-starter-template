@@ -1,9 +1,9 @@
 {
   "name": "truwit-starter-template",
-  "description": "Build a personal website, blog, or portfolio with Astro.",
+  "description": "Truwit - Where Provenance Meets Proof. Redefining trust in the age of AI.",
   "private": true,
   "cloudflare": {
-    "label": "Astro Framework Starter",
+    "label": "Truwit Website",
     "products": [
       "Workers"
     ],

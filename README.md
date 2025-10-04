@@ -1,12 +1,14 @@
-# Astro Starter Kit: Blog
+# Truwit Website
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/astro-blog-starter-template)
 
-![Astro Template Preview](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
+![Truwit Website Preview](https://github.com/withastro/astro/assets/2244813/ff10799f-a816-4703-b967-c78997e8323d)
 
 <!-- dash-content-start -->
 
-Create a blog with Astro and deploy it on Cloudflare Workers as a [static website](https://developers.cloudflare.com/workers/static-assets/).
+**Where Provenance Meets Proof** - Redefining trust in the age of AI.
+
+Truwit is the lightweight verification layer for digital media—attaching cryptographic provenance, consent, and authenticity to AI-generated or user-created content.
 
 Features:
 
