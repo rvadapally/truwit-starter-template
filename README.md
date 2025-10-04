@@ -8,7 +8,7 @@
 
 **Where Provenance Meets Proof** - Redefining trust in the age of AI.
 
-Truwit is the lightweight verification layer for digital media—attaching cryptographic provenance, consent, and authenticity to AI-generated or user-created content.Test changes
+Truwit is the lightweight verification layer for digital media—attaching cryptographic provenance, consent, and authenticity to AI-generated or user-created content.Test changes with new build
 
 Features:
 
