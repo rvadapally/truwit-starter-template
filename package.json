@@ -1,39 +1,27 @@
 {
-  "name": "truwit-site",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Truwit — Where Provenance Meets Proof. Redefining trust in the age of AI.",
-  "author": "Truwit",
-  "license": "UNLICENSED",
-  "cloudflare": {
-    "label": "Truwit Website",
-    "products": [
-      "Workers"
-    ],
-    "categories": [],
-    "preview_icon_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/394ca3c9-d351-4036-035a-9f6dfa26dd00/public",
-    "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/f40a6577-eed5-4f3e-cef4-b5ef0a1be100/preview",
-    "publish": true
+  "name": "@example/truwit-integrated",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "dev:app": "cd app && npm start",
+    "start": "astro dev",
+    "build": "npm run build:app && npm run build:astro && npm run integrate",
+    "build:astro": "astro check && astro build",
+    "build:app": "cd app && npm install && npm run build",
+    "integrate": "node build-integration.js",
+    "preview": "astro preview",
+    "astro": "astro",
+    "deploy": "npm run build && wrangler pages deploy ./dist"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "12.6.0",
-    "@astrojs/mdx": "4.3.0",
-    "@astrojs/rss": "4.0.11",
-    "@astrojs/sitemap": "3.4.1",
-    "astro": "5.10.1",
-    "typescript": "5.8.3"
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^4.16.18",
+    "typescript": "^5.7.2"
   },
   "devDependencies": {
-    "wrangler": "4.21.x"
-  },
-  "scripts": {
-    "astro": "astro",
-    "build": "astro build",
-    "cf-typegen": "wrangler types",
-    "check": "astro build && tsc && wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
-    "dev": "astro dev",
-    "preview": "astro build && wrangler dev"
-  },
-  "type": "module"
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "wrangler": "^3.95.0"
+  }
 }

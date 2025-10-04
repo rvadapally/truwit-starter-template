@@ -1,0 +1,23 @@
+---
+// Redirect to Angular app in development
+---
+
+<script>
+  // Check if we're in development
+  const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  
+  if (isDev) {
+    // Try to redirect to Angular dev server
+    window.location.href = 'http://localhost:4200';
+  } else {
+    // In production, the Angular app will be served from /app/
+    window.location.href = '/app/';
+  }
+</script>
+
+<div style="text-align: center; padding: 2rem; color: #e6eefc; font-family: ui-sans-serif, system-ui; background: radial-gradient(1200px 600px at 70% -10%, #0e1b35 0%, #0b1220 60%); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+  <h2 style="color: #0ea5e9; margin-bottom: 1rem;">Redirecting to Verification App...</h2>
+  <p style="margin-bottom: 1rem;">If you're not redirected automatically:</p>
+  <a href="http://localhost:4200" style="color: #22c55e; text-decoration: none; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #0ea5e9, #22c55e); border-radius: 12px; font-weight: 600;">Open Verification App</a>
+  <p style="margin-top: 1rem; font-size: 0.9rem; color: #9fb3d9;">Make sure the Angular dev server is running on port 4200</p>
+</div>
