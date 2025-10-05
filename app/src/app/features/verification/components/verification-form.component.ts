@@ -211,22 +211,29 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   }
 
   private getErrorMessage(error: any): string {
+    // Check for specific API error message first
     if (error.error?.message) {
       return error.error.message;
     }
     if (error.message) {
       return error.message;
     }
-    if (error.status === 0) {
-      return 'Unable to connect to the server. Please check your internet connection.';
+    
+    // Handle specific HTTP status codes
+    switch (error.status) {
+      case 0:
+        return 'Unable to connect to the server. Please check your internet connection.';
+      case 400:
+        return 'Invalid request. Please check your input and try again.';
+      case 408:
+        return 'The request timed out. Please try again with a smaller file or different URL.';
+      case 502:
+        return 'Unable to access the provided URL. Please check if the URL is valid and accessible.';
+      case 500:
+        return 'Server error. Please try again later.';
+      default:
+        return 'An unexpected error occurred. Please try again.';
     }
-    if (error.status === 400) {
-      return 'Invalid request. Please check your input and try again.';
-    }
-    if (error.status === 500) {
-      return 'Server error. Please try again later.';
-    }
-    return 'An unexpected error occurred. Please try again.';
   }
 
   private markFormGroupTouched(): void {
