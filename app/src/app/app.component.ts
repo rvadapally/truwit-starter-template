@@ -4,6 +4,11 @@ import { Component } from '@angular/core';
   selector: 'app-root',
   template: `
     <div class="main-container">
+      <!-- Banner Section -->
+      <section class="banner-section">
+        <img src="/images/truwit-banner.png" alt="Truwit Banner" class="banner-image" />
+      </section>
+      
       <header class="header">
         <h1 class="brand-name">Truwit</h1>
         <p class="subtitle gradient-text">Where Provenance Meets Proof</p>
@@ -66,6 +71,27 @@ import { Component } from '@angular/core';
       display: flex;
       flex-direction: column;
       padding: 2rem;
+    }
+
+    .banner-section {
+      width: 100%;
+      height: 20vh;
+      min-height: 150px;
+      max-height: 200px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .banner-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transform: scaleY(0.7);
+      transform-origin: center;
     }
 
     .header {
