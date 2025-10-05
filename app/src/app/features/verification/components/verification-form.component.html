@@ -1,6 +1,6 @@
 <form [formGroup]="verificationForm" (ngSubmit)="onSubmit()" class="verification-form">
   <div class="form-section">
-    <h3 class="section-title">Content Verification</h3>
+    <h3 class="section-title">Video Content Verification</h3>
     
     <!-- URL Input -->
     <div class="input-group">
@@ -25,11 +25,11 @@
 
     <!-- File Upload -->
     <div class="input-group">
-      <label class="input-label">Upload file</label>
+      <label class="input-label">Upload video file</label>
       <input 
         type="file" 
         class="file-input"
-        accept="video/*,image/*"
+        accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.m4v,.3gp,.flv,.wmv"
         (change)="onFileSelected($event)">
       <div class="file-info" *ngIf="selectedFile">
         Selected: {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})

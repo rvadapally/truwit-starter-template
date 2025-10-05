@@ -14,16 +14,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private router: Router) {
-    console.log('🚀 AppComponent constructor called');
-    console.log('📍 Current URL:', window.location.href);
-    console.log('🔗 Router:', router);
-  }
+  constructor(private router: Router) {}
 
   ngOnInit(): void {
-    console.log('🎯 AppComponent ngOnInit called');
-    console.log('📍 Initial route:', this.currentRoute);
-    
     // Track route changes
     this.router.events
       .pipe(
@@ -32,13 +25,10 @@ export class AppComponent implements OnInit, OnDestroy {
       )
       .subscribe((event) => {
         this.currentRoute = (event as NavigationEnd).url;
-        console.log('🔄 Route changed to:', this.currentRoute);
-        console.log('📍 Full URL:', window.location.href);
       });
   }
 
   ngOnDestroy(): void {
-    console.log('💀 AppComponent ngOnDestroy called');
     this.destroy$.next();
     this.destroy$.complete();
   }

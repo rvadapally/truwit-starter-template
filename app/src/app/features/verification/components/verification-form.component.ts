@@ -59,10 +59,57 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
-      this.selectedFile = input.files[0];
+      const file = input.files[0];
+      
+      // Validate file type - only allow video files
+      if (!this.isVideoFile(file)) {
+        alert('Please select a video file only. Supported formats: MP4, MOV, AVI, MKV, WebM, M4V, 3GP, FLV, WMV');
+        input.value = ''; // Clear the input
+        this.selectedFile = null;
+        return;
+      }
+      
+      // Validate file size (max 100MB)
+      const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+      if (file.size > maxSize) {
+        alert('File size must be less than 100MB');
+        input.value = ''; // Clear the input
+        this.selectedFile = null;
+        return;
+      }
+      
+      this.selectedFile = file;
       // Clear URL when file is selected
       this.verificationForm.patchValue({ url: '' });
     }
+  }
+
+  private isVideoFile(file: File): boolean {
+    const videoTypes = [
+      'video/mp4',
+      'video/quicktime',
+      'video/x-msvideo',
+      'video/x-matroska',
+      'video/webm',
+      'video/x-m4v',
+      'video/3gpp',
+      'video/x-flv',
+      'video/x-ms-wmv'
+    ];
+    
+    const videoExtensions = [
+      '.mp4', '.mov', '.avi', '.mkv', '.webm', 
+      '.m4v', '.3gp', '.flv', '.wmv'
+    ];
+    
+    // Check MIME type
+    if (videoTypes.includes(file.type)) {
+      return true;
+    }
+    
+    // Check file extension as fallback
+    const fileName = file.name.toLowerCase();
+    return videoExtensions.some(ext => fileName.endsWith(ext));
   }
 
   onUrlChange(): void {

@@ -4,10 +4,6 @@ import { Component, type OnInit } from '@angular/core';
   selector: 'app-home',
   template: `
     <div class="landing-content">
-      <!-- DEBUG: Home Component -->
-      <div style="background: green; color: white; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
-        🏠 HOME COMPONENT LOADED - This is the NEW Angular routing!
-      </div>
       <p class="subtitle gradient-text">Where Provenance Meets Proof</p>
       
       <div class="landing-card">
@@ -153,7 +149,6 @@ import { Component, type OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
   ngOnInit(): void {
-    console.log('🏠 HomeComponent loaded!');
-    console.log('📍 Current URL:', window.location.href);
+    // Component initialized
   }
 }

@@ -59,8 +59,7 @@ export class VerifyPageComponent implements OnInit {
   verificationResult: any = null;
   
   ngOnInit(): void {
-    console.log('✅ VerifyPageComponent loaded!');
-    console.log('📍 Current URL:', window.location.href);
+    // Component initialized
   }
   
   onNewVerification(): void {
