@@ -1,4 +1,14 @@
 import type { Routes } from '@angular/router';
+import { PublicVerifyComponent } from './features/verification/components/public-verify.component';
 
-// Simple routing - no redirects, handle everything in app component
-export const routes: Routes = [];
+export const routes: Routes = [
+  {
+    path: 't/:id',
+    component: PublicVerifyComponent
+  },
+  {
+    path: '',
+    redirectTo: '/',
+    pathMatch: 'full'
+  }
+];

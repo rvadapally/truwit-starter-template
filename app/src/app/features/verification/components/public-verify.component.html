@@ -1,0 +1,100 @@
+<div class="public-verify-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading verification data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <h2>Verification Not Found</h2>
+    <p>{{ error }}</p>
+    <button class="btn-primary" (click)="loadVerifyData()">Retry</button>
+  </div>
+
+  <!-- Verification Data -->
+  <div *ngIf="verifyData && !isLoading" class="verify-content">
+    <!-- Header -->
+    <div class="verify-header">
+      <div class="verdict-badge" [style.background-color]="getVerdictColor()">
+        {{ getVerdictText() }}
+      </div>
+      <h1>Verification Report</h1>
+      <p class="proof-id">Proof ID: {{ verifyData.proofId }}</p>
+    </div>
+
+    <!-- Content Details -->
+    <div class="content-details">
+      <div class="detail-card">
+        <h3>Content Information</h3>
+        <div class="detail-row">
+          <span class="label">Content Hash:</span>
+          <span class="value">{{ verifyData.contentHash }}</span>
+          <button class="copy-btn" (click)="copyToClipboard(verifyData.contentHash)">Copy</button>
+        </div>
+        <div class="detail-row" *ngIf="verifyData.mime">
+          <span class="label">MIME Type:</span>
+          <span class="value">{{ verifyData.mime }}</span>
+        </div>
+        <div class="detail-row" *ngIf="verifyData.duration">
+          <span class="label">Duration:</span>
+          <span class="value">{{ verifyData.duration }}s</span>
+        </div>
+        <div class="detail-row" *ngIf="verifyData.resolution">
+          <span class="label">Resolution:</span>
+          <span class="value">{{ verifyData.resolution }}</span>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h3>Declared Information</h3>
+        <div class="detail-row">
+          <span class="label">Generator:</span>
+          <span class="value">{{ verifyData.declared.generator }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Prompt:</span>
+          <span class="value">{{ verifyData.declared.prompt }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">License:</span>
+          <span class="value">{{ verifyData.declared.license }}</span>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h3>Verification Details</h3>
+        <div class="detail-row">
+          <span class="label">Issued At:</span>
+          <span class="value">{{ verifyData.issuedAt | date:'medium' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Signature Status:</span>
+          <span class="value" [class]="verifyData.signatureStatus">{{ verifyData.signatureStatus }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-section">
+      <button class="btn-primary" (click)="copyToClipboard(window.location.href)">
+        Copy Verification Link
+      </button>
+      <button class="btn-secondary" (click)="shareToX()">
+        Share on X
+      </button>
+      <a [href]="verifyData.badgeUrl" target="_blank" class="btn-outline">
+        View Badge
+      </a>
+    </div>
+
+    <!-- Badge Preview -->
+    <div class="badge-preview">
+      <h3>TrustMark Badge</h3>
+      <img [src]="verifyData.badgeUrl" alt="Truwit TrustMark Badge" class="badge-image">
+      <p class="badge-description">
+        Add this badge to your content description to show it's verified by Truwit.
+      </p>
+    </div>
+  </div>
+</div>

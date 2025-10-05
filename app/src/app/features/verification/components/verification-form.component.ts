@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, type OnInit, type OnDestroy } from 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
-import type { VerificationRequest, VerificationMetadata } from '../../../core/models';
+import type { VerificationRequest, VerificationMetadata, CreateProofResponse } from '../../../core/models';
 import { LicenseType } from '../../../core/models';
 
 @Component({
@@ -79,31 +79,37 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     }
 
     const formValue = this.verificationForm.value;
-    
-    const request: VerificationRequest = {
-      url: formValue.url || undefined,
-      file: this.selectedFile || undefined,
-      metadata: {
-        prompt: formValue.prompt,
-        toolName: formValue.toolName,
-        toolVersion: formValue.toolVersion,
-        likenessConsent: formValue.likenessConsent,
-        license: formValue.license
-      }
-    };
-
     this.isVerifying = true;
     
-    this.verificationService.verifyContent(request)
+    // Prepare common parameters
+    const generator = formValue.toolName || 'Unknown';
+    const prompt = formValue.prompt || '';
+    const license = formValue.license || LicenseType.CreatorOwned;
+    
+    let verification$;
+    
+    if (this.selectedFile) {
+      // File upload verification
+      verification$ = this.verificationService.createProofFromFile(this.selectedFile, generator, prompt, license);
+    } else if (formValue.url) {
+      // URL verification
+      verification$ = this.verificationService.createProofFromUrl(formValue.url, generator, prompt, license);
+    } else {
+      this.isVerifying = false;
+      return;
+    }
+    
+    verification$
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (result) => {
-          this.verificationService.setVerificationResult(result);
-          this.isVerifying = false;
+        next: (result: CreateProofResponse) => {
+          // Redirect to the verify URL as specified in your requirements
+          window.location.href = result.verifyUrl;
         },
         error: (error) => {
           console.error('Verification failed:', error);
           this.isVerifying = false;
+          // TODO: Show user-friendly error message
         }
       });
   }

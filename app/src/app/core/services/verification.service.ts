@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import type { VerificationRequest, VerificationResult, ProofDetails } from '../models';
+import type { VerificationRequest, VerificationResult, ProofDetails, CreateProofRequest, CreateProofResponse, VerifyResponse } from '../models';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -13,6 +13,35 @@ export class VerificationService {
 
   constructor(private apiService: ApiService) {}
 
+  // New API methods matching your specification
+  createProofFromUrl(url: string, generator: string, prompt: string, license: string): Observable<CreateProofResponse> {
+    const request: CreateProofRequest = {
+      input: { url },
+      declared: { generator, prompt, license }
+    };
+    
+    return this.apiService.post<CreateProofResponse>('/v1/proofs', request).pipe(
+      map(response => response.data)
+    );
+  }
+
+  createProofFromFile(file: File, generator: string, prompt: string, license: string): Observable<CreateProofResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('declared', JSON.stringify({ generator, prompt, license }));
+    
+    return this.apiService.post<CreateProofResponse>('/v1/proofs/file', formData).pipe(
+      map(response => response.data)
+    );
+  }
+
+  verifyProof(proofId: string): Observable<VerifyResponse> {
+    return this.apiService.get<VerifyResponse>(`/v1/verify/${proofId}`).pipe(
+      map(response => response.data)
+    );
+  }
+
+  // Legacy methods for backward compatibility
   verifyContent(request: VerificationRequest): Observable<VerificationResult> {
     if (request.file) {
       return this.verifyFile(request.file, request.metadata);

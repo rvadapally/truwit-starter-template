@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, type OnInit, type OnDestroy } from '@angular/core';
-import { Subject, takeUntil } from 'rxjs';
+import { Router, NavigationEnd } from '@angular/router';
+import { Subject, takeUntil, filter } from 'rxjs';
 import { VerificationService } from './core/services/verification.service';
 import type { VerificationResult } from './core/models';
 
@@ -17,7 +18,8 @@ export class AppComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    private verificationService: VerificationService
+    private verificationService: VerificationService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -25,6 +27,16 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(result => {
         this.verificationResult = result;
+      });
+
+    // Track route changes
+    this.router.events
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((event) => {
+        this.currentRoute = (event as NavigationEnd).url;
       });
   }
 
@@ -34,15 +46,15 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   navigateToVerification(): void {
-    this.currentRoute = '/verify';
+    this.router.navigate(['/verify']);
   }
 
   navigateToHome(): void {
-    this.currentRoute = '/';
+    this.router.navigate(['/']);
   }
 
   onNewVerification(): void {
     this.verificationService.clearVerificationResult();
-    this.currentRoute = '/verify';
+    this.router.navigate(['/verify']);
   }
 }

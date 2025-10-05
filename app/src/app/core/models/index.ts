@@ -45,11 +45,46 @@ export interface VerificationMetadata {
 }
 
 export enum LicenseType {
-  CreatorOwned = 'CREATOR_OWNED',
-  BrandOwned = 'BRAND_OWNED',
-  Public = 'PUBLIC'
+  CreatorOwned = 'creator-owned',
+  BrandOwned = 'brand-owned',
+  Public = 'public'
 }
 
+// API Request/Response models matching your specification
+export interface CreateProofRequest {
+  input: {
+    url: string;
+  };
+  declared: {
+    generator: string;
+    prompt: string;
+    license: string;
+  };
+}
+
+export interface CreateProofResponse {
+  proofId: string;
+  verifyUrl: string;
+  badgeUrl: string;
+}
+
+export interface VerifyResponse {
+  proofId: string;
+  verdict: 'green' | 'yellow' | 'red';
+  contentHash: string;
+  mime?: string;
+  duration?: number;
+  resolution?: string;
+  declared: {
+    generator: string;
+    prompt: string;
+    license: string;
+  };
+  issuedAt: string;
+  signatureStatus: 'valid' | 'invalid' | 'unknown';
+}
+
+// Legacy models for backward compatibility
 export interface VerificationResult {
   proofId: string;
   contentHash: string;

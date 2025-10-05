@@ -1,6 +1,6 @@
 <div class="main-container">
-  <!-- Navigation Header -->
-  <header class="header">
+  <!-- Navigation Header (hidden on public verify pages) -->
+  <header class="header" *ngIf="!currentRoute.startsWith('/t/')">
     <nav class="nav">
       <div class="nav-brand">
         <img src="assets/verified-by-truwit.png" alt="Truwit Logo" class="nav-logo" />
@@ -13,10 +13,11 @@
     </nav>
   </header>
 
-  <!-- Banner Section Removed -->
-  
-  <!-- Landing Page Content -->
-  <div *ngIf="currentRoute === '/'">
+  <!-- Router Outlet for all routes -->
+  <router-outlet></router-outlet>
+
+  <!-- Landing Page Content (for root route) -->
+  <div *ngIf="currentRoute === '/' && !currentRoute.startsWith('/t/')">
     <div class="landing-content">
       <p class="subtitle gradient-text">Where Provenance Meets Proof</p>
       
@@ -77,7 +78,7 @@
     </div>
   </div>
   
-  <footer class="footer">
+  <footer class="footer" *ngIf="!currentRoute.startsWith('/t/')">
     <p>© {{currentYear}} Truwit. All rights reserved.</p>
   </footer>
 </div>

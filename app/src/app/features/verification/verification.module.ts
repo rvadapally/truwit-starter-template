@@ -4,11 +4,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 import { VerificationFormComponent } from './components/verification-form.component';
 import { VerificationResultComponent } from './components/verification-result.component';
+import { PublicVerifyComponent } from './components/public-verify.component';
 
 @NgModule({
   declarations: [
     VerificationFormComponent,
-    VerificationResultComponent
+    VerificationResultComponent,
+    PublicVerifyComponent
   ],
   imports: [
     CommonModule,
@@ -16,7 +18,8 @@ import { VerificationResultComponent } from './components/verification-result.co
   ],
   exports: [
     VerificationFormComponent,
-    VerificationResultComponent
+    VerificationResultComponent,
+    PublicVerifyComponent
   ]
 })
 export class VerificationModule { }
