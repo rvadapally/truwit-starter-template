@@ -1,0 +1,101 @@
+<form [formGroup]="verificationForm" (ngSubmit)="onSubmit()" class="verification-form">
+  <div class="form-section">
+    <h3 class="section-title">Content Verification</h3>
+    
+    <!-- URL Input -->
+    <div class="input-group">
+      <label class="input-label">Paste URL</label>
+      <div class="url-input-container">
+        <input 
+          type="url" 
+          formControlName="url"
+          placeholder="https://example.com/video.mp4" 
+          class="url-input"
+          (input)="onUrlChange()">
+        <button 
+          type="button" 
+          class="btn-primary"
+          [disabled]="!verificationForm.get('url')?.valid || isVerifying">
+          Verify URL
+        </button>
+      </div>
+    </div>
+
+    <div class="divider">or</div>
+
+    <!-- File Upload -->
+    <div class="input-group">
+      <label class="input-label">Upload file</label>
+      <input 
+        type="file" 
+        class="file-input"
+        accept="video/*,image/*"
+        (change)="onFileSelected($event)">
+      <div class="file-info" *ngIf="selectedFile">
+        Selected: {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})
+      </div>
+    </div>
+  </div>
+
+  <!-- Metadata Section -->
+  <div class="form-section">
+    <h3 class="section-title">Metadata (Optional)</h3>
+    
+    <div class="metadata-grid">
+      <div class="input-group">
+        <label class="input-label">Prompt Used</label>
+        <textarea 
+          formControlName="prompt"
+          placeholder="Describe the prompt used to generate this content..."
+          class="textarea-input"
+          rows="3">
+        </textarea>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Tool Name</label>
+        <input 
+          type="text" 
+          formControlName="toolName"
+          placeholder="e.g., Sora, Midjourney, DALL-E"
+          class="text-input">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Tool Version</label>
+        <input 
+          type="text" 
+          formControlName="toolVersion"
+          placeholder="e.g., v2, 5.2"
+          class="text-input">
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">License Type</label>
+        <select formControlName="license" class="select-input">
+          <option *ngFor="let license of licenseTypes" [value]="license.value">
+            {{ license.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="form-actions">
+    <button 
+      type="button" 
+      class="btn-secondary"
+      (click)="resetForm()"
+      [disabled]="isVerifying">
+      Reset
+    </button>
+    <button 
+      type="submit" 
+      class="btn-primary"
+      [disabled]="verificationForm.invalid || isVerifying">
+      <span *ngIf="isVerifying">Verifying...</span>
+      <span *ngIf="!isVerifying">Generate Proof</span>
+    </button>
+  </div>
+</form>

@@ -7,4 +7,11 @@ export default defineConfig({
   site: "https://truwit.ai",
   trailingSlash: "never",
   integrations: [sitemap()],
+  vite: {
+    server: {
+      fs: {
+        allow: ['..']
+      }
+    }
+  }
 });

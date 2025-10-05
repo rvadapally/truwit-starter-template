@@ -1,0 +1,124 @@
+<div class="verification-result" *ngIf="result">
+  <div class="success-header">
+    <div class="success-icon">✅</div>
+    <h2 class="success-title">Verification Complete!</h2>
+    <p class="success-subtitle">Your content has been verified and proof generated</p>
+  </div>
+
+  <div class="result-content">
+    <!-- Proof ID -->
+    <div class="result-section">
+      <h3 class="section-title">Proof ID</h3>
+      <div class="proof-id-container">
+        <code class="proof-id">{{ result.proofId }}</code>
+        <button 
+          class="copy-btn"
+          (click)="copyToClipboard(result.proofId)"
+          title="Copy Proof ID">
+          📋
+        </button>
+      </div>
+    </div>
+
+    <!-- Verification URL -->
+    <div class="result-section">
+      <h3 class="section-title">Verification Link</h3>
+      <div class="url-container">
+        <a [href]="result.verificationUrl" target="_blank" class="verification-url">
+          {{ result.verificationUrl }}
+        </a>
+        <button 
+          class="copy-btn"
+          (click)="copyToClipboard(result.verificationUrl)"
+          title="Copy Verification URL">
+          📋
+        </button>
+      </div>
+    </div>
+
+    <!-- Badge -->
+    <div class="result-section">
+      <h3 class="section-title">Verification Badge</h3>
+      <div class="badge-container">
+        <img [src]="result.badgeUrl" alt="Truwit Verification Badge" class="verification-badge">
+        <button 
+          class="download-btn"
+          (click)="downloadBadge()"
+          title="Download Badge">
+          📥 Download Badge
+        </button>
+      </div>
+    </div>
+
+    <!-- QR Code (if available) -->
+    <div class="result-section" *ngIf="result.qrCodeUrl">
+      <h3 class="section-title">QR Code</h3>
+      <div class="qr-container">
+        <img [src]="result.qrCodeUrl" alt="QR Code" class="qr-code">
+        <button 
+          class="download-btn"
+          (click)="downloadQRCode()"
+          title="Download QR Code">
+          📥 Download QR
+        </button>
+      </div>
+    </div>
+
+    <!-- Metadata -->
+    <div class="result-section">
+      <h3 class="section-title">Metadata</h3>
+      <div class="metadata-display">
+        <div class="metadata-item" *ngIf="result.metadata.prompt">
+          <span class="metadata-label">Prompt:</span>
+          <span class="metadata-value">{{ result.metadata.prompt }}</span>
+        </div>
+        <div class="metadata-item" *ngIf="result.metadata.toolName">
+          <span class="metadata-label">Tool:</span>
+          <span class="metadata-value">{{ result.metadata.toolName }}</span>
+        </div>
+        <div class="metadata-item" *ngIf="result.metadata.toolVersion">
+          <span class="metadata-label">Version:</span>
+          <span class="metadata-value">{{ result.metadata.toolVersion }}</span>
+        </div>
+        <div class="metadata-item">
+          <span class="metadata-label">License:</span>
+          <span class="metadata-value">{{ result.metadata.license }}</span>
+        </div>
+        <div class="metadata-item">
+          <span class="metadata-label">Verified:</span>
+          <span class="metadata-value">{{ result.timestamp | date:'medium' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hash Information -->
+    <div class="result-section">
+      <h3 class="section-title">Technical Details</h3>
+      <div class="hash-container">
+        <div class="hash-item">
+          <span class="hash-label">Content Hash:</span>
+          <code class="hash-value">{{ result.contentHash }}</code>
+        </div>
+        <div class="hash-item">
+          <span class="hash-label">Perceptual Hash:</span>
+          <code class="hash-value">{{ result.perceptualHash }}</code>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button 
+      class="btn-primary"
+      (click)="copyToClipboard(result.verificationUrl)">
+      📋 Copy Verification Link
+    </button>
+    <a 
+      [href]="result.verificationUrl" 
+      target="_blank"
+      class="btn-secondary">
+      🔗 View Proof Page
+    </a>
+  </div>
+</div>

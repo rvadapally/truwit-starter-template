@@ -26,19 +26,18 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "baseHref": "/app/"
+            "baseHref": "/"
           }
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "humanproof-web:build"
+            "buildTarget": "humanproof-web:build"
           }
         }
       }
     }
   },
-  "defaultProject": "humanproof-web",
   "cli": {
     "analytics": "3887381b-a1a3-4e74-8311-5ce659058d39"
   }
