@@ -88,10 +88,15 @@
   <script>
     // If Angular doesn't load within 5 seconds, show fallback
     setTimeout(() => {
-      if (!document.querySelector('app-root').hasChildNodes()) {
-        document.querySelector('.loading-text').textContent = 'Angular app not loaded';
-        document.querySelector('.loading-subtitle').textContent = 'Click the link below to open the Angular app directly';
-        document.querySelector('.fallback-link').style.display = 'block';
+      const appRoot = document.querySelector('app-root');
+      const loadingText = document.querySelector('.loading-text');
+      const loadingSubtitle = document.querySelector('.loading-subtitle');
+      const fallbackLink = document.querySelector('.fallback-link') as HTMLElement;
+      
+      if (appRoot && !appRoot.hasChildNodes()) {
+        if (loadingText) loadingText.textContent = 'Angular app not loaded';
+        if (loadingSubtitle) loadingSubtitle.textContent = 'Click the link below to open the Angular app directly';
+        if (fallbackLink) fallbackLink.style.display = 'block';
       }
     }, 5000);
   </script>

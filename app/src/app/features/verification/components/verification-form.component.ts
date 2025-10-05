@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, type OnInit, type OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
-import { VerificationRequest, VerificationMetadata, LicenseType } from '../../../core/models';
+import type { VerificationRequest, VerificationMetadata } from '../../../core/models';
+import { LicenseType } from '../../../core/models';
 
 @Component({
   selector: 'app-verification-form',

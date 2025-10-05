@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { VerificationRequest, VerificationResult, ProofDetails } from '../models';
+import type { VerificationRequest, VerificationResult, ProofDetails } from '../models';
 import { ApiService } from './api.service';
 
 @Injectable({

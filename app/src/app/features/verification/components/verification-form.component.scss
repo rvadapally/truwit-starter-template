@@ -2,14 +2,18 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .form-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   padding: 1.5rem;
   background: rgba(14, 27, 53, 0.4);
   border: 1px solid rgba(14, 165, 233, 0.2);
   border-radius: 16px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .section-title {
@@ -21,7 +25,7 @@
 }
 
 .input-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
 }
@@ -62,6 +66,7 @@
 
 .text-input, .textarea-input, .select-input {
   width: 100%;
+  max-width: 100%;
   padding: 0.875rem 1rem;
   background: rgba(11, 18, 32, 0.8);
   border: 2px solid rgba(14, 165, 233, 0.3);
@@ -69,6 +74,7 @@
   color: #e6eefc;
   font-size: 1rem;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .text-input:focus, .textarea-input:focus, .select-input:focus {
@@ -140,7 +146,7 @@
 .metadata-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
   align-items: start;
 }
 
@@ -154,6 +160,7 @@
 
 .select-input {
   width: 100%;
+  max-width: 100%;
   min-width: 0;
   height: auto;
   min-height: 3.5rem;
@@ -163,6 +170,7 @@
   background-position: right 1rem center;
   background-size: 1rem;
   padding-right: 3rem;
+  box-sizing: border-box;
 }
 
 .textarea-input {
@@ -226,7 +234,7 @@
   }
   
   .url-input, .text-input, .textarea-input, .select-input {
-    min-width: 100%;
+    min-width: 80%;
   }
   
   .metadata-grid {

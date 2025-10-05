@@ -1,5 +1,5 @@
 // Build integration script for Cloudflare Pages
-import { copyFileSync, mkdirSync, readdirSync, statSync } from 'fs';
+import { copyFileSync, mkdirSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 

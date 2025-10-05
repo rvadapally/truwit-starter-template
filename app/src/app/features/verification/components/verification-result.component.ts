@@ -1,5 +1,5 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { VerificationResult } from '../../../core/models';
+import type { VerificationResult } from '../../../core/models';
 
 @Component({
   selector: 'app-verification-result',
