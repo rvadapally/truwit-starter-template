@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, type OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-verify-page',
@@ -55,8 +55,13 @@ import { Component } from '@angular/core';
     }
   `]
 })
-export class VerifyPageComponent {
+export class VerifyPageComponent implements OnInit {
   verificationResult: any = null;
+  
+  ngOnInit(): void {
+    console.log('✅ VerifyPageComponent loaded!');
+    console.log('📍 Current URL:', window.location.href);
+  }
   
   onNewVerification(): void {
     this.verificationResult = null;

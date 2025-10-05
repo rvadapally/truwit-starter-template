@@ -24,4 +24,9 @@ import { routes } from './app.routes';
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { 
+  constructor() {
+    console.log('📦 AppModule constructor called');
+    console.log('🔗 Routes:', routes);
+  }
+}
