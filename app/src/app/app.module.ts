@@ -5,11 +5,15 @@ import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { VerificationModule } from './features/verification/verification.module';
+import { HomeComponent } from './features/home/home.component';
+import { VerifyPageComponent } from './features/verification/components/verify-page.component';
 import { routes } from './app.routes';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    HomeComponent,
+    VerifyPageComponent
   ],
   imports: [
     BrowserModule,

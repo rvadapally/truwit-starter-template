@@ -4,11 +4,11 @@
     <nav class="nav">
       <div class="nav-brand">
         <img src="assets/verified-by-truwit.png" alt="Truwit Logo" class="nav-logo" />
-        <h1 class="brand-name" (click)="navigateToHome()">Truwit</h1>
+        <h1 class="brand-name" routerLink="/">Truwit</h1>
       </div>
       <div class="nav-links">
-        <a (click)="navigateToHome()" class="nav-link" [class.active]="currentRoute === '/'">Home</a>
-        <a (click)="navigateToVerification()" class="nav-link" [class.active]="currentRoute === '/verify'">Verify</a>
+        <a routerLink="/" class="nav-link" [class.active]="currentRoute === '/'">Home</a>
+        <a routerLink="/verify" class="nav-link" [class.active]="currentRoute === '/verify'">Verify</a>
       </div>
     </nav>
   </header>
@@ -16,68 +16,6 @@
   <!-- Router Outlet for all routes -->
   <router-outlet></router-outlet>
 
-  <!-- Landing Page Content (for root route) -->
-  <div *ngIf="currentRoute === '/' && !currentRoute.startsWith('/t/')">
-    <div class="landing-content">
-      <p class="subtitle gradient-text">Where Provenance Meets Proof</p>
-      
-      <div class="landing-card">
-        <h2 class="card-title">
-          <span class="gradient-text-primary">Verify origin. Prove consent.</span>
-          <span class="gradient-text-secondary">Publish with confidence.</span>
-        </h2>
-        <p class="card-description">
-          Truwit attaches cryptographic provenance, consent, and authenticity to digital media. 
-          Verify the origin and prove consent for AI-generated content.
-        </p>
-        
-        <div class="features">
-          <div class="feature">
-            <div class="feature-icon">🔒</div>
-            <h3>Cryptographic Proof</h3>
-            <p>Immutable verification using blockchain technology</p>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">✅</div>
-            <h3>Consent Tracking</h3>
-            <p>Track and verify consent for likeness usage</p>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">🎯</div>
-            <h3>AI Detection</h3>
-            <p>Identify and verify AI-generated content</p>
-          </div>
-        </div>
-        
-        <div class="cta-section">
-          <button class="cta-button" (click)="navigateToVerification()">
-            Start Verification
-          </button>
-          <p class="cta-subtitle">Upload your content to begin</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Verification Page Content -->
-  <div *ngIf="currentRoute === '/verify'">
-    <!-- Verification Form (shown when no result) -->
-    <div class="verification-form" *ngIf="!verificationResult">
-      <app-verification-form></app-verification-form>
-    </div>
-
-    <!-- Verification Result (shown when result exists) -->
-    <div class="verification-result" *ngIf="verificationResult">
-      <app-verification-result [result]="verificationResult"></app-verification-result>
-      
-      <div class="new-verification-section">
-        <button class="btn-secondary" (click)="onNewVerification()">
-          Verify Another Content
-        </button>
-      </div>
-    </div>
-  </div>
-  
   <footer class="footer" *ngIf="!currentRoute.startsWith('/t/')">
     <p>© {{currentYear}} Truwit. All rights reserved.</p>
   </footer>
