@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, type OnInit, type OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
@@ -16,6 +16,10 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   selectedFile: File | null = null;
   isVerifying = false;
   verificationResult: any = null;
+  errorMessage: string | null = null;
+  successMessage: string | null = null;
+  verificationStep: string = '';
+  createdProof: CreateProofResponse | null = null;
   
   private destroy$ = new Subject<void>();
   
@@ -27,7 +31,8 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private verificationService: VerificationService
+    private verificationService: VerificationService,
+    private cdr: ChangeDetectorRef
   ) {
     this.verificationForm = this.createForm();
   }
@@ -120,45 +125,108 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    console.log('🚀 onSubmit() called');
+    console.log('📋 Form valid:', this.verificationForm.valid);
+    console.log('📋 Form value:', this.verificationForm.value);
+    
     if (this.verificationForm.invalid) {
+      console.log('❌ Form is invalid, marking as touched');
       this.markFormGroupTouched();
       return;
     }
 
     const formValue = this.verificationForm.value;
-    this.isVerifying = true;
+    console.log('📝 Form values:', formValue);
+    console.log('📁 Selected file:', this.selectedFile);
+    
+            this.isVerifying = true;
+            this.errorMessage = null;
+            this.successMessage = null;
+            this.verificationStep = 'Preparing verification...';
+            
+            console.log('🔄 Starting verification process...');
     
     // Prepare common parameters
     const generator = formValue.toolName || 'Unknown';
     const prompt = formValue.prompt || '';
     const license = formValue.license || LicenseType.CreatorOwned;
     
+    console.log('⚙️ Parameters:', { generator, prompt, license });
+    
     let verification$;
     
-    if (this.selectedFile) {
-      // File upload verification
-      verification$ = this.verificationService.createProofFromFile(this.selectedFile, generator, prompt, license);
-    } else if (formValue.url) {
-      // URL verification
-      verification$ = this.verificationService.createProofFromUrl(formValue.url, generator, prompt, license);
-    } else {
-      this.isVerifying = false;
-      return;
-    }
+            if (this.selectedFile) {
+              console.log('📁 File upload verification selected');
+              this.verificationStep = 'Uploading file...';
+              // File upload verification
+              verification$ = this.verificationService.createProofFromFile(this.selectedFile, generator, prompt, license);
+            } else if (formValue.url) {
+              console.log('🔗 URL verification selected:', formValue.url);
+              this.verificationStep = 'Processing URL...';
+              // URL verification
+              verification$ = this.verificationService.createProofFromUrl(formValue.url, generator, prompt, license);
+            } else {
+              console.log('❌ No file or URL provided');
+              this.isVerifying = false;
+              return;
+            }
     
-    verification$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
+            console.log('📡 Making API call...');
+            this.verificationStep = 'Creating cryptographic proof...';
+            
+            verification$
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
         next: (result: CreateProofResponse) => {
-          // Redirect to the verify URL as specified in your requirements
-          window.location.href = result.verifyUrl;
+          console.log('✅ API Success!', result);
+          
+          // Force immediate UI update
+          setTimeout(() => {
+            this.verificationStep = 'Verification complete!';
+            this.successMessage = `🎉 Proof created successfully! Proof ID: ${result.proofId}`;
+            this.isVerifying = false;
+            this.createdProof = result;
+            
+            // Force change detection
+            this.cdr.detectChanges();
+            
+            console.log('✅ Proof created:', result.proofId);
+            console.log('🔗 Verify URL:', result.verifyUrl);
+            console.log('🏆 Badge URL:', result.badgeUrl);
+            console.log('🎉 SUCCESS MESSAGE SHOULD BE VISIBLE NOW!');
+          }, 100);
         },
         error: (error) => {
-          console.error('Verification failed:', error);
+          console.error('❌ API Error:', error);
+          console.error('❌ Error details:', {
+            status: error.status,
+            message: error.message,
+            error: error.error
+          });
           this.isVerifying = false;
-          // TODO: Show user-friendly error message
+          this.errorMessage = this.getErrorMessage(error);
+          console.log('💬 Error message shown to user:', this.errorMessage);
         }
       });
+  }
+
+  private getErrorMessage(error: any): string {
+    if (error.error?.message) {
+      return error.error.message;
+    }
+    if (error.message) {
+      return error.message;
+    }
+    if (error.status === 0) {
+      return 'Unable to connect to the server. Please check your internet connection.';
+    }
+    if (error.status === 400) {
+      return 'Invalid request. Please check your input and try again.';
+    }
+    if (error.status === 500) {
+      return 'Server error. Please try again later.';
+    }
+    return 'An unexpected error occurred. Please try again.';
   }
 
   private markFormGroupTouched(): void {
@@ -168,11 +236,22 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  resetForm(): void {
-    this.verificationForm.reset();
-    this.selectedFile = null;
-    this.verificationService.clearVerificationResult();
-  }
+          resetForm(): void {
+            this.verificationForm.reset();
+            this.selectedFile = null;
+            this.isVerifying = false;
+            this.errorMessage = null;
+            this.successMessage = null;
+            this.verificationStep = '';
+            this.createdProof = null;
+            this.verificationService.clearVerificationResult();
+          }
+
+          visitVerificationPage(): void {
+            if (this.createdProof) {
+              window.open(this.createdProof.verifyUrl, '_blank');
+            }
+          }
 
   formatFileSize(bytes: number): string {
     if (bytes === 0) return '0 Bytes';

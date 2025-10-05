@@ -9,7 +9,7 @@ import { Component, type OnInit } from '@angular/core';
       <div class="landing-card">
         <h2 class="card-title">
           <span class="gradient-text-primary">Verify origin. Prove consent.</span>
-          <span class="gradient-text-secondary">Publish with confidence.</span>
+          <span class="gradient-text-secondary"> Publish with confidence.</span>
         </h2>
         <p class="card-description">
           Truwit attaches cryptographic provenance, consent, and authenticity to digital media. 

@@ -11,7 +11,9 @@ import type { ApiResponse, ErrorResponse } from '../models';
 export class ApiService {
   private readonly apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('🔧 ApiService initialized with API URL:', this.apiUrl);
+  }
 
   get<T>(endpoint: string): Observable<ApiResponse<T>> {
     return this.http.get<ApiResponse<T>>(`${this.apiUrl}${endpoint}`).pipe(
@@ -21,7 +23,12 @@ export class ApiService {
   }
 
   post<T>(endpoint: string, data: any): Observable<ApiResponse<T>> {
-    return this.http.post<ApiResponse<T>>(`${this.apiUrl}${endpoint}`, data).pipe(
+    const fullUrl = `${this.apiUrl}${endpoint}`;
+    console.log('🌐 ApiService.post called:');
+    console.log('📍 URL:', fullUrl);
+    console.log('📤 Data:', data);
+    
+    return this.http.post<ApiResponse<T>>(fullUrl, data).pipe(
       catchError(this.handleError)
     );
   }

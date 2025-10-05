@@ -15,13 +15,22 @@ export class VerificationService {
 
   // New API methods matching your specification
   createProofFromUrl(url: string, generator: string, prompt: string, license: string): Observable<CreateProofResponse> {
+    console.log('🔗 VerificationService.createProofFromUrl called with:', { url, generator, prompt, license });
+    
     const request: CreateProofRequest = {
       input: { url },
       declared: { generator, prompt, license }
     };
     
+    console.log('📤 Sending request to API:', request);
+    
     return this.apiService.post<CreateProofResponse>('/v1/proofs', request).pipe(
-      map(response => response.data)
+      map(response => {
+        console.log('📥 API Response received:', response);
+        console.log('📥 Extracted data:', response.data);
+        // The API returns the data directly, not wrapped in a data property
+        return response.data || response;
+      })
     );
   }
 
@@ -31,13 +40,13 @@ export class VerificationService {
     formData.append('declared', JSON.stringify({ generator, prompt, license }));
     
     return this.apiService.post<CreateProofResponse>('/v1/proofs/file', formData).pipe(
-      map(response => response.data)
+      map(response => response.data || response)
     );
   }
 
   verifyProof(proofId: string): Observable<VerifyResponse> {
     return this.apiService.get<VerifyResponse>(`/v1/verify/${proofId}`).pipe(
-      map(response => response.data)
+      map(response => response.data || response)
     );
   }
 

@@ -1,5 +1,51 @@
 <form [formGroup]="verificationForm" (ngSubmit)="onSubmit()" class="verification-form">
-  <div class="form-section">
+  
+  <!-- Status Messages - Moved to be near the form -->
+  <div class="status-messages" *ngIf="errorMessage || successMessage || isVerifying">
+    <!-- Loading State -->
+    <div class="status-message loading" *ngIf="isVerifying">
+      <div class="spinner"></div>
+      <div class="loading-content">
+        <span class="loading-title">🔄 Verifying Your Content</span>
+        <span class="loading-subtitle">{{ verificationStep }}</span>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Success Message -->
+    <div class="status-message success" *ngIf="successMessage">
+      <div class="success-content">
+        <div class="success-icon">🎉</div>
+        <div class="success-text">
+          <span class="success-title">Proof Created Successfully!</span>
+          <span class="success-subtitle">{{ successMessage }}</span>
+          <div class="success-actions" *ngIf="createdProof">
+            <button class="btn-primary" (click)="visitVerificationPage()">
+              View Verification Details
+            </button>
+            <button class="btn-secondary" (click)="resetForm()">
+              Create Another Proof
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Error Message -->
+    <div class="status-message error" *ngIf="errorMessage">
+      <div class="error-content">
+        <div class="error-icon">⚠️</div>
+        <div class="error-text">
+          <span class="error-title">Verification Failed</span>
+          <span class="error-subtitle">{{ errorMessage }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section" *ngIf="!createdProof">
     <h3 class="section-title">Video Content Verification</h3>
     
     <!-- URL Input -->
@@ -11,13 +57,18 @@
           formControlName="url"
           placeholder="https://example.com/video.mp4" 
           class="url-input"
+          [disabled]="isVerifying"
           (input)="onUrlChange()">
         <button 
           type="button" 
-          class="btn-primary"
-          [disabled]="!verificationForm.get('url')?.valid || isVerifying">
+          class="btn-url-verify"
+          [disabled]="!verificationForm.get('url')?.valid || isVerifying"
+          (click)="onSubmit()">
           Verify URL
         </button>
+      </div>
+      <div class="url-help-text">
+        <small>Click "Verify URL" to check if the URL is valid, or scroll down to "Generate Proof" to create a verification proof</small>
       </div>
     </div>
 
@@ -26,11 +77,12 @@
     <!-- File Upload -->
     <div class="input-group">
       <label class="input-label">Upload video file</label>
-      <input 
-        type="file" 
-        class="file-input"
-        accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.m4v,.3gp,.flv,.wmv"
-        (change)="onFileSelected($event)">
+              <input 
+                type="file" 
+                class="file-input"
+                accept="video/*,.mp4,.mov,.avi,.mkv,.webm,.m4v,.3gp,.flv,.wmv"
+                [disabled]="isVerifying"
+                (change)="onFileSelected($event)">
       <div class="file-info" *ngIf="selectedFile">
         Selected: {{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})
       </div>
@@ -38,7 +90,7 @@
   </div>
 
   <!-- Metadata Section -->
-  <div class="form-section">
+  <div class="form-section" *ngIf="!createdProof">
     <h3 class="section-title">Metadata (Optional)</h3>
     
     <div class="metadata-grid">
@@ -48,6 +100,7 @@
           formControlName="prompt"
           placeholder="Describe the prompt used to generate this content..."
           class="textarea-input"
+          [disabled]="isVerifying"
           rows="3">
         </textarea>
       </div>
@@ -58,7 +111,8 @@
           type="text" 
           formControlName="toolName"
           placeholder="e.g., Sora, Midjourney, DALL-E"
-          class="text-input">
+          class="text-input"
+          [disabled]="isVerifying">
       </div>
 
       <div class="input-group">
@@ -67,12 +121,13 @@
           type="text" 
           formControlName="toolVersion"
           placeholder="e.g., v2, 5.2"
-          class="text-input">
+          class="text-input"
+          [disabled]="isVerifying">
       </div>
 
       <div class="input-group">
         <label class="input-label">License Type</label>
-        <select formControlName="license" class="select-input">
+        <select formControlName="license" class="select-input" [disabled]="isVerifying">
           <option *ngFor="let license of licenseTypes" [value]="license.value">
             {{ license.label }}
           </option>
@@ -82,20 +137,26 @@
   </div>
 
   <!-- Action Buttons -->
-  <div class="form-actions">
-    <button 
-      type="button" 
-      class="btn-secondary"
-      (click)="resetForm()"
-      [disabled]="isVerifying">
-      Reset
-    </button>
-    <button 
-      type="submit" 
-      class="btn-primary"
-      [disabled]="verificationForm.invalid || isVerifying">
-      <span *ngIf="isVerifying">Verifying...</span>
-      <span *ngIf="!isVerifying">Generate Proof</span>
-    </button>
+  <div class="form-actions" *ngIf="!createdProof">
+    <div class="action-section">
+      <h4 class="action-title">Ready to Create Proof?</h4>
+      <p class="action-description">Generate a cryptographic proof for your content</p>
+      <div class="action-buttons">
+        <button 
+          type="submit" 
+          class="btn-generate-proof"
+          [disabled]="verificationForm.invalid || isVerifying">
+          <span *ngIf="isVerifying">Creating Proof...</span>
+          <span *ngIf="!isVerifying">🚀 Generate Proof</span>
+        </button>
+        <button 
+          type="button" 
+          class="btn-secondary"
+          (click)="resetForm()"
+          [disabled]="isVerifying">
+          Reset Form
+        </button>
+      </div>
+    </div>
   </div>
 </form>
