@@ -1,14 +1,14 @@
 .verification-form {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .form-section {
-  margin-bottom: 1.5rem;
-  padding: 1.5rem;
+  margin-bottom: 1.0rem;
+  padding: 1.0rem;
   background: rgba(14, 27, 53, 0.4);
   border: 1px solid rgba(14, 165, 233, 0.2);
   border-radius: 16px;
@@ -93,6 +93,7 @@
 
 .file-input {
   width: 100%;
+  max-width: 100%;
   padding: 0.875rem 1rem;
   background: rgba(11, 18, 32, 0.8);
   border: 2px dashed rgba(14, 165, 233, 0.3);
@@ -100,6 +101,7 @@
   color: #e6eefc;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
 .file-input:hover {
