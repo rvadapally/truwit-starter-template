@@ -26,7 +26,12 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "baseHref": "/app/"
+            "baseHref": "/"
+          },
+          "configurations": {
+            "production": {
+              "baseHref": "/app/"
+            }
           }
         },
         "serve": {
