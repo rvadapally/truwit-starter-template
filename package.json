@@ -1,39 +1,39 @@
 {
-  "name": "truwit-site",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Truwit — Where Provenance Meets Proof. Redefining trust in the age of AI.",
-  "author": "Truwit",
-  "license": "UNLICENSED",
-  "cloudflare": {
-    "label": "Truwit Website",
-    "products": [
-      "Workers"
-    ],
-    "categories": [],
-    "preview_icon_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/394ca3c9-d351-4036-035a-9f6dfa26dd00/public",
-    "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/f40a6577-eed5-4f3e-cef4-b5ef0a1be100/preview",
-    "publish": true
-  },
-  "dependencies": {
-    "@astrojs/cloudflare": "12.6.0",
-    "@astrojs/mdx": "4.3.0",
-    "@astrojs/rss": "4.0.11",
-    "@astrojs/sitemap": "3.4.1",
-    "astro": "5.10.1",
-    "typescript": "5.8.3"
-  },
-  "devDependencies": {
-    "wrangler": "4.21.x"
+  "name": "@example/truwit-integrated",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=18.0.0"
   },
   "scripts": {
-    "astro": "astro",
-    "build": "astro build",
-    "cf-typegen": "wrangler types",
-    "check": "astro build && tsc && wrangler deploy --dry-run",
-    "deploy": "wrangler deploy",
     "dev": "astro dev",
-    "preview": "astro build && wrangler dev"
+    "dev:app": "cd app && npm start",
+    "dev:both": "concurrently \"npm run dev:app\" \"npm run dev\"",
+    "start": "astro dev",
+    "build": "npm run build:app && npm run build:astro && npm run integrate",
+    "build:astro": "astro check && astro build",
+    "build:app": "cd app && npm install && npm run build -- --base-href=/app/",
+    "integrate": "node build-integration.js",
+    "preview": "astro preview",
+    "astro": "astro",
+    "deploy": "npm run build && npx wrangler pages deploy ./dist --project-name=truwit-starter-template"
   },
-  "type": "module"
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/sitemap": "^3.2.1",
+    "astro": "^4.16.18",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241218.0",
+    "concurrently": "^8.2.2",
+    "rollup": "^4.28.1",
+    "wrangler": "^3.95.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.28.1",
+    "@rollup/rollup-linux-x64-musl": "^4.28.1",
+    "@rollup/rollup-darwin-x64": "^4.28.1",
+    "@rollup/rollup-win32-x64-msvc": "^4.28.1"
+  }
 }

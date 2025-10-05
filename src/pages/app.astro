@@ -1,0 +1,104 @@
+---
+// Serve Angular app directly
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Truwit Verification App</title>
+  <base href="/app/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(1200px 600px at 70% -10%, #0e1b35 0%, #0b1220 60%);
+      color: #e6eefc;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      min-height: 100vh;
+    }
+    
+    .loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(14, 165, 233, 0.3);
+      border-top: 4px solid #0ea5e9;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+      color: #0ea5e9;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .loading-subtitle {
+      color: #9fb3d9;
+      font-size: 0.9rem;
+    }
+    
+    .fallback-link {
+      margin-top: 2rem;
+    }
+    
+    .fallback-link a {
+      color: #22c55e;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      border-radius: 12px;
+      font-weight: 600;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div class="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading Verification App...</div>
+    <div class="loading-subtitle">Please wait while the app initializes</div>
+    
+    <div class="fallback-link">
+      <a href="/app/" target="_blank">Open Angular App Directly</a>
+    </div>
+  </div>
+  
+  <app-root></app-root>
+  
+  <!-- Fallback script -->
+  <script>
+    // If Angular doesn't load within 5 seconds, show fallback
+    setTimeout(() => {
+      const appRoot = document.querySelector('app-root');
+      const loadingText = document.querySelector('.loading-text');
+      const loadingSubtitle = document.querySelector('.loading-subtitle');
+      const fallbackLink = document.querySelector('.fallback-link') as HTMLElement;
+      
+      if (appRoot && !appRoot.hasChildNodes()) {
+        if (loadingText) loadingText.textContent = 'Angular app not loaded';
+        if (loadingSubtitle) loadingSubtitle.textContent = 'Click the link below to open the Angular app directly';
+        if (fallbackLink) fallbackLink.style.display = 'block';
+      }
+    }, 5000);
+  </script>
+</body>
+</html>

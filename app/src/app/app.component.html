@@ -1,0 +1,22 @@
+<div class="main-container">
+  <!-- Navigation Header (hidden on public verify pages) -->
+  <header class="header" *ngIf="!currentRoute.startsWith('/t/')">
+    <nav class="nav">
+      <div class="nav-brand">
+        <img src="assets/verified-by-truwit.png" alt="Truwit Logo" class="nav-logo" />
+        <h1 class="brand-name" routerLink="/">Truwit</h1>
+      </div>
+      <div class="nav-links">
+        <a routerLink="/" class="nav-link" [class.active]="currentRoute === '/'">Home</a>
+        <a routerLink="/verify" class="nav-link" [class.active]="currentRoute === '/verify'">Verify</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Router Outlet for all routes -->
+  <router-outlet></router-outlet>
+
+  <footer class="footer" *ngIf="!currentRoute.startsWith('/t/')">
+    <p>© {{currentYear}} Truwit. All rights reserved.</p>
+  </footer>
+</div>

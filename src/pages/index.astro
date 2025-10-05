@@ -4,7 +4,7 @@ import BaseHead from '../components/BaseHead.astro';
 
 <html lang="en">
   <head>
-    <BaseHead title="Truwit — Where Provenance Meets Proof" />
+    <BaseHead title="Truwit — Where Provenance Meets Proof" description="Redefining trust in the age of AI. Truwit attaches cryptographic provenance, consent, and authenticity to digital media." />
     <meta name="description" content="Redefining trust in the age of AI. Truwit attaches cryptographic provenance, consent, and authenticity to digital media.">
     <meta property="og:title" content="Truwit — Where Provenance Meets Proof" />
     <meta property="og:description" content="Redefining trust in the age of AI. Truwit attaches cryptographic provenance, consent, and authenticity to digital media." />
@@ -33,7 +33,14 @@ import BaseHead from '../components/BaseHead.astro';
           </p>
 
           <div class="cta-section">
-            <a href="https://x.com/TruwitAi" target="_blank" rel="noopener" class="cta-button">
+            <a href="/app/" target="_blank" class="cta-button cta-button-primary">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="cta-icon">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Try Verification App
+            </a>
+            
+            <a href="https://x.com/TruwitAi" target="_blank" rel="noopener" class="cta-button cta-button-secondary">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="cta-icon">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
@@ -204,20 +211,37 @@ import BaseHead from '../components/BaseHead.astro';
         padding: 1rem 2rem;
         border-radius: 16px;
         text-decoration: none;
-        color: #08111f;
-        background: linear-gradient(135deg, #0ea5e9, #22c55e);
         font-weight: 700;
         font-size: 1.1rem;
-        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
         transition: all 0.3s ease;
         border: none;
         cursor: pointer;
       }
 
-      .cta-button:hover {
+      .cta-button-primary {
+        color: #08111f;
+        background: linear-gradient(135deg, #0ea5e9, #22c55e);
+        box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+      }
+
+      .cta-button-primary:hover {
         transform: translateY(-2px);
         box-shadow: 0 15px 40px rgba(34, 197, 94, 0.4);
         background: linear-gradient(135deg, #0284c7, #16a34a);
+      }
+
+      .cta-button-secondary {
+        color: #e6eefc;
+        background: rgba(14, 165, 233, 0.15);
+        border: 2px solid rgba(14, 165, 233, 0.3);
+        box-shadow: 0 10px 30px rgba(14, 165, 233, 0.2);
+      }
+
+      .cta-button-secondary:hover {
+        transform: translateY(-2px);
+        background: rgba(14, 165, 233, 0.25);
+        border-color: rgba(14, 165, 233, 0.5);
+        box-shadow: 0 15px 40px rgba(14, 165, 233, 0.3);
       }
 
       .cta-icon {
