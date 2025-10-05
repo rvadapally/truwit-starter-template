@@ -2,6 +2,9 @@
   "name": "@example/truwit-integrated",
   "type": "module",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "dev": "astro dev",
     "dev:app": "cd app && npm start",
@@ -24,6 +27,13 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0",
     "concurrently": "^8.2.2",
+    "rollup": "^4.28.1",
     "wrangler": "^3.95.0"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "^4.28.1",
+    "@rollup/rollup-linux-x64-musl": "^4.28.1",
+    "@rollup/rollup-darwin-x64": "^4.28.1",
+    "@rollup/rollup-win32-x64-msvc": "^4.28.1"
   }
 }
