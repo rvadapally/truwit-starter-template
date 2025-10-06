@@ -5,10 +5,10 @@ import { VerificationService, VerificationStep, CreateProofFromUrlResponse, Crea
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-verification',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
+    selector: 'app-verification',
+    standalone: true,
+    imports: [CommonModule, FormsModule],
+    template: `
     <div class="verification-container">
       <div class="card">
         <h2>Verify origin. Prove consent. Publish with confidence.</h2>
@@ -145,7 +145,7 @@ import { Subscription } from 'rxjs';
       </div>
     </div>
   `,
-  styles: [`
+    styles: [`
     .verification-container {
       max-width: 800px;
       margin: 0 auto;
@@ -438,133 +438,133 @@ import { Subscription } from 'rxjs';
   `]
 })
 export class VerificationComponent implements OnInit, OnDestroy {
-  urlInput = '';
-  likenessOwnerName = '';
-  consentEvidenceUrl = '';
-  showOptionalFields = false;
-  verificationSteps: VerificationStep[] = [];
-  result: CreateProofFromUrlResponse | CreateProofFromFileResponse | null = null;
-  error: string | null = null;
-  isProcessing = false;
-  
-  private subscriptions: Subscription[] = [];
+    urlInput = '';
+    likenessOwnerName = '';
+    consentEvidenceUrl = '';
+    showOptionalFields = false;
+    verificationSteps: VerificationStep[] = [];
+    result: CreateProofFromUrlResponse | CreateProofFromFileResponse | null = null;
+    error: string | null = null;
+    isProcessing = false;
 
-  constructor(private verificationService: VerificationService) {}
+    private subscriptions: Subscription[] = [];
 
-  ngOnInit(): void {
-    this.subscriptions.push(
-      this.verificationService.verificationSteps$.subscribe(steps => {
-        this.verificationSteps = steps;
-      })
-    );
-  }
+    constructor(private verificationService: VerificationService) { }
 
-  ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
-  }
+    ngOnInit(): void {
+        this.subscriptions.push(
+            this.verificationService.verificationSteps$.subscribe(steps => {
+                this.verificationSteps = steps;
+            })
+        );
+    }
 
-  verifyUrl(): void {
-    if (!this.urlInput || this.isProcessing) return;
-    
-    this.isProcessing = true;
-    this.error = null;
-    this.result = null;
-    
-    const idempotencyKey = this.generateIdempotencyKey();
-    
-    this.verificationService.createProofFromUrl(this.urlInput, idempotencyKey).subscribe({
-      next: (response) => {
-        this.result = response;
+    ngOnDestroy(): void {
+        this.subscriptions.forEach(sub => sub.unsubscribe());
+    }
+
+    verifyUrl(): void {
+        if (!this.urlInput || this.isProcessing) return;
+
+        this.isProcessing = true;
+        this.error = null;
+        this.result = null;
+
+        const idempotencyKey = this.generateIdempotencyKey();
+
+        this.verificationService.createProofFromUrl(this.urlInput, idempotencyKey).subscribe({
+            next: (response) => {
+                this.result = response;
+                this.isProcessing = false;
+                this.verificationService.clearSteps();
+            },
+            error: (err) => {
+                this.error = err.error?.message || 'Verification failed';
+                this.isProcessing = false;
+                this.verificationService.setError('verifying', this.error);
+            }
+        });
+    }
+
+    onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            this.verifyFile(input.files[0]);
+        }
+    }
+
+    verifyFile(file: File): void {
+        if (this.isProcessing) return;
+
+        this.isProcessing = true;
+        this.error = null;
+        this.result = null;
+
+        const request = {
+            likenessOwnerName: this.likenessOwnerName || undefined,
+            consentEvidenceUrl: this.consentEvidenceUrl || undefined
+        };
+
+        this.verificationService.createProofFromFile(file, request).subscribe({
+            next: (response) => {
+                this.result = response;
+                this.isProcessing = false;
+                this.verificationService.clearSteps();
+            },
+            error: (err) => {
+                this.error = err.error?.message || 'File verification failed';
+                this.isProcessing = false;
+                this.verificationService.setError('uploading', this.error);
+            }
+        });
+    }
+
+    toggleOptionalFields(): void {
+        this.showOptionalFields = !this.showOptionalFields;
+    }
+
+    getStepNumber(step: VerificationStep): number {
+        return this.verificationSteps.indexOf(step) + 1;
+    }
+
+    viewProofPage(): void {
+        if (this.result) {
+            window.open(`/t/${this.result.trustmarkId}`, '_blank');
+        }
+    }
+
+    downloadReceipt(): void {
+        if (this.result) {
+            // This would trigger a download of the PDF receipt
+            console.log('Download receipt for:', this.result.proofId);
+        }
+    }
+
+    copyEmbedBadge(): void {
+        if (this.result) {
+            const badgeUrl = `${window.location.origin}/badges/${this.result.trustmarkId}.png`;
+            navigator.clipboard.writeText(`<img src="${badgeUrl}" alt="Verified by Truwit" />`);
+            // Show a toast notification
+            console.log('Embed badge copied to clipboard');
+        }
+    }
+
+    reset(): void {
+        this.urlInput = '';
+        this.likenessOwnerName = '';
+        this.consentEvidenceUrl = '';
+        this.showOptionalFields = false;
+        this.result = null;
+        this.error = null;
         this.isProcessing = false;
         this.verificationService.clearSteps();
-      },
-      error: (err) => {
-        this.error = err.error?.message || 'Verification failed';
-        this.isProcessing = false;
-        this.verificationService.setError('verifying', this.error);
-      }
-    });
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.verifyFile(input.files[0]);
     }
-  }
 
-  verifyFile(file: File): void {
-    if (this.isProcessing) return;
-    
-    this.isProcessing = true;
-    this.error = null;
-    this.result = null;
-    
-    const request = {
-      likenessOwnerName: this.likenessOwnerName || undefined,
-      consentEvidenceUrl: this.consentEvidenceUrl || undefined
-    };
-    
-    this.verificationService.createProofFromFile(file, request).subscribe({
-      next: (response) => {
-        this.result = response;
-        this.isProcessing = false;
-        this.verificationService.clearSteps();
-      },
-      error: (err) => {
-        this.error = err.error?.message || 'File verification failed';
-        this.isProcessing = false;
-        this.verificationService.setError('uploading', this.error);
-      }
-    });
-  }
-
-  toggleOptionalFields(): void {
-    this.showOptionalFields = !this.showOptionalFields;
-  }
-
-  getStepNumber(step: VerificationStep): number {
-    return this.verificationSteps.indexOf(step) + 1;
-  }
-
-  viewProofPage(): void {
-    if (this.result) {
-      window.open(`/t/${this.result.trustmarkId}`, '_blank');
+    private generateIdempotencyKey(): string {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = Math.random() * 16 | 0;
+            const v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
-  }
-
-  downloadReceipt(): void {
-    if (this.result) {
-      // This would trigger a download of the PDF receipt
-      console.log('Download receipt for:', this.result.proofId);
-    }
-  }
-
-  copyEmbedBadge(): void {
-    if (this.result) {
-      const badgeUrl = `${window.location.origin}/badges/${this.result.trustmarkId}.png`;
-      navigator.clipboard.writeText(`<img src="${badgeUrl}" alt="Verified by Truwit" />`);
-      // Show a toast notification
-      console.log('Embed badge copied to clipboard');
-    }
-  }
-
-  reset(): void {
-    this.urlInput = '';
-    this.likenessOwnerName = '';
-    this.consentEvidenceUrl = '';
-    this.showOptionalFields = false;
-    this.result = null;
-    this.error = null;
-    this.isProcessing = false;
-    this.verificationService.clearSteps();
-  }
-
-  private generateIdempotencyKey(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  }
 }

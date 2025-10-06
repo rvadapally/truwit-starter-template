@@ -16,7 +16,9 @@ public class SqlMigrationRunner
     {
         _context = context;
         _logger = logger;
-        _migrationsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Migrations");
+        // Look for migrations in the project root, not the bin directory
+        var projectRoot = Directory.GetCurrentDirectory();
+        _migrationsPath = Path.Combine(projectRoot, "Data", "Migrations");
     }
 
     /// <summary>
@@ -65,10 +67,10 @@ public class SqlMigrationRunner
                 }
 
                 _logger.LogInformation("Executing migration: {FileName}", fileName);
-                
+
                 var sql = await File.ReadAllTextAsync(migrationFile);
                 await ExecuteMigrationAsync(connection, fileName, sql);
-                
+
                 _logger.LogInformation("Successfully executed migration: {FileName}", fileName);
             }
         }
@@ -97,7 +99,7 @@ public class SqlMigrationRunner
         var checkSql = "SELECT COUNT(*) FROM __SqlMigrations WHERE FileName = @fileName";
         using var command = new SqliteCommand(checkSql, connection);
         command.Parameters.AddWithValue("@fileName", fileName);
-        
+
         var count = Convert.ToInt32(await command.ExecuteScalarAsync());
         return count > 0;
     }

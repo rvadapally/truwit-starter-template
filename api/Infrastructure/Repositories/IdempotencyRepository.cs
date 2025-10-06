@@ -23,28 +23,28 @@ public class IdempotencyRepository : IIdempotencyRepository
     public async Task<(string? proofId, string? responseJson)> TryGetAsync(string idemKey)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         var sql = @"
             SELECT ProofId, ResponseJson 
             FROM Idempotency 
             WHERE IdemKey = @IdemKey";
-        
+
         var result = await connection.QueryFirstOrDefaultAsync<(string? ProofId, string? ResponseJson)>(sql, new { IdemKey = idemKey });
-        
+
         return (result.ProofId, result.ResponseJson);
     }
 
     public async Task InsertIfAbsentAsync(string idemKey)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         try
         {
             var sql = @"
                 INSERT INTO Idempotency (IdemKey, CreatedAt)
                 VALUES (@IdemKey, @CreatedAt)";
-            
-            await connection.ExecuteAsync(sql, new { IdemKey = idemKey, CreatedAt = DateTime.UtcNow });
+
+            await connection.ExecuteAsync(sql, new { IdemKey = idemKey, CreatedAt = DateTime.Now });
         }
         catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint violation
         {
@@ -56,12 +56,12 @@ public class IdempotencyRepository : IIdempotencyRepository
     public async Task UpdateResultAsync(string idemKey, string proofId, string responseJson)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         var sql = @"
             UPDATE Idempotency 
             SET ProofId = @ProofId, ResponseJson = @ResponseJson
             WHERE IdemKey = @IdemKey";
-        
+
         await connection.ExecuteAsync(sql, new { IdemKey = idemKey, ProofId = proofId, ResponseJson = responseJson });
     }
 }

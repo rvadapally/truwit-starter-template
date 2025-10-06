@@ -15,9 +15,9 @@ public class ProcessRunner : IProcessRunner
     }
 
     public async Task<(int code, string stdout, string stderr)> RunAsync(
-        string fileName, 
-        string args, 
-        int timeoutSecs, 
+        string fileName,
+        string args,
+        int timeoutSecs,
         CancellationToken ct = default)
     {
         try
@@ -35,7 +35,9 @@ public class ProcessRunner : IProcessRunner
             };
 
             using var process = new Process { StartInfo = startInfo };
-            
+
+            process.Start();
+
             var stdoutTask = Task.Run(async () =>
             {
                 var output = await process.StandardOutput.ReadToEndAsync();
@@ -48,17 +50,15 @@ public class ProcessRunner : IProcessRunner
                 return error;
             }, ct);
 
-            process.Start();
-
             var timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeoutSecs), ct);
             var processTask = Task.Run(() => process.WaitForExit(), ct);
 
             var completedTask = await Task.WhenAny(processTask, timeoutTask);
-            
+
             if (completedTask == timeoutTask)
             {
                 _logger.LogWarning("Process timed out after {TimeoutSecs}s: {FileName} {Args}", timeoutSecs, fileName, args);
-                
+
                 try
                 {
                     process.Kill();
@@ -67,7 +67,7 @@ public class ProcessRunner : IProcessRunner
                 {
                     _logger.LogWarning(ex, "Error killing timed out process");
                 }
-                
+
                 throw new TimeoutException($"Process timed out after {timeoutSecs} seconds");
             }
 
@@ -76,7 +76,7 @@ public class ProcessRunner : IProcessRunner
             var stderr = await stderrTask;
 
             _logger.LogDebug("Process completed with exit code {ExitCode}: {FileName}", process.ExitCode, fileName);
-            
+
             return (process.ExitCode, stdout, stderr);
         }
         catch (Exception ex)

@@ -8,7 +8,7 @@ public class LinkIndex
     public string Platform { get; set; } = string.Empty;
     public string CanonicalId { get; set; } = string.Empty;
     public string ProofId { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 /// <summary>
@@ -23,7 +23,7 @@ public class Asset
     public double? DurationSec { get; set; }
     public int? Width { get; set; }
     public int? Height { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 /// <summary>
@@ -41,8 +41,8 @@ public class Proof
     public string? PolicyJson { get; set; }
     public string? MetadataId { get; set; }
     public string? ReceiptId { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime UpdatedAt { get; set; } = DateTime.Now;
 }
 
 /// <summary>
@@ -57,7 +57,7 @@ public class Receipt
     public string ReceiptHash { get; set; } = string.Empty;
     public string? Signature { get; set; }
     public string? SignerPubKey { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }
 
 /// <summary>
@@ -68,5 +68,5 @@ public class Idempotency
     public string IdemKey { get; set; } = string.Empty;
     public string? ProofId { get; set; }
     public string? ResponseJson { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

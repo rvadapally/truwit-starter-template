@@ -27,6 +27,7 @@ public class ProofsController : ControllerBase
     private readonly IIdempotencyRepository _idempotencyRepo;
     private readonly IReceiptSigner _receiptSigner;
     private readonly IHasher _hasher;
+    private readonly IMediaDownloader _downloader;
     private readonly ILogger<ProofsController> _logger;
 
     public ProofsController(
@@ -41,6 +42,7 @@ public class ProofsController : ControllerBase
         IIdempotencyRepository idempotencyRepo,
         IReceiptSigner receiptSigner,
         IHasher hasher,
+        IMediaDownloader downloader,
         ILogger<ProofsController> logger)
     {
         _verificationService = verificationService;
@@ -54,6 +56,7 @@ public class ProofsController : ControllerBase
         _idempotencyRepo = idempotencyRepo;
         _receiptSigner = receiptSigner;
         _hasher = hasher;
+        _downloader = downloader;
         _logger = logger;
     }
 
@@ -65,8 +68,11 @@ public class ProofsController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(request.Url))
+            _logger.LogInformation("🚀 CreateProofFromUrl called with URL: {Url}", request?.Url);
+
+            if (string.IsNullOrEmpty(request?.Url))
             {
+                _logger.LogWarning("❌ URL is null or empty");
                 return BadRequest(new ApiResponse<object>
                 {
                     Success = false,
@@ -77,28 +83,33 @@ public class ProofsController : ControllerBase
 
             // Check idempotency key
             var idempotencyKey = Request.Headers["Idempotency-Key"].FirstOrDefault();
+            _logger.LogInformation("🔑 Idempotency key: {IdempotencyKey}", idempotencyKey ?? "none");
+
             if (!string.IsNullOrEmpty(idempotencyKey))
             {
                 var (existingProofId, existingResponse) = await _idempotencyRepo.TryGetAsync(idempotencyKey);
                 if (!string.IsNullOrEmpty(existingProofId) && !string.IsNullOrEmpty(existingResponse))
                 {
-                    _logger.LogInformation("Returning cached response for idempotency key: {IdemKey}", idempotencyKey);
+                    _logger.LogInformation("✅ Returning cached response for idempotency key: {IdemKey}", idempotencyKey);
                     var cachedResponse = JsonSerializer.Deserialize<CreateProofFromUrlResponse>(existingResponse);
                     return Ok(cachedResponse);
                 }
             }
 
             // Canonicalize URL and check for existing proof
+            _logger.LogInformation("🔍 Canonicalizing URL: {Url}", request.Url);
             var (platform, canonicalId) = _canonicalizer.Canonicalize(request.Url);
+            _logger.LogInformation("📍 Canonicalized to platform: {Platform}, ID: {CanonicalId}", platform, canonicalId);
+
             var existingProofIdFromIndex = await _linkIndexRepo.TryGetProofIdAsync(platform.ToString(), canonicalId);
-            
+
             if (!string.IsNullOrEmpty(existingProofIdFromIndex))
             {
                 var existingProof = await _proofsRepo.GetByIdAsync(existingProofIdFromIndex);
                 if (existingProof != null)
                 {
                     _logger.LogInformation("Found existing proof for URL: {Url}, ProofId: {ProofId}", request.Url, existingProofIdFromIndex);
-                    
+
                     var existingResponse = new CreateProofFromUrlResponse(
                         ProofId: existingProof.Id,
                         TrustmarkId: existingProof.TrustmarkId,
@@ -117,24 +128,68 @@ public class ProofsController : ControllerBase
             }
 
             // Create new proof
+            _logger.LogInformation("🆕 Creating new proof for URL: {Url}", request.Url);
             var proofId = Guid.NewGuid().ToString("N");
             var trustmarkId = GenerateShortId();
-            
+            _logger.LogInformation("🆔 Generated ProofId: {ProofId}, TrustmarkId: {TrustmarkId}", proofId, trustmarkId);
+
+            // Download and create asset
+            _logger.LogInformation("📥 Downloading video from URL: {Url}", request.Url);
+            var downloadedFilePath = await _downloader.DownloadAsync(request.Url);
+            var fileInfo = new FileInfo(downloadedFilePath);
+            _logger.LogInformation("✅ Download completed. File: {FilePath}, Size: {Size} bytes", downloadedFilePath, fileInfo.Length);
+
+            // Calculate SHA256 hash
+            var sha256 = await _hasher.Sha256Async(downloadedFilePath);
+            _logger.LogInformation("🔐 SHA256 calculated: {Sha256}", sha256);
+
+            // Check if asset already exists
+            var existingAsset = await _assetsRepo.GetBySha256Async(sha256);
+            string assetId;
+
+            if (existingAsset != null)
+            {
+                _logger.LogInformation("♻️ Reusing existing asset: {AssetId}", existingAsset.AssetId);
+                assetId = existingAsset.AssetId;
+            }
+            else
+            {
+                // Create new asset
+                assetId = Guid.NewGuid().ToString("N");
+                var asset = new Asset
+                {
+                    AssetId = assetId,
+                    Sha256 = sha256,
+                    MediaType = "video/mp4", // Default for downloaded videos
+                    Bytes = fileInfo.Length,
+                    DurationSec = null, // We don't have duration info from yt-dlp
+                    Width = null, // We don't have dimensions info from yt-dlp
+                    Height = null,
+                    CreatedAt = DateTime.Now
+                };
+                await _assetsRepo.InsertAsync(asset);
+                _logger.LogInformation("🆕 Created new asset: {AssetId}", assetId);
+            }
+
             // Try hosted verifier first
+            _logger.LogInformation("🔍 Starting C2PA verification for URL: {Url}", request.Url);
             var c2paResult = await _c2paVerifier.VerifyFromUrlAsync(request.Url);
-            
+            _logger.LogInformation("✅ C2PA verification completed. Manifest found: {ManifestFound}, Status: {Status}",
+                c2paResult.ManifestFound, c2paResult.Status);
+
             // Create proof record
             var proof = new Proof
             {
                 Id = proofId,
                 TrustmarkId = trustmarkId,
+                AssetId = assetId,
                 C2paPresent = c2paResult.ManifestFound,
                 C2paJson = c2paResult.RawJson,
                 OriginStatus = c2paResult.Status ?? "not_found",
                 PolicyResult = "pass", // Stub for now
                 PolicyJson = "{}",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now,
+                UpdatedAt = DateTime.Now
             };
 
             await _proofsRepo.InsertAsync(proof);
@@ -150,7 +205,7 @@ public class ProofsController : ControllerBase
                 c2paPresent = c2paResult.ManifestFound,
                 originStatus = c2paResult.Status,
                 policyResult = "pass",
-                timestamp = DateTime.UtcNow
+                timestamp = DateTime.Now
             };
 
             var (signature, publicKey) = await _receiptSigner.SignReceiptAsync(receiptData);
@@ -164,7 +219,7 @@ public class ProofsController : ControllerBase
                 ReceiptHash = receiptHash,
                 Signature = signature,
                 SignerPubKey = publicKey,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
 
             await _receiptsRepo.InsertAsync(receipt);
@@ -193,11 +248,14 @@ public class ProofsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating proof from URL: {Url}", request.Url);
+            _logger.LogError(ex, "❌ Error creating proof from URL: {Url}", request?.Url);
+            _logger.LogError("❌ Exception details: {ExceptionType}: {ExceptionMessage}", ex.GetType().Name, ex.Message);
+            _logger.LogError("❌ Stack trace: {StackTrace}", ex.StackTrace);
+
             return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
             {
                 Success = false,
-                Message = "Internal server error",
+                Message = $"Internal server error: {ex.Message}",
                 Status = StatusCodes.Status500InternalServerError
             });
         }
@@ -205,11 +263,9 @@ public class ProofsController : ControllerBase
 
     private string GenerateShortId()
     {
-        // Generate a short, URL-safe ID (8 characters)
-        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        var random = new Random();
-        return new string(Enumerable.Repeat(chars, 8)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
+        // Generate a short, URL-safe ID using Guid (8 characters)
+        // Using Guid ensures uniqueness
+        return Guid.NewGuid().ToString("N").Substring(0, 8);
     }
 
     [HttpPost("proofs/file-upload")]
@@ -242,7 +298,7 @@ public class ProofsController : ControllerBase
             {
                 // Compute SHA256 hash
                 var sha256 = await _hasher.Sha256Async(tempPath);
-                
+
                 // Check if asset already exists
                 var existingAsset = await _assetsRepo.GetBySha256Async(sha256);
                 string assetId;
@@ -264,7 +320,7 @@ public class ProofsController : ControllerBase
                         Sha256 = sha256,
                         MediaType = file.ContentType,
                         Bytes = file.Length,
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.Now
                     };
                     await _assetsRepo.InsertAsync(asset);
                 }
@@ -272,7 +328,7 @@ public class ProofsController : ControllerBase
                 // Create proof
                 var proofId = Guid.NewGuid().ToString("N");
                 var trustmarkId = GenerateShortId();
-                
+
                 var proof = new Proof
                 {
                     Id = proofId,
@@ -282,7 +338,7 @@ public class ProofsController : ControllerBase
                     OriginStatus = "pending",
                     PolicyResult = "pass",
                     PolicyJson = "{}",
-                    CreatedAt = DateTime.UtcNow,
+                    CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.UtcNow
                 };
 
@@ -300,7 +356,7 @@ public class ProofsController : ControllerBase
                     fileSize = file.Length,
                     likenessOwnerName = request.LikenessOwnerName,
                     consentEvidenceUrl = request.ConsentEvidenceUrl,
-                    timestamp = DateTime.UtcNow
+                    timestamp = DateTime.Now
                 };
 
                 var (signature, publicKey) = await _receiptSigner.SignReceiptAsync(receiptData);
@@ -314,7 +370,7 @@ public class ProofsController : ControllerBase
                     ReceiptHash = receiptHash,
                     Signature = signature,
                     SignerPubKey = publicKey,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now
                 };
 
                 await _receiptsRepo.InsertAsync(receipt);

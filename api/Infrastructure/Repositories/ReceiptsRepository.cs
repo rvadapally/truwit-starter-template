@@ -23,25 +23,25 @@ public class ReceiptsRepository : IReceiptsRepository
     public async Task<string> InsertAsync(Receipt receipt)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         var sql = @"
             INSERT INTO Receipts (Id, ProofId, Json, PdfPath, ReceiptHash, Signature, SignerPubKey, CreatedAt)
             VALUES (@Id, @ProofId, @Json, @PdfPath, @ReceiptHash, @Signature, @SignerPubKey, @CreatedAt)";
-        
+
         await connection.ExecuteAsync(sql, receipt);
-        
+
         return receipt.Id;
     }
 
     public async Task<Receipt?> GetByProofIdAsync(string proofId)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         var sql = @"
             SELECT Id, ProofId, Json, PdfPath, ReceiptHash, Signature, SignerPubKey, CreatedAt
             FROM Receipts 
             WHERE ProofId = @ProofId";
-        
+
         return await connection.QueryFirstOrDefaultAsync<Receipt>(sql, new { ProofId = proofId });
     }
 }

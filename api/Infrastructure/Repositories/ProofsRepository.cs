@@ -23,37 +23,47 @@ public class ProofsRepository : IProofsRepository
     public async Task<string> InsertAsync(Proof proof)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         var sql = @"
             INSERT INTO Proofs (Id, TrustmarkId, AssetId, C2paPresent, C2paJson, OriginStatus, PolicyResult, PolicyJson, MetadataId, ReceiptId, CreatedAt, UpdatedAt)
-            VALUES (@Id, @TrustmarkId, @AssetId, @C2paPresent, @C2paJson, @OriginStatus, @PolicyResult, @PolicyJson, @MetadataId, @ReceiptId, @CreatedAt, @UpdatedAt)";
-        
+            VALUES (@Id, @TrustmarkId, @AssetId, @C2paPresent, @C2paJson, @OriginStatus, @PolicyResult, @PolicyJson, @MetadataId, @ReceiptId, @CreatedAt, @UpdatedAt)
+            ON CONFLICT(Id) DO UPDATE SET
+                AssetId = excluded.AssetId,
+                C2paPresent = excluded.C2paPresent,
+                C2paJson = excluded.C2paJson,
+                OriginStatus = excluded.OriginStatus,
+                PolicyResult = excluded.PolicyResult,
+                PolicyJson = excluded.PolicyJson,
+                MetadataId = excluded.MetadataId,
+                ReceiptId = excluded.ReceiptId,
+                UpdatedAt = excluded.UpdatedAt";
+
         await connection.ExecuteAsync(sql, proof);
-        
+
         return proof.Id;
     }
 
     public async Task<Proof?> GetByIdAsync(string id)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         var sql = @"
             SELECT Id, TrustmarkId, AssetId, C2paPresent, C2paJson, OriginStatus, PolicyResult, PolicyJson, MetadataId, ReceiptId, CreatedAt, UpdatedAt
             FROM Proofs 
             WHERE Id = @Id";
-        
+
         return await connection.QueryFirstOrDefaultAsync<Proof>(sql, new { Id = id });
     }
 
     public async Task<Proof?> GetByTrustmarkIdAsync(string trustmarkId)
     {
         using var connection = new SqliteConnection(_connectionString);
-        
+
         var sql = @"
             SELECT Id, TrustmarkId, AssetId, C2paPresent, C2paJson, OriginStatus, PolicyResult, PolicyJson, MetadataId, ReceiptId, CreatedAt, UpdatedAt
             FROM Proofs 
             WHERE TrustmarkId = @TrustmarkId";
-        
+
         return await connection.QueryFirstOrDefaultAsync<Proof>(sql, new { TrustmarkId = trustmarkId });
     }
 }
