@@ -1,0 +1,55 @@
+name: API Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'api/**' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'api/**' ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore api/HumanProof.Api.csproj
+      
+    - name: Build
+      run: dotnet build api/HumanProof.Api.csproj --no-restore
+      
+    - name: Test
+      run: dotnet test api/HumanProof.Api.csproj --no-build --verbosity normal
+      
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Publish
+      run: dotnet publish api/HumanProof.Api.csproj -c Release -o ./publish
+      
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+        package: ./publish

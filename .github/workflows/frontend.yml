@@ -1,0 +1,59 @@
+name: Frontend Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: |
+          truwit-integrated/package-lock.json
+          truwit-integrated/app/package-lock.json
+          
+    - name: Install dependencies
+      run: |
+        cd truwit-integrated
+        npm ci
+        
+    - name: Install Angular dependencies
+      run: |
+        cd truwit-integrated/app
+        npm ci
+        
+    - name: Build Angular app
+      run: |
+        cd truwit-integrated/app
+        npm run build -- --configuration=production
+        
+    - name: Build Astro site
+      run: |
+        cd truwit-integrated
+        npm run build:astro
+        
+    - name: Integrate builds
+      run: |
+        cd truwit-integrated
+        npm run integrate
+        
+    - name: Deploy to Cloudflare Pages
+      if: github.ref == 'refs/heads/main'
+      uses: cloudflare/pages-action@v1
+      with:
+        apiToken: ${{ secrets.CF_API_TOKEN }}
+        accountId: ${{ secrets.CF_ACCOUNT_ID }}
+        projectName: truwit-starter-template
+        directory: truwit-integrated/dist
+        gitHubToken: ${{ secrets.GITHUB_TOKEN }}

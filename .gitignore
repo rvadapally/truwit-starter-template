@@ -1,0 +1,9 @@
+
+web/node_modules/
+web/dist/
+api/bin/
+api/obj/
+storage/
+data/receipts/
+.DS_Store
+Thumbs.db

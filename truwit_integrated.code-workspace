@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Website"
+		}
+	],
+	"settings": {
+		"csharp.debug.symbolOptions.moduleFilter.includeSymbolsNextToModules": false,
+		"editor.fontSize": 16,
+		"editor.formatOnPaste": true,
+		"editor.formatOnSave": true
+	}
+}
