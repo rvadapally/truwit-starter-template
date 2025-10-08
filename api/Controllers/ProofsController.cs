@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using HumanProof.Api.Application.DTOs;
 using HumanProof.Api.Application.Services;
 using HumanProof.Api.Domain.Interfaces;
@@ -29,6 +30,9 @@ public class ProofsController : ControllerBase
     private readonly IHasher _hasher;
     private readonly IMediaDownloader _downloader;
     private readonly ILogger<ProofsController> _logger;
+    private readonly IOptionsSnapshot<FeatureFlags> _featureFlags;
+    private readonly DevC2paSigner _devC2paSigner;
+    private readonly IC2paLocalParser _c2paLocalParser;
 
     public ProofsController(
         IVerificationService verificationService,
@@ -43,7 +47,10 @@ public class ProofsController : ControllerBase
         IReceiptSigner receiptSigner,
         IHasher hasher,
         IMediaDownloader downloader,
-        ILogger<ProofsController> logger)
+        ILogger<ProofsController> logger,
+        IOptionsSnapshot<FeatureFlags> featureFlags,
+        DevC2paSigner devC2paSigner,
+        IC2paLocalParser c2paLocalParser)
     {
         _verificationService = verificationService;
         _c2paVerifier = c2paVerifier;
@@ -58,6 +65,9 @@ public class ProofsController : ControllerBase
         _hasher = hasher;
         _downloader = downloader;
         _logger = logger;
+        _featureFlags = featureFlags;
+        _devC2paSigner = devC2paSigner;
+        _c2paLocalParser = c2paLocalParser;
     }
 
     [HttpPost("proofs/url")]
@@ -325,6 +335,11 @@ public class ProofsController : ControllerBase
                     await _assetsRepo.InsertAsync(asset);
                 }
 
+                // Parse C2PA data from the uploaded file
+                var c2paResult = await _c2paLocalParser.ParseAsync(tempPath);
+                _logger.LogInformation("C2PA parsing completed for file {FileName}: ManifestFound={ManifestFound}",
+                    file.FileName, c2paResult.ManifestFound);
+
                 // Create proof
                 var proofId = Guid.NewGuid().ToString("N");
                 var trustmarkId = GenerateShortId();
@@ -334,8 +349,9 @@ public class ProofsController : ControllerBase
                     Id = proofId,
                     TrustmarkId = trustmarkId,
                     AssetId = assetId,
-                    C2paPresent = false, // Will be updated after C2PA check
-                    OriginStatus = "pending",
+                    C2paPresent = c2paResult.ManifestFound,
+                    C2paJson = c2paResult.RawJson,
+                    OriginStatus = c2paResult.ManifestFound ? "verified" : "not_found",
                     PolicyResult = "pass",
                     PolicyJson = "{}",
                     CreatedAt = DateTime.Now,
@@ -384,7 +400,16 @@ public class ProofsController : ControllerBase
                     TrustmarkId: proof.TrustmarkId,
                     VerifyUrl: $"/t/{proof.TrustmarkId}",
                     AssetId: assetId,
-                    AssetReused: assetReused
+                    AssetReused: assetReused,
+                    C2pa: c2paResult.ManifestFound,
+                    Origin: c2paResult.ManifestFound ? new OriginInfo(
+                        C2pa: true,
+                        Status: "verified",
+                        ClaimGenerator: c2paResult.ClaimGenerator,
+                        Issuer: c2paResult.Issuer,
+                        Timestamp: c2paResult.ClaimedAt,
+                        Sha256: sha256
+                    ) : null
                 );
 
                 return Ok(response);
@@ -455,6 +480,104 @@ public class ProofsController : ControllerBase
         {
             _logger.LogError(ex, "Error verifying proof: {TrustmarkId}", trustmarkId);
             return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// DEV-ONLY: Sign an MP4 file with C2PA for testing purposes
+    /// </summary>
+    [HttpPost("dev/sign")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<ActionResult<object>> DevSignFile(IFormFile file)
+    {
+        try
+        {
+            // Guard: Only allow in Development with SyntheticSignTool enabled
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Development" ||
+                !_featureFlags.Value.SyntheticSignTool)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Dev signing is only available in Development mode with SyntheticSignTool enabled",
+                    Status = StatusCodes.Status403Forbidden
+                });
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "File is required",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // Validate file type (MP4 only for signing)
+            if (file.ContentType != "video/mp4")
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Only MP4 files can be signed",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // Save uploaded file to temp location
+            var tempInputPath = Path.GetTempFileName() + ".mp4";
+            var tempOutputPath = Path.GetTempFileName() + "_signed.mp4";
+
+            try
+            {
+                using (var stream = new FileStream(tempInputPath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                // Sign the file
+                var success = await _devC2paSigner.SignFileAsync(tempInputPath, tempOutputPath);
+
+                if (!success)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Failed to sign file",
+                        Status = StatusCodes.Status500InternalServerError
+                    });
+                }
+
+                var fileInfo = new FileInfo(tempOutputPath);
+
+                return Ok(new
+                {
+                    signedPath = tempOutputPath,
+                    sizeBytes = fileInfo.Length,
+                    message = "File signed successfully"
+                });
+            }
+            finally
+            {
+                // Clean up temp input file
+                if (System.IO.File.Exists(tempInputPath))
+                {
+                    System.IO.File.Delete(tempInputPath);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in dev sign endpoint");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
+            {
+                Success = false,
+                Message = "An error occurred while signing the file",
+                Status = StatusCodes.Status500InternalServerError
+            });
         }
     }
 
@@ -662,6 +785,26 @@ public class ProofsController : ControllerBase
                 });
             }
 
+            // MIME type validation with feature flag support
+            var allowedMimeTypes = new List<string> { "video/mp4", "video/avi", "video/mov", "video/webm" };
+
+            // In Development with DevImageTestMode enabled, also allow images
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&
+                _featureFlags.Value.DevImageTestMode)
+            {
+                allowedMimeTypes.AddRange(new[] { "image/jpeg", "image/png" });
+            }
+
+            if (!allowedMimeTypes.Contains(file.ContentType))
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = $"Unsupported file type: {file.ContentType}. Allowed types: {string.Join(", ", allowedMimeTypes)}",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
             var declaredData = System.Text.Json.JsonSerializer.Deserialize<DeclaredDataDto>(declared);
 
             if (declaredData == null ||
@@ -701,7 +844,9 @@ public class ProofsController : ControllerBase
             {
                 ProofId = result.ProofId,
                 VerifyUrl = $"http://localhost:4200/#/t/{result.ProofId}",
-                BadgeUrl = $"http://localhost:5000/badges/{result.ProofId}.png"
+                BadgeUrl = $"http://localhost:5000/badges/{result.ProofId}.png",
+                DevTestMode = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&
+                             _featureFlags.Value.DevImageTestMode
             };
 
             return Ok(response);
@@ -944,6 +1089,42 @@ public class ProofsController : ControllerBase
         {
             _logger.LogInformation("Fetching verification details for: {Id}", id);
 
+            // Try to get proof by trustmark ID first
+            var proof = await _proofsRepo.GetByTrustmarkIdAsync(id);
+            if (proof != null)
+            {
+                var asset = proof.AssetId != null ? await _assetsRepo.GetBySha256Async(proof.AssetId) : null;
+
+                var response = new VerifyResponseDto
+                {
+                    ProofId = proof.Id,
+                    Verdict = "green",
+                    ContentHash = asset?.Sha256 ?? "unknown",
+                    Mime = asset?.MediaType ?? "video/mp4",
+                    Duration = null,
+                    Resolution = null,
+                    Declared = new DeclaredDataDto
+                    {
+                        Generator = ExtractClaimGenerator(proof.C2paJson) ?? "Unknown",
+                        Prompt = "",
+                        License = "creator-owned"
+                    },
+                    IssuedAt = proof.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    SignatureStatus = proof.C2paPresent ? "valid" : "invalid",
+                    Origin = new OriginInfo(
+                        C2pa: proof.C2paPresent,
+                        Status: proof.OriginStatus,
+                        ClaimGenerator: ExtractClaimGenerator(proof.C2paJson),
+                        Issuer: ExtractIssuer(proof.C2paJson),
+                        Timestamp: ExtractTimestamp(proof.C2paJson),
+                        Sha256: asset?.Sha256
+                    )
+                };
+
+                return Ok(response);
+            }
+
+            // Fallback to verification service for legacy proofs
             var result = await _verificationService.GetProofDetailsAsync(id);
 
             if (result == null)
@@ -956,7 +1137,7 @@ public class ProofsController : ControllerBase
                 });
             }
 
-            var response = new VerifyResponseDto
+            var fallbackResponse = new VerifyResponseDto
             {
                 ProofId = result.ProofId,
                 Verdict = "green", // Mock verdict for POC
@@ -971,10 +1152,18 @@ public class ProofsController : ControllerBase
                     License = result.Metadata.License.ToString().ToLower().Replace("owned", "-owned")
                 },
                 IssuedAt = result.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssZ"),
-                SignatureStatus = result.IsValid ? "valid" : "invalid"
+                SignatureStatus = result.IsValid ? "valid" : "invalid",
+                Origin = new OriginInfo(
+                    C2pa: false,
+                    Status: "not_found",
+                    ClaimGenerator: null,
+                    Issuer: null,
+                    Timestamp: null,
+                    Sha256: result.ContentHash
+                )
             };
 
-            return Ok(response);
+            return Ok(fallbackResponse);
         }
         catch (Exception ex)
         {
@@ -1024,6 +1213,7 @@ public class CreateProofResponseDto
     public string ProofId { get; set; } = string.Empty;
     public string VerifyUrl { get; set; } = string.Empty;
     public string BadgeUrl { get; set; } = string.Empty;
+    public bool DevTestMode { get; set; } = false;
 }
 
 public class VerifyResponseDto
@@ -1037,4 +1227,5 @@ public class VerifyResponseDto
     public DeclaredDataDto Declared { get; set; } = null!;
     public string IssuedAt { get; set; } = string.Empty;
     public string SignatureStatus { get; set; } = string.Empty;
+    public OriginInfo? Origin { get; set; }
 }

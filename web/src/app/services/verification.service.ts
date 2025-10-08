@@ -25,6 +25,15 @@ export interface CreateProofFromFileResponse {
     verifyUrl: string;
     assetId: string;
     assetReused: boolean;
+    c2pa?: boolean;
+    origin?: {
+        c2pa: boolean;
+        status: string;
+        claimGenerator?: string;
+        issuer?: string;
+        timestamp?: string;
+        sha256?: string;
+    };
 }
 
 export interface VerifyProofResponse {

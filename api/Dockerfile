@@ -37,7 +37,10 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
 # Add startup script to log tool versions
-RUN echo '#!/bin/bash\necho "=== Tool Versions ==="\necho "yt-dlp: $(yt-dlp --version)"\necho "c2patool: $(c2patool --version)"\necho "ffmpeg: $(ffmpeg -version | head -1)"\necho "==================="\nexec "$@"' > /usr/local/bin/startup.sh \
+RUN echo '#!/bin/bash\necho "=== Tool Versions ==="\necho "yt-dlp: $(yt-dlp --version)"\necho "c2patool: $(c2patool --version)"\necho "ffmpeg: $(ffmpeg -version | head -1)"\necho "==================="\necho "Starting HumanProof API..."\nexec "$@"' > /usr/local/bin/startup.sh \
     && chmod +x /usr/local/bin/startup.sh
 
-ENTRYPOINT ["dotnet", "HumanProof.Api.dll"]
+# Create keys directory for dev keys (if needed)
+RUN mkdir -p /app/keys && chmod 755 /app/keys
+
+ENTRYPOINT ["/usr/local/bin/startup.sh", "dotnet", "HumanProof.Api.dll"]

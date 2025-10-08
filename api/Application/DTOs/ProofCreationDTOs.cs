@@ -33,5 +33,7 @@ public record CreateProofFromFileResponse(
     string TrustmarkId,
     string VerifyUrl,
     string AssetId,
-    bool AssetReused = false
+    bool AssetReused = false,
+    bool C2pa = false,
+    OriginInfo? Origin = null
 );

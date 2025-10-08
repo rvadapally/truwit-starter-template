@@ -68,6 +68,8 @@ try
     builder.Services.AddScoped<IHostedC2paVerifier, HostedC2paVerifier>();
     builder.Services.AddScoped<IMediaDownloader, YtDlpDownloader>();
     builder.Services.AddScoped<IC2paToolRunner, C2paToolRunner>();
+    builder.Services.AddScoped<IC2paLocalParser, C2paLocalParser>();
+    builder.Services.AddScoped<DevC2paSigner>();
     builder.Services.AddScoped<IHasher, Hasher>();
     builder.Services.AddScoped<IPlatformDetector, PlatformDetector>();
     builder.Services.AddScoped<IProcessRunner, ProcessRunner>();
@@ -78,6 +80,7 @@ try
     builder.Services.Configure<C2paOptions>(builder.Configuration.GetSection("C2pa"));
     builder.Services.Configure<DownloaderOptions>(builder.Configuration.GetSection("Downloader"));
     builder.Services.Configure<C2paToolOptions>(builder.Configuration.GetSection("C2paTool"));
+    builder.Services.Configure<FeatureFlags>(builder.Configuration.GetSection("Features"));
 
     // Register SQL migration runner
     builder.Services.AddScoped<SqlMigrationRunner>();
@@ -222,6 +225,113 @@ try
             timestamp = DateTime.Now,
             tools = toolVersions
         });
+    }).AllowAnonymous();
+
+    // Tools health check endpoint
+    app.MapGet("/health/tools", () =>
+    {
+        var toolVersions = new Dictionary<string, string>();
+        var allToolsWorking = true;
+
+        try
+        {
+            // Get yt-dlp version
+            var ytDlpProcess = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "yt-dlp",
+                Arguments = "--version",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            });
+            if (ytDlpProcess != null)
+            {
+                ytDlpProcess.WaitForExit(5000);
+                toolVersions["yt-dlp"] = ytDlpProcess.StandardOutput.ReadToEnd().Trim();
+            }
+        }
+        catch
+        {
+            toolVersions["yt-dlp"] = "unknown";
+            allToolsWorking = false;
+        }
+
+        try
+        {
+            // Get c2patool version - try full path first, then PATH
+            var c2paProcess = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "C:\\Tools\\c2patool\\c2patool.exe",
+                Arguments = "--version",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            });
+            if (c2paProcess != null)
+            {
+                c2paProcess.WaitForExit(5000);
+                toolVersions["c2patool"] = c2paProcess.StandardOutput.ReadToEnd().Trim();
+            }
+        }
+        catch
+        {
+            // Fallback to PATH
+            try
+            {
+                var c2paProcess = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "c2patool",
+                    Arguments = "--version",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                });
+                if (c2paProcess != null)
+                {
+                    c2paProcess.WaitForExit(5000);
+                    toolVersions["c2patool"] = c2paProcess.StandardOutput.ReadToEnd().Trim();
+                }
+            }
+            catch
+            {
+                toolVersions["c2patool"] = "unknown";
+                allToolsWorking = false;
+            }
+        }
+
+        try
+        {
+            // Get ffmpeg version (first line only)
+            var ffmpegProcess = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = "ffmpeg",
+                Arguments = "-version",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            });
+            if (ffmpegProcess != null)
+            {
+                ffmpegProcess.WaitForExit(5000);
+                var output = ffmpegProcess.StandardOutput.ReadToEnd();
+                var firstLine = output.Split('\n').FirstOrDefault()?.Trim();
+                toolVersions["ffmpeg"] = firstLine ?? "unknown";
+            }
+        }
+        catch
+        {
+            toolVersions["ffmpeg"] = "unknown";
+            allToolsWorking = false;
+        }
+
+        if (allToolsWorking)
+        {
+            return Results.Ok(toolVersions);
+        }
+        else
+        {
+            return Results.StatusCode(500);
+        }
     }).AllowAnonymous();
 
     // Badge endpoint
