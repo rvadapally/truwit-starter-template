@@ -1,46 +1,24 @@
+# Use the official .NET 8 runtime as the base image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    ffmpeg \
-    curl \
-    jq \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install yt-dlp
-RUN pip3 install --no-cache-dir yt-dlp
-
-# Install c2patool (Linux x64 release)
-RUN curl -L -o /usr/local/bin/c2patool https://github.com/contentauth/c2pa/releases/download/v2.2.0/c2patool-linux-x64 \
-    && chmod +x /usr/local/bin/c2patool
-
-# Create temp directory for downloads
-RUN mkdir -p /tmp/truwit_dl && chmod 777 /tmp/truwit_dl
-
 WORKDIR /app
-
-# Copy published application
-COPY ./publish/ ./
-
-# Set environment variables
-ENV ASPNETCORE_URLS=http://+:8080
-ENV ASPNETCORE_ENVIRONMENT=Production
-
-# Expose port
 EXPOSE 8080
+EXPOSE 8081
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/health || exit 1
+# Use the .NET 8 SDK for building
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["HumanProof.Api.csproj", "."]
+RUN dotnet restore "HumanProof.Api.csproj"
+COPY . .
+WORKDIR "/src"
+RUN dotnet build "HumanProof.Api.csproj" -c Release -o /app/build
 
-# Add startup script to log tool versions
-RUN echo '#!/bin/bash\necho "=== Tool Versions ==="\necho "yt-dlp: $(yt-dlp --version)"\necho "c2patool: $(c2patool --version)"\necho "ffmpeg: $(ffmpeg -version | head -1)"\necho "==================="\necho "Starting HumanProof API..."\nexec "$@"' > /usr/local/bin/startup.sh \
-    && chmod +x /usr/local/bin/startup.sh
+# Publish the application
+FROM build AS publish
+RUN dotnet publish "HumanProof.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
-# Create keys directory for dev keys (if needed)
-RUN mkdir -p /app/keys && chmod 755 /app/keys
-
-ENTRYPOINT ["/usr/local/bin/startup.sh", "dotnet", "HumanProof.Api.dll"]
+# Create the final runtime image
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "HumanProof.Api.dll"]

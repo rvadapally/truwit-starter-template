@@ -1,0 +1,27 @@
+name = "truwit-api"
+compatibility_date = "2024-01-01"
+
+# Environment variables
+[vars]
+ASPNETCORE_ENVIRONMENT = "Production"
+
+# D1 Database configuration
+[[d1_databases]]
+binding = "DB"
+database_name = "truwit-db"
+database_id = "f8d8065e-1041-4716-9093-c2b30856f007"
+
+# Build configuration
+[build]
+command = "dotnet publish -c Release -o bin/Release/net8.0/publish"
+
+# Workers configuration for .NET
+[workers]
+main = "bin/Release/net8.0/publish/HumanProof.Api.dll"
+
+# Deployment settings
+[env.production]
+name = "truwit-api-prod"
+
+[env.staging]
+name = "truwit-api-staging"
