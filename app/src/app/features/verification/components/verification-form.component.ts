@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
 import type { VerificationRequest, VerificationMetadata, CreateProofResponse } from '../../../core/models';
@@ -32,7 +33,8 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private verificationService: VerificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {
     this.verificationForm = this.createForm();
   }
@@ -253,8 +255,9 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
           }
 
           visitVerificationPage(): void {
-            if (this.createdProof) {
-              window.open(this.createdProof.verifyUrl, '_blank');
+            if (this.createdProof && this.createdProof.verifyUrl) {
+              // Navigate using Angular Router instead of window.open
+              this.router.navigate([this.createdProof.verifyUrl]);
             }
           }
 
