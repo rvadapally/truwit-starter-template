@@ -52,12 +52,12 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
 
   private createForm(): FormGroup {
     return this.fb.group({
-      url: ['', [Validators.pattern(/^https?:\/\/.+/)]],
+      url: [''],  // Remove pattern validator - we check for URL or file in onSubmit
       prompt: [''],
       toolName: [''],
       toolVersion: [''],
       likenessConsent: [[]],
-      license: [LicenseType.CreatorOwned, Validators.required]
+      license: [LicenseType.CreatorOwned]  // Remove required validator - it has a default
     });
   }
 
@@ -128,16 +128,18 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     console.log('🚀 onSubmit() called');
     console.log('📋 Form valid:', this.verificationForm.valid);
     console.log('📋 Form value:', this.verificationForm.value);
-    
-    if (this.verificationForm.invalid) {
-      console.log('❌ Form is invalid, marking as touched');
-      this.markFormGroupTouched();
-      return;
-    }
 
     const formValue = this.verificationForm.value;
     console.log('📝 Form values:', formValue);
     console.log('📁 Selected file:', this.selectedFile);
+    
+    // Check if either URL or file is provided
+    if (!formValue.url && !this.selectedFile) {
+      console.log('❌ No URL or file provided');
+      this.errorMessage = 'Please provide either a URL or upload a file';
+      this.cdr.detectChanges();
+      return;
+    }
     
             this.isVerifying = true;
             this.errorMessage = null;
@@ -160,15 +162,11 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
               this.verificationStep = 'Uploading file...';
               // File upload verification
               verification$ = this.verificationService.createProofFromFile(this.selectedFile, generator, prompt, license);
-            } else if (formValue.url) {
+            } else {
               console.log('🔗 URL verification selected:', formValue.url);
               this.verificationStep = 'Processing URL...';
               // URL verification
               verification$ = this.verificationService.createProofFromUrl(formValue.url, generator, prompt, license);
-            } else {
-              console.log('❌ No file or URL provided');
-              this.isVerifying = false;
-              return;
             }
     
             console.log('📡 Making API call...');

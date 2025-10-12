@@ -62,7 +62,7 @@
         <button 
           type="button" 
           class="btn-url-verify"
-          [disabled]="!verificationForm.get('url')?.valid || isVerifying"
+          [disabled]="!verificationForm.get('url')?.value || isVerifying"
           (click)="onSubmit()">
           Verify URL
         </button>
@@ -145,7 +145,7 @@
         <button 
           type="submit" 
           class="btn-generate-proof"
-          [disabled]="verificationForm.invalid || isVerifying">
+          [disabled]="(!verificationForm.get('url')?.value && !selectedFile) || isVerifying">
           <span *ngIf="isVerifying">Creating Proof...</span>
           <span *ngIf="!isVerifying">🚀 Generate Proof</span>
         </button>
