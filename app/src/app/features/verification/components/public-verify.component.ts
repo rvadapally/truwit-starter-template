@@ -70,6 +70,13 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     });
   }
 
+  copyVerificationLink(): void {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      // TODO: Show toast notification
+    });
+  }
+
   shareToX(): void {
     if (!this.verifyData) return;
     
