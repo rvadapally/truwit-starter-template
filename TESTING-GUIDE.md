@@ -1,474 +1,429 @@
-# 🧪 Professional Testing Guide
+# 🧪 Truwit Automated Testing Guide
 
-This guide explains how to properly test the Truwit application locally and in production using Docker and automated tests.
+## Overview
 
----
-
-## 🎯 Philosophy: Test Like Production
-
-**Key Principle:** If you test on Windows but deploy on Linux, you WILL have problems.
-
-This is why we use Docker locally:
-- ✅ Same Linux environment as Railway production
-- ✅ Catches path issues (`C:\temp` vs `/tmp`)
-- ✅ Catches missing dependencies
-- ✅ No "works on my machine" syndrome
+This guide explains how to use the automated test suite to verify the Truwit Verification App's critical functionality in both local and production environments.
 
 ---
 
-## 🚀 Quick Start
+## 📁 Test Files
 
-### 1. Start Everything (One Command)
+All test files are located in `app/src/testFiles/`:
 
-```bash
+- **`urlsToTest.txt`** - List of URLs to test (YouTube, TikTok, etc.)
+- **`sample.mp4`** - Sample video file for upload testing (4.1 MB)
+
+### Adding Test URLs
+
+Edit `app/src/testFiles/urlsToTest.txt`:
+
+```
+// Comments start with //
+https://youtu.be/NH2_-4iZEn8
+https://youtube.com/shorts/9tr7R1aFqws
+https://www.tiktok.com/@toptierlives/video/7555756163036433677
+```
+
+---
+
+## 🚀 Running Tests
+
+### Method 1: Test Local Environment (Recommended)
+
+Tests your local Docker setup that mirrors production:
+
+```batch
 start.bat
 ```
 
-This will:
-1. ✅ Check prerequisites (Docker, Node.js)
-2. ✅ Clean up existing services
-3. ✅ Install dependencies
-4. ✅ Start API in Docker (Linux environment)
-5. ✅ Start Angular dev server
-6. ✅ Run automated tests
+**What it does:**
+1. ✅ Checks Docker and Node.js prerequisites
+2. 🧹 Cleans up existing services
+3. 📦 Installs Angular dependencies
+4. 🐳 Starts API in Docker container
+5. 🌐 Starts Angular dev server
+6. 🧪 **Runs automated tests**
 
-### 2. Stop Everything (One Command)
-
-```bash
-stop.bat
-```
-
-This will:
-1. ✅ Stop Angular dev server
-2. ✅ Stop Docker containers
-3. ✅ Clean up processes
+**Wait times:**
+- API startup: ~15 seconds
+- Angular startup: ~10 seconds
+- Then tests run automatically
 
 ---
 
-## 🧪 Automated Test Suite
+### Method 2: Test Production Environment
 
-### Local Testing
+Tests your live Railway and Cloudflare deployment:
+
+```batch
+test-production.bat
+```
+
+**Or manually:**
 
 ```powershell
-# Test local Docker environment
-.\test-suite.ps1
+powershell -ExecutionPolicy Bypass -File test-suite.ps1 -Environment production
 ```
 
-### Production Testing
+---
+
+### Method 3: Manual Testing
+
+Run tests manually with options:
 
 ```powershell
-# Test Railway production deployment
-.\test-suite.ps1 -ProductionTest
-```
+# Test local with verbose output
+powershell -ExecutionPolicy Bypass -File test-suite.ps1 -Verbose
 
-### What Gets Tested
-
-#### Test 1: Docker Container Health
-- ✅ Container is running
-- ✅ Container state is healthy
-- ❌ Shows container logs if failing
-
-#### Test 2: API Health Endpoint
-- ✅ API responds on `/health`
-- ✅ Returns 200 status
-- ❌ Shows Docker logs if failing
-
-#### Test 3: Direct Video URL Processing
-- ✅ API can download and process direct video URLs
-- ✅ Creates proof successfully
-- ❌ Diagnoses path issues, yt-dlp problems
-
-#### Test 4: TikTok/Social Media URL Processing
-- ✅ API processes social media URLs
-- ⚠️  May require cookies (expected)
-- ❌ Diagnoses authentication issues
-
-#### Test 5: Frontend Accessibility
-- ✅ Frontend loads correctly
-- ✅ Contains expected content
-
-#### Test 6: Frontend API Configuration
-- ✅ Frontend uses correct API URL
-- ⚠️  Warns if pointing to wrong environment
-
-#### Diagnostics
-- ✅ Checks yt-dlp installation in container
-- ✅ Checks ffmpeg installation in container
-- ✅ Checks temp directory exists and is writable
-- ✅ Captures recent container logs
-
----
-
-## 📊 Test Output
-
-### Success Output
-
-```
-========================================
-  Test Summary
-========================================
-
-Total Tests: 6
-✓ Passed: 6
-✗ Failed: 0
-⚠ Warnings: 0
-
-Pass Rate: 100%
-
-🎉 ALL TESTS PASSED! Application is working perfectly!
-```
-
-### Failure Output with Diagnosis
-
-```
-✗ FAILED - Direct video URL processing failed (Status: 500)
-Error: Specified method is not supported
-
-⚠ DIAGNOSIS: Path or method not supported on Linux
-ℹ This usually means Windows-specific code is running on Linux
-
-Troubleshooting Recommendations:
-1. Check Docker logs:
-   docker-compose -f api/docker-compose.yml logs -f
-2. Check appsettings.json for correct configuration
-   - TempDir should be /tmp/truwit_dl, not C:\temp\...
+# Test production with verbose output
+powershell -ExecutionPolicy Bypass -File test-suite.ps1 -Environment production -Verbose
 ```
 
 ---
 
-## 🐳 Docker Local Development
+## 🧪 What Gets Tested
 
-### Why Docker Locally?
+### Test 1: Docker Container Health ✅
+- **Local only** - Verifies Docker container is running
+- Checks API container status
 
-| Without Docker | With Docker |
-|---------------|-------------|
-| ❌ Test on Windows | ✅ Test on Linux (production) |
-| ❌ Path issues not caught | ✅ Path issues caught immediately |
-| ❌ Missing deps in production | ✅ Missing deps caught locally |
-| ❌ "Works on my machine" | ✅ Works everywhere |
+### Test 2: API Health Endpoint ✅
+- Tests `/health` endpoint
+- Verifies API is responding
+- Expected: `200 OK`
 
-### Commands
+### Test 3-5: URL Processing Tests 🔗
+For each URL in `urlsToTest.txt`:
+- Sends URL to `/v1/proofs` endpoint
+- Downloads video with `yt-dlp`
+- Analyzes video for C2PA metadata
+- Returns proof ID and analysis
 
-```bash
-# Start API in Docker
+**Expected results:**
+- ✅ **Success**: Proof created, video analyzed
+- ⚠️ **Warning**: YouTube authentication needed (cookies required)
+- ❌ **Failure**: API error or timeout
+
+### Test 6: File Upload Test 📤
+- Uploads `sample.mp4` to `/v1/proofs`
+- Processes uploaded file
+- Returns proof ID and analysis
+
+**Expected**: `200 OK` or `201 Created`
+
+---
+
+## 📊 Understanding Test Results
+
+### ✅ Perfect Result (100% Pass)
+```
+🎉 100% ALL TESTS PASSED! Application is working perfectly!
+🚀 Ready for production deployment!
+```
+
+**What this means:**
+- All endpoints working
+- Video processing functional
+- File uploads working
+- No warnings or errors
+
+---
+
+### ⚠️ Warning Result (Passed with Warnings)
+```
+✅ All critical tests passed with 1 warning(s)
+ℹ️  Warnings are typically non-blocking (e.g., YouTube authentication)
+```
+
+**Common warnings:**
+1. **YouTube Bot Protection**
+   ```
+   ⚠️  YouTube requires authentication cookies
+   ```
+   **Solution**: Configure YouTube cookies (see below)
+
+2. **TikTok Access Issues**
+   ```
+   ⚠️  TikTok requires specific user agent
+   ```
+   **Solution**: Use direct video URLs or configure `yt-dlp` options
+
+**Action required:**
+- Application works but may need configuration for specific platforms
+- Non-blocking for most use cases
+
+---
+
+### ❌ Failure Result
+```
+⛔ TESTS FAILED - Application has issues that need fixing
+```
+
+**Common failures:**
+
+1. **API Not Responding**
+   ```
+   ❌ API health endpoint failed (Status: 0)
+   ```
+   **Fix**: 
+   - Check if Docker container is running: `docker ps`
+   - Restart: `stop.bat` then `start.bat`
+
+2. **yt-dlp Missing**
+   ```
+   ❌ URL processing failed: yt-dlp not found
+   ```
+   **Fix**: 
+   - Rebuild Docker image: `docker-compose -f api/docker-compose.yml up --build`
+
+3. **Database Issues**
+   ```
+   ❌ Database error
+   ```
+   **Fix**:
+   - Check API logs: `docker-compose -f api/docker-compose.yml logs`
+
+---
+
+## 🔧 Advanced Testing
+
+### Verbose Mode
+
+Get detailed output for debugging:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File test-suite.ps1 -Verbose
+```
+
+**Shows:**
+- Full API requests/responses
+- HTTP headers
+- Detailed error messages
+- Container diagnostics
+
+---
+
+### Test Logs
+
+Every test run creates a log file:
+
+```
+test-results-YYYYMMDD-HHMMSS.log
+```
+
+**Contains:**
+- Complete test transcript
+- All console output
+- Timestamps
+- Error details
+
+**View logs:**
+```powershell
+# View latest log
+Get-Content (Get-ChildItem test-results-*.log | Sort-Object LastWriteTime -Descending | Select-Object -First 1).Name
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Issue: "Docker container is not running"
+
+**Solution:**
+```batch
 cd api
 docker-compose up --build
-
-# View logs
-docker-compose logs -f
-
-# Check if yt-dlp works
-docker-compose exec api yt-dlp --version
-
-# Check temp directory
-docker-compose exec api ls -la /tmp/truwit_dl
-
-# Stop
-docker-compose down
 ```
+
+Wait for: `Now listening on: http://0.0.0.0:8080`
 
 ---
 
-## 🔍 Diagnostic Tools
+### Issue: "YouTube Sign in to confirm you're not a bot"
 
-### Check Docker Container Status
+This is **expected behavior** without cookies.
 
-```bash
-cd api
-docker-compose ps
-```
+**Solution 1: Use Cookies (Recommended)**
 
-### View Live Logs
+1. Export YouTube cookies:
+   ```bash
+   yt-dlp --cookies-from-browser chrome --cookies cookies.txt
+   ```
 
-```bash
-cd api
-docker-compose logs -f api
-```
+2. Update `api/appsettings.json`:
+   ```json
+   {
+     "YtDlp": {
+       "CookieFile": "/app/cookies.txt"
+     }
+   }
+   ```
 
-### Execute Commands in Container
+3. Copy cookies to Docker:
+   ```dockerfile
+   COPY cookies.txt /app/cookies.txt
+   ```
 
-```bash
-cd api
+**Solution 2: Test with Non-YouTube URLs**
 
-# Check yt-dlp
-docker-compose exec api yt-dlp --version
+Use direct video URLs or platforms that don't require authentication.
 
-# Check ffmpeg
-docker-compose exec api ffmpeg -version
+---
 
-# Check temp directory permissions
-docker-compose exec api ls -la /tmp/
+### Issue: "File upload timeout"
 
-# Open shell in container
-docker-compose exec api /bin/bash
-```
+**Solution:**
+- Increase timeout in test script
+- Use smaller test files
+- Check Docker container resources
 
-### Test API Endpoints Manually
+---
 
-```bash
-# Health check
+### Issue: Tests fail but API works in browser
+
+**Solution:**
+```powershell
+# Test manually
 curl http://localhost:5000/health
-
-# Create proof from URL
-curl -X POST http://localhost:5000/v1/proofs \
-  -H "Content-Type: application/json" \
-  -d '{
-    "input": {"url": "https://example.com/video.mp4"},
-    "declared": {
-      "generator": "Test",
-      "prompt": "Test",
-      "license": "public"
-    }
-  }'
+curl -X POST http://localhost:5000/v1/proofs -H "Content-Type: application/json" -d "{\"url\":\"YOUR_URL\"}"
 ```
 
 ---
 
-## 📝 Test Logs
+## 📋 Pre-Deployment Checklist
 
-All tests generate detailed logs:
+Before deploying to production, ensure:
 
+- [ ] ✅ All local tests pass
+- [ ] ✅ No critical failures
+- [ ] ✅ File upload works
+- [ ] ✅ URL processing works (at least one platform)
+- [ ] ✅ Health endpoint responds
+- [ ] ⚠️ YouTube cookies configured (if testing YouTube)
+
+**Run:**
+```batch
+start.bat
 ```
-test-results-YYYYMMDD-HHmmss.log
-```
 
-These logs include:
-- Complete test output
-- API responses
-- Error messages
-- Diagnostic information
-- Docker container logs (if applicable)
+Watch for: `🎉 100% ALL TESTS PASSED!` or `✅ All critical tests passed`
 
 ---
 
-## 🔄 Development Workflow
+## 🚀 Post-Deployment Testing
 
-### Recommended Workflow
+After deploying to Railway/Cloudflare:
 
-```
-1. Make code changes
-2. Run: start.bat
-3. Review test results
-4. If tests pass → Commit changes
-5. Deploy to Railway
-6. Run: test-suite.ps1 -ProductionTest
-7. If production tests pass → Success!
+```batch
+test-production.bat
 ```
 
-### If Tests Fail Locally
-
-```
-1. Check test output for diagnosis
-2. Review Docker logs: docker-compose -f api/docker-compose.yml logs
-3. Fix issues
-4. Rebuild: docker-compose down && docker-compose up --build
-5. Rerun tests: .\test-suite.ps1
-```
-
-### If Tests Pass Locally but Fail in Production
-
-```
-1. Check Railway deployment logs
-2. Compare local vs production configuration
-3. Verify environment variables in Railway
-4. Check Railway Root Directory setting (should be 'api')
-5. Verify Dockerfile is being used (not Nixpacks)
-```
+**Expected:**
+- Same results as local tests
+- Production parity verified
+- If local tests passed, production tests should pass
 
 ---
 
-## 🎓 Understanding Test Results
+## 📊 Continuous Testing
 
-### Exit Codes
+### Daily Testing
 
-- `0` - All tests passed
-- `1` - One or more tests failed
-
-### Test Status Symbols
-
-- `✓` - Test passed (green)
-- `✗` - Test failed (red)
-- `⚠` - Warning (yellow)
-- `ℹ` - Information (cyan)
-
-### Common Warnings
-
-**"TikTok requires authentication (expected behavior)"**
-- Not a bug
-- TikTok/YouTube require cookies for yt-dlp
-- See `DEPLOYMENT.md` for cookie configuration
-
-**"Frontend may not be using correct API URL"**
-- Check `app/src/environments/environment.prod.ts`
-- Verify `angular.json` has `fileReplacements` configured
-- Rebuild frontend: `cd app && npm run build`
-
----
-
-## 🚨 Common Issues and Solutions
-
-### Issue 1: Docker not running
-
-**Error:**
-```
-ERROR: Docker is not running. Please start Docker Desktop
-```
-
-**Solution:**
-1. Open Docker Desktop
-2. Wait for it to fully start
-3. Run `start.bat` again
-
-### Issue 2: Port already in use
-
-**Error:**
-```
-Error response from daemon: Ports are not available
-```
-
-**Solution:**
-```bash
-# Stop all Docker containers
-docker-compose -f api/docker-compose.yml down
-
-# Kill processes on port 5000
-netstat -ano | findstr :5000
-# Find the PID and kill it
-taskkill /F /PID [PID]
-```
-
-### Issue 3: Container fails to start
-
-**Symptoms:**
-- Container exits immediately
-- Health check fails
-
-**Solution:**
-```bash
-# View container logs
-cd api
-docker-compose logs api
-
-# Rebuild without cache
-docker-compose build --no-cache
-docker-compose up
-```
-
-### Issue 4: "Specified method is not supported"
-
-**Diagnosis:**
-- Windows-specific code running on Linux
-- Usually a path issue
-
-**Solution:**
-1. Check `api/appsettings.json`
-2. Ensure all paths use Linux format:
-   - ✅ `/tmp/truwit_dl`
-   - ❌ `C:\temp\truwit_dl`
-3. Rebuild and test
-
-### Issue 5: yt-dlp fails
-
-**Symptoms:**
-```
-ERROR: [youtube] Sign in to confirm you're not a bot
-```
-
-**Diagnosis:**
-- YouTube/TikTok require authentication
-- Expected behavior for protected content
-
-**Solutions:**
-1. **Use direct video URLs for testing**
-   ```
-   https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4
-   ```
-
-2. **Configure cookies for YouTube** (see `DEPLOYMENT.md`)
-
-3. **Use file upload instead of URLs**
-
----
-
-## 📈 Continuous Improvement
-
-### Adding New Tests
-
-Edit `test-suite.ps1` and add new test sections:
+Test production daily to catch issues:
 
 ```powershell
-Write-Section "Test 7: Your New Test"
-
-try {
-    # Your test code here
-    Write-Success "Test passed"
-    $Passed++
-} catch {
-    Write-Failure "Test failed"
-    $Failed++
-}
+# Schedule with Windows Task Scheduler
+powershell -ExecutionPolicy Bypass -File test-suite.ps1 -Environment production
 ```
 
-### Integrating with CI/CD
+### CI/CD Integration
 
-See `api/README-DOCKER.md` for GitHub Actions example.
+Add to your CI/CD pipeline:
 
----
-
-## 🎯 Best Practices
-
-1. ✅ **Always test in Docker before committing**
-2. ✅ **Run automated tests after every change**
-3. ✅ **Review test logs when tests fail**
-4. ✅ **Test production after deploying**
-5. ✅ **Keep Docker images updated**
-6. ✅ **Clean up Docker resources regularly**
-
-```bash
-# Clean up unused Docker resources
-docker system prune -a
+```yaml
+# Example GitHub Actions
+- name: Test Production
+  run: powershell -ExecutionPolicy Bypass -File test-suite.ps1 -Environment production
 ```
 
 ---
 
-## 📚 Additional Resources
+## 💡 Best Practices
 
-- **Docker Development Guide:** `api/README-DOCKER.md`
-- **Deployment Guide:** `DEPLOYMENT.md`
-- **API Tests:** `api/test-api.ps1` and `api/test-api.sh`
-- **Docker Compose:** `api/docker-compose.yml`
+1. **Test Locally First**
+   - Always run `start.bat` before deploying
+   - Fix failures in local environment
+
+2. **Keep Test Files Updated**
+   - Add URLs that represent your use cases
+   - Test with various file sizes
+
+3. **Review Logs**
+   - Check `test-results-*.log` for issues
+   - Keep logs for debugging
+
+4. **Monitor Warnings**
+   - Warnings are okay but should be investigated
+   - Plan to fix warnings when possible
+
+5. **Production Parity**
+   - Local Docker = Production Railway
+   - If it works locally, it should work in production
 
 ---
 
 ## 🆘 Getting Help
 
-### Check These First
+### Check Diagnostics
 
-1. Test logs: `test-results-*.log`
-2. Docker logs: `docker-compose -f api/docker-compose.yml logs`
-3. Railway logs: Railway Dashboard → Deployments → Logs
-4. Browser console: F12 → Console tab
+The test suite automatically runs diagnostics:
 
-### Diagnostic Commands
+- ✅ yt-dlp version
+- ✅ ffmpeg version  
+- ✅ Temp directory permissions
+- ✅ Recent container logs
 
-```bash
-# Complete system check
-.\test-suite.ps1
+### View Container Logs
 
-# Docker status
-docker ps
-docker-compose -f api/docker-compose.yml ps
+```powershell
+# Follow logs in real-time
+docker-compose -f api/docker-compose.yml logs -f
 
-# Container inspection
+# View last 100 lines
+docker-compose -f api/docker-compose.yml logs --tail=100
+```
+
+### Debug Container
+
+```powershell
+# Get shell access
 docker-compose -f api/docker-compose.yml exec api /bin/bash
 
-# Health check
-curl http://localhost:5000/health
+# Inside container:
+yt-dlp --version
+ffmpeg -version
+ls -la /tmp/truwit_dl
 ```
 
 ---
 
-**Remember:** Testing locally in Docker is not optional. It's the ONLY way to ensure your code will work in production.
+## 📝 Summary
 
-**"If it works in Docker locally, it will work in production."** ✅
+| Environment | Command | Duration | Purpose |
+|-------------|---------|----------|---------|
+| **Local** | `start.bat` | ~2-5 min | Full dev environment + tests |
+| **Production** | `test-production.bat` | ~1-3 min | Test live deployment |
+| **Verbose** | `test-suite.ps1 -Verbose` | ~2-5 min | Detailed debugging |
 
+**Success criteria:**
+- ✅ All tests passed = Ready to deploy
+- ⚠️ Warnings only = Safe to deploy (with caveats)
+- ❌ Any failures = Fix before deploying
+
+---
+
+**Next Steps:**
+1. Run `start.bat` to test locally
+2. If tests pass, deploy to Railway/Cloudflare
+3. Run `test-production.bat` to verify deployment
+4. Monitor logs and test results daily

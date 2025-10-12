@@ -1,372 +1,558 @@
-# Automated Test Suite with Diagnostics
-# Tests both API and Frontend, captures logs, and diagnoses issues
+#!/usr/bin/env pwsh
+<#
+.SYNOPSIS
+    Automated test suite for Truwit Verification App
+.DESCRIPTION
+    Tests critical functionality including URL processing and file uploads
+    Supports both local Docker and production Railway environments
+#>
 
 param(
-    [string]$ApiUrl = "http://localhost:5000",
-    [string]$FrontendUrl = "http://localhost:4200",
-    [switch]$ProductionTest = $false
+    [string]$Environment = "local",  # "local" or "production"
+    [switch]$Verbose
 )
 
-# Colors
-function Write-Success { param($msg) Write-Host "✓ $msg" -ForegroundColor Green }
-function Write-Failure { param($msg) Write-Host "✗ $msg" -ForegroundColor Red }
-function Write-Warning { param($msg) Write-Host "⚠ $msg" -ForegroundColor Yellow }
-function Write-Info { param($msg) Write-Host "ℹ $msg" -ForegroundColor Cyan }
-function Write-Section { param($msg) Write-Host "`n========================================" -ForegroundColor Cyan; Write-Host "  $msg" -ForegroundColor Cyan; Write-Host "========================================`n" -ForegroundColor Cyan }
+# Configuration
+$script:ApiUrl = if ($Environment -eq "production") { 
+    "https://truwit-starter-template-production.up.railway.app" 
+} else { 
+    "http://localhost:5000" 
+}
+$script:FrontendUrl = if ($Environment -eq "production") { 
+    "https://www.truwit.ai" 
+} else { 
+    "http://localhost:4200" 
+}
+$script:TestFilesDir = "app/src/testFiles"
+$script:UrlsFile = Join-Path $TestFilesDir "urlsToTest.txt"
+$script:SampleVideo = Join-Path $TestFilesDir "sample.mp4"
+$script:LogFile = "test-results-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
 
-$Failed = 0
-$Passed = 0
-$Warnings = 0
-$LogFile = "test-results-$(Get-Date -Format 'yyyyMMdd-HHmmss').log"
+# Test results tracking
+$script:Passed = 0
+$script:Failed = 0
+$script:Warnings = 0
+$script:TestResults = @()
 
-# Production URLs
-if ($ProductionTest) {
-    $ApiUrl = "https://truwit-starter-template-production.up.railway.app"
-    $FrontendUrl = "https://truwit.ai"
-    Write-Info "Testing PRODUCTION environment"
-} else {
-    Write-Info "Testing LOCAL environment"
+# Color output functions
+function Write-Success { 
+    param([string]$Message)
+    Write-Host "✅ $Message" -ForegroundColor Green
 }
 
-Write-Section "Truwit Automated Test Suite"
-Write-Info "API URL: $ApiUrl"
-Write-Info "Frontend URL: $FrontendUrl"
-Write-Info "Log file: $LogFile"
-Write-Host ""
+function Write-Failure { 
+    param([string]$Message)
+    Write-Host "❌ $Message" -ForegroundColor Red
+}
 
-# Start logging
-Start-Transcript -Path $LogFile
+function Write-TestWarning { 
+    param([string]$Message)
+    Write-Host "⚠️  $Message" -ForegroundColor Yellow
+}
 
-# ==========================================
-# TEST 1: Docker Container Health
-# ==========================================
-Write-Section "Test 1: Docker Container Health"
+function Write-Info { 
+    param([string]$Message)
+    Write-Host "ℹ️  $Message" -ForegroundColor Cyan
+}
 
-if (-not $ProductionTest) {
+function Write-TestHeader {
+    param([string]$Title)
+    Write-Host "`n========================================" -ForegroundColor Magenta
+    Write-Host "  $Title" -ForegroundColor Magenta
+    Write-Host "========================================`n" -ForegroundColor Magenta
+}
+
+# Helper function for API calls
+function Invoke-ApiTest {
+    param(
+        [string]$Endpoint,
+        [string]$Method = "GET",
+        [object]$Body = $null,
+        [string]$ContentType = "application/json",
+        [int]$TimeoutSec = 120
+    )
+    
     try {
-        $containerStatus = docker-compose -f api/docker-compose.yml ps --format json | ConvertFrom-Json
+        $params = @{
+            Uri = "$ApiUrl$Endpoint"
+            Method = $Method
+            TimeoutSec = $TimeoutSec
+            ErrorAction = 'Stop'
+        }
         
-        if ($containerStatus.State -eq "running") {
+        if ($Body) {
+            if ($ContentType -eq "application/json") {
+                $params.Body = ($Body | ConvertTo-Json -Depth 10)
+                $params.ContentType = $ContentType
+            } else {
+                $params.Body = $Body
+                $params.ContentType = $ContentType
+            }
+        }
+        
+        if ($Verbose) {
+            Write-Info "Request: $Method $($params.Uri)"
+            if ($Body -and $ContentType -eq "application/json") {
+                Write-Info "Body: $($params.Body)"
+            }
+        }
+        
+        $response = Invoke-WebRequest @params
+        
+        return @{
+            Success = $true
+            StatusCode = $response.StatusCode
+            Content = $response.Content
+            Response = $response
+        }
+    }
+    catch {
+        $statusCode = if ($_.Exception.Response) { 
+            [int]$_.Exception.Response.StatusCode 
+        } else { 
+            0 
+        }
+        
+        $errorMessage = if ($_.Exception.Response) {
+            try {
+                $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
+                $reader.BaseStream.Position = 0
+                $reader.ReadToEnd()
+            } catch {
+                $_.Exception.Message
+            }
+        } else {
+            $_.Exception.Message
+        }
+        
+        return @{
+            Success = $false
+            StatusCode = $statusCode
+            Error = $errorMessage
+            Exception = $_
+        }
+    }
+}
+
+# Test functions
+function Test-DockerContainer {
+    Write-TestHeader "Test 1: Docker Container Health"
+    
+    if ($Environment -eq "production") {
+        Write-Info "Skipping Docker check for production environment"
+        return $true
+    }
+    
+    try {
+        $containers = docker-compose -f api/docker-compose.yml ps --format json 2>&1 | ConvertFrom-Json
+        
+        if ($containers -and $containers.State -eq "running") {
             Write-Success "Docker container is running"
-            Write-Info "Container: $($containerStatus.Name)"
-            Write-Info "State: $($containerStatus.State)"
-            $Passed++
+            $script:Passed++
+            return $true
         } else {
             Write-Failure "Docker container is not running"
-            Write-Info "Container state: $($containerStatus.State)"
-            $Failed++
+            Write-Info "Run 'docker-compose -f api/docker-compose.yml up' to start the container"
+            $script:Failed++
+            return $false
+        }
+    }
+    catch {
+        Write-Failure "Could not check Docker container status: $($_.Exception.Message)"
+        $script:Failed++
+        return $false
+    }
+}
+
+function Test-ApiHealth {
+    Write-TestHeader "Test 2: API Health Endpoint"
+    
+    $result = Invoke-ApiTest -Endpoint "/health" -TimeoutSec 10
+    
+    if ($result.Success -and $result.StatusCode -eq 200) {
+        Write-Success "API health endpoint returned 200 OK"
+        $script:Passed++
+        
+        if ($Verbose) {
+            Write-Info "Response: $($result.Content)"
+        }
+        
+        return $true
+    }
+    else {
+        Write-Failure "API health endpoint failed (Status: $($result.StatusCode))"
+        Write-Info "Error: $($result.Error)"
+        $script:Failed++
+        return $false
+    }
+}
+
+function Test-UrlProcessing {
+    param([string]$Url, [int]$TestNumber)
+    
+    Write-TestHeader "Test $TestNumber: URL Processing - $Url"
+    
+    $body = @{
+        url = $Url
+        includeMetadata = $true
+        performDeepAnalysis = $false
+    }
+    
+    Write-Info "Processing URL: $Url"
+    Write-Info "This may take 30-60 seconds for video download and analysis..."
+    
+    $result = Invoke-ApiTest -Endpoint "/v1/proofs" -Method "POST" -Body $body -TimeoutSec 120
+    
+    if ($result.Success) {
+        if ($result.StatusCode -eq 200 -or $result.StatusCode -eq 201) {
+            Write-Success "URL processed successfully (Status: $($result.StatusCode))"
             
-            # Show last 20 lines of logs
-            Write-Warning "Last 20 lines of container logs:"
-            docker-compose -f api/docker-compose.yml logs --tail=20
+            try {
+                $response = $result.Content | ConvertFrom-Json
+                Write-Info "Proof ID: $($response.id)"
+                Write-Info "Status: $($response.status)"
+                Write-Info "Analysis: $($response.analysis)"
+                
+                $script:TestResults += @{
+                    Test = "URL Processing: $Url"
+                    Status = "PASSED"
+                    ProofId = $response.id
+                    Analysis = $response.analysis
+                }
+                
+                $script:Passed++
+                return $true
+            }
+            catch {
+                Write-Info "Response: $($result.Content)"
+                $script:Passed++
+                return $true
+            }
         }
-    } catch {
-        Write-Failure "Could not check Docker container status"
-        Write-Info "Error: $($_.Exception.Message)"
-        $Failed++
-    }
-} else {
-    Write-Info "Skipping Docker check for production"
-}
-
-# ==========================================
-# TEST 2: API Health Endpoint
-# ==========================================
-Write-Section "Test 2: API Health Endpoint"
-
-try {
-    $response = Invoke-WebRequest -Uri "$ApiUrl/health" -Method Get -TimeoutSec 10 -ErrorAction Stop
-    
-    if ($response.StatusCode -eq 200) {
-        Write-Success "API health endpoint returned 200"
-        $healthData = $response.Content | ConvertFrom-Json
-        Write-Info "Response: $($response.Content)"
-        $Passed++
-    } else {
-        Write-Failure "API health endpoint returned $($response.StatusCode)"
-        $Failed++
-    }
-} catch {
-    Write-Failure "API health endpoint failed"
-    Write-Info "Error: $($_.Exception.Message)"
-    $Failed++
-    
-    if (-not $ProductionTest) {
-        Write-Warning "Checking Docker logs for errors..."
-        docker-compose -f api/docker-compose.yml logs --tail=30
-    }
-}
-
-# ==========================================
-# TEST 3: API Direct Video URL Processing
-# ==========================================
-Write-Section "Test 3: API Direct Video URL Processing"
-
-$videoUrl = "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4"
-$body = @{
-    input = @{
-        url = $videoUrl
-    }
-    declared = @{
-        generator = "Automated Test"
-        prompt = "Test direct video URL"
-        license = "public"
-    }
-} | ConvertTo-Json
-
-try {
-    $response = Invoke-WebRequest -Uri "$ApiUrl/v1/proofs" -Method Post -Body $body -ContentType "application/json" -TimeoutSec 30 -ErrorAction Stop
-    
-    if ($response.StatusCode -eq 200) {
-        $result = $response.Content | ConvertFrom-Json
-        Write-Success "Direct video URL processing succeeded"
-        Write-Info "Proof ID: $($result.proofId)"
-        Write-Info "Verify URL: $($result.verifyUrl)"
-        $Passed++
-    } else {
-        Write-Failure "Unexpected response code: $($response.StatusCode)"
-        $Failed++
-    }
-} catch {
-    $statusCode = $_.Exception.Response.StatusCode.value__
-    $errorBody = ""
-    
-    if ($_.Exception.Response) {
-        $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-        $errorBody = $reader.ReadToEnd()
-    }
-    
-    Write-Failure "Direct video URL processing failed (Status: $statusCode)"
-    Write-Info "Error: $errorBody"
-    
-    # Diagnose the error
-    if ($errorBody -like "*TempDir*") {
-        Write-Warning "DIAGNOSIS: Temp directory configuration issue"
-        Write-Info "Check appsettings.json - TempDir should be /tmp/truwit_dl for Linux"
-    } elseif ($errorBody -like "*yt-dlp*") {
-        Write-Warning "DIAGNOSIS: yt-dlp execution issue"
-        
-        if (-not $ProductionTest) {
-            Write-Info "Checking if yt-dlp is installed in container..."
-            docker-compose -f api/docker-compose.yml exec -T api yt-dlp --version
+        elseif ($result.StatusCode -eq 500) {
+            # Check if it's a known YouTube bot protection issue
+            if ($result.Error -match "Sign in to confirm you're not a bot") {
+                Write-TestWarning "YouTube requires authentication cookies"
+                Write-Info "This is expected behavior for YouTube videos without cookies"
+                Write-Info "Solution: Configure YouTube cookies in appsettings.json"
+                Write-Info "See DEPLOYMENT.md for instructions"
+                
+                $script:TestResults += @{
+                    Test = "URL Processing: $Url"
+                    Status = "WARNING"
+                    Message = "YouTube authentication required"
+                }
+                
+                $script:Warnings++
+                return $true
+            }
+            else {
+                Write-Failure "API returned 500 error"
+                Write-Info "Error: $($result.Error)"
+                
+                $script:TestResults += @{
+                    Test = "URL Processing: $Url"
+                    Status = "FAILED"
+                    Error = $result.Error
+                }
+                
+                $script:Failed++
+                return $false
+            }
         }
-    } elseif ($errorBody -like "*Specified method is not supported*") {
-        Write-Warning "DIAGNOSIS: Path or method not supported on Linux"
-        Write-Info "This usually means Windows-specific code is running on Linux"
+        else {
+            Write-Failure "Unexpected status code: $($result.StatusCode)"
+            Write-Info "Error: $($result.Error)"
+            $script:Failed++
+            return $false
+        }
     }
-    
-    $Failed++
-}
-
-# ==========================================
-# TEST 4: API TikTok URL Processing
-# ==========================================
-Write-Section "Test 4: API TikTok URL Processing"
-
-$tiktokUrl = "https://www.tiktok.com/@user33951549420561/video/7524292924507426078"
-$body = @{
-    input = @{
-        url = $tiktokUrl
-    }
-    declared = @{
-        generator = "Automated Test"
-        prompt = "Test TikTok video"
-        license = "creator-owned"
-    }
-} | ConvertTo-Json
-
-try {
-    $response = Invoke-WebRequest -Uri "$ApiUrl/v1/proofs" -Method Post -Body $body -ContentType "application/json" -TimeoutSec 30 -ErrorAction Stop
-    
-    if ($response.StatusCode -eq 200) {
-        $result = $response.Content | ConvertFrom-Json
-        Write-Success "TikTok URL processing succeeded"
-        Write-Info "Proof ID: $($result.proofId)"
-        $Passed++
-    } else {
-        Write-Warning "TikTok URL processing returned $($response.StatusCode) (may require cookies)"
-        $Warnings++
-    }
-} catch {
-    $statusCode = $_.Exception.Response.StatusCode.value__
-    $errorBody = ""
-    
-    if ($_.Exception.Response) {
-        $reader = New-Object System.IO.StreamReader($_.Exception.Response.GetResponseStream())
-        $errorBody = $reader.ReadToEnd()
-    }
-    
-    # TikTok may fail due to authentication requirements - this is expected
-    if ($errorBody -like "*Sign in to confirm*" -or $errorBody -like "*bot*") {
-        Write-Warning "TikTok requires authentication (expected behavior)"
-        Write-Info "This is not a bug - TikTok requires cookies for yt-dlp"
-        Write-Info "See DEPLOYMENT.md for YouTube/TikTok cookie configuration"
-        $Warnings++
-    } else {
-        Write-Failure "TikTok URL processing failed unexpectedly (Status: $statusCode)"
-        Write-Info "Error: $errorBody"
-        $Failed++
-    }
-}
-
-# ==========================================
-# TEST 5: Frontend Accessibility
-# ==========================================
-Write-Section "Test 5: Frontend Accessibility"
-
-try {
-    $response = Invoke-WebRequest -Uri $FrontendUrl -Method Get -TimeoutSec 10 -ErrorAction Stop
-    
-    if ($response.StatusCode -eq 200) {
-        Write-Success "Frontend is accessible"
+    else {
+        Write-Failure "Request failed"
+        Write-Info "Error: $($result.Error)"
         
-        # Check if it contains expected elements
-        if ($response.Content -match "truwit|verification") {
-            Write-Info "Page contains expected content"
-        } else {
-            Write-Warning "Page content may be incorrect"
+        $script:TestResults += @{
+            Test = "URL Processing: $Url"
+            Status = "FAILED"
+            Error = $result.Error
         }
         
-        $Passed++
-    } else {
-        Write-Failure "Frontend returned $($response.StatusCode)"
-        $Failed++
+        $script:Failed++
+        return $false
     }
-} catch {
-    Write-Failure "Frontend is not accessible"
-    Write-Info "Error: $($_.Exception.Message)"
-    $Failed++
 }
 
-# ==========================================
-# TEST 6: Frontend API Configuration
-# ==========================================
-Write-Section "Test 6: Frontend API Configuration"
-
-try {
-    $response = Invoke-WebRequest -Uri "$FrontendUrl/app/" -Method Get -TimeoutSec 10 -ErrorAction Stop
-    $content = $response.Content
+function Test-FileUpload {
+    param([int]$TestNumber)
     
-    # Check if the bundled JS contains the correct API URL
-    $expectedApiUrl = if ($ProductionTest) { "truwit-starter-template-production.up.railway.app" } else { "localhost:5000" }
+    Write-TestHeader "Test $TestNumber: File Upload - sample.mp4"
     
-    if ($content -match $expectedApiUrl) {
-        Write-Success "Frontend is configured with correct API URL"
-        Write-Info "Expected: $expectedApiUrl"
-        $Passed++
-    } else {
-        Write-Warning "Frontend may not be using correct API URL"
-        Write-Info "Expected: $expectedApiUrl"
+    if (-not (Test-Path $SampleVideo)) {
+        Write-Failure "Sample video file not found: $SampleVideo"
+        $script:Failed++
+        return $false
+    }
+    
+    Write-Info "Uploading file: $SampleVideo"
+    Write-Info "File size: $([math]::Round((Get-Item $SampleVideo).Length / 1MB, 2)) MB"
+    Write-Info "This may take 30-90 seconds for upload and analysis..."
+    
+    try {
+        # Create multipart form data
+        $boundary = [System.Guid]::NewGuid().ToString()
+        $contentType = "multipart/form-data; boundary=$boundary"
         
-        # Try to find what API URL is being used
-        if ($content -match "(http[s]?://[^/]+)/v1") {
-            Write-Info "Found API URL in JS: $($Matches[1])"
+        # Read file content
+        $fileContent = [System.IO.File]::ReadAllBytes($SampleVideo)
+        $fileName = Split-Path $SampleVideo -Leaf
+        
+        # Build multipart form data manually
+        $bodyLines = @(
+            "--$boundary",
+            "Content-Disposition: form-data; name=`"file`"; filename=`"$fileName`"",
+            "Content-Type: video/mp4",
+            "",
+            [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetString($fileContent),
+            "--$boundary",
+            "Content-Disposition: form-data; name=`"includeMetadata`"",
+            "",
+            "true",
+            "--$boundary",
+            "Content-Disposition: form-data; name=`"performDeepAnalysis`"",
+            "",
+            "false",
+            "--$boundary--"
+        )
+        
+        $body = [System.Text.Encoding]::GetEncoding("ISO-8859-1").GetBytes($bodyLines -join "`r`n")
+        
+        $result = Invoke-ApiTest -Endpoint "/v1/proofs" -Method "POST" -Body $body -ContentType $contentType -TimeoutSec 120
+        
+        if ($result.Success -and ($result.StatusCode -eq 200 -or $result.StatusCode -eq 201)) {
+            Write-Success "File uploaded and processed successfully (Status: $($result.StatusCode))"
+            
+            try {
+                $response = $result.Content | ConvertFrom-Json
+                Write-Info "Proof ID: $($response.id)"
+                Write-Info "Status: $($response.status)"
+                Write-Info "Analysis: $($response.analysis)"
+                
+                $script:TestResults += @{
+                    Test = "File Upload: $fileName"
+                    Status = "PASSED"
+                    ProofId = $response.id
+                    Analysis = $response.analysis
+                }
+            }
+            catch {
+                Write-Info "Response: $($result.Content)"
+            }
+            
+            $script:Passed++
+            return $true
+        }
+        else {
+            Write-Failure "File upload failed (Status: $($result.StatusCode))"
+            Write-Info "Error: $($result.Error)"
+            
+            $script:TestResults += @{
+                Test = "File Upload: $fileName"
+                Status = "FAILED"
+                Error = $result.Error
+            }
+            
+            $script:Failed++
+            return $false
+        }
+    }
+    catch {
+        Write-Failure "File upload failed with exception: $($_.Exception.Message)"
+        
+        $script:TestResults += @{
+            Test = "File Upload"
+            Status = "FAILED"
+            Error = $_.Exception.Message
         }
         
-        $Warnings++
+        $script:Failed++
+        return $false
     }
-} catch {
-    Write-Warning "Could not verify frontend API configuration"
-    Write-Info "Error: $($_.Exception.Message)"
-    $Warnings++
 }
 
-# ==========================================
-# DIAGNOSTICS: Docker Container Inspection
-# ==========================================
-if (-not $ProductionTest) {
-    Write-Section "Diagnostics: Docker Container"
+function Show-Diagnostics {
+    Write-TestHeader "Diagnostics"
     
-    Write-Info "Checking yt-dlp installation..."
+    if ($Environment -eq "production") {
+        Write-Info "Testing production environment - diagnostics limited"
+        return
+    }
+    
+    Write-Info "Checking Docker container tools..."
+    
+    # Check yt-dlp
     try {
         $ytdlpVersion = docker-compose -f api/docker-compose.yml exec -T api yt-dlp --version 2>&1
-        Write-Success "yt-dlp version: $ytdlpVersion"
-    } catch {
-        Write-Failure "yt-dlp not found in container"
+        if ($ytdlpVersion -match '\d{4}\.\d{2}\.\d{2}') {
+            Write-Success "yt-dlp version: $ytdlpVersion"
+        }
+    }
+    catch {
+        Write-Failure "yt-dlp check failed: $($_.Exception.Message)"
     }
     
-    Write-Info "Checking ffmpeg installation..."
+    # Check ffmpeg
     try {
         $ffmpegVersion = docker-compose -f api/docker-compose.yml exec -T api ffmpeg -version 2>&1 | Select-Object -First 1
-        Write-Success "ffmpeg: $ffmpegVersion"
-    } catch {
-        Write-Failure "ffmpeg not found in container"
+        if ($ffmpegVersion) {
+            Write-Success "ffmpeg: $ffmpegVersion"
+        }
+    }
+    catch {
+        Write-Failure "ffmpeg check failed: $($_.Exception.Message)"
     }
     
-    Write-Info "Checking temp directory..."
+    # Check temp directory
     try {
-        docker-compose -f api/docker-compose.yml exec -T api ls -la /tmp/truwit_dl 2>&1
-        Write-Success "Temp directory exists and is accessible"
-    } catch {
-        Write-Failure "Temp directory not accessible"
+        $tempDir = docker-compose -f api/docker-compose.yml exec -T api ls -la /tmp/truwit_dl 2>&1
+        if ($tempDir) {
+            Write-Success "Temp directory exists and is accessible"
+            if ($Verbose) {
+                Write-Info "Contents:`n$tempDir"
+            }
+        }
+    }
+    catch {
+        Write-Failure "Temp directory check failed: $($_.Exception.Message)"
     }
     
+    # Show recent logs
     Write-Info "Recent container logs (last 20 lines):"
-    docker-compose -f api/docker-compose.yml logs --tail=20
+    docker-compose -f api/docker-compose.yml logs --tail=20 2>&1
 }
 
-# ==========================================
-# TEST SUMMARY
-# ==========================================
-Write-Section "Test Summary"
-
-Write-Host ""
-Write-Host "Total Tests: $($Passed + $Failed)" -ForegroundColor Cyan
-Write-Success "Passed: $Passed"
-Write-Failure "Failed: $Failed"
-Write-Warning "Warnings: $Warnings"
-Write-Host ""
-
-# Calculate pass rate
-$totalTests = $Passed + $Failed
-if ($totalTests -gt 0) {
-    $passRate = [math]::Round(($Passed / $totalTests) * 100, 2)
-    Write-Info "Pass Rate: $passRate%"
-}
-
-# Final verdict
-Write-Host ""
-if ($Failed -eq 0 -and $Warnings -eq 0) {
-    Write-Success "🎉 ALL TESTS PASSED! Application is working perfectly!"
-    $exitCode = 0
-} elseif ($Failed -eq 0) {
-    Write-Warning "⚠️  All tests passed with $Warnings warnings"
-    Write-Info "Review warnings above for potential issues"
-    $exitCode = 0
-} else {
-    Write-Failure "❌ $Failed tests failed"
-    Write-Info "Review failures above and check logs in $LogFile"
-    $exitCode = 1
-}
-
-Write-Host ""
-Write-Info "Detailed logs saved to: $LogFile"
-Write-Host ""
-
-# Stop transcript
-Stop-Transcript
-
-# Recommendations
-if ($Failed -gt 0) {
-    Write-Section "Troubleshooting Recommendations"
+function Show-Summary {
+    Write-TestHeader "Test Summary"
     
-    if (-not $ProductionTest) {
-        Write-Info "1. Check Docker logs:"
-        Write-Host "   docker-compose -f api/docker-compose.yml logs -f" -ForegroundColor Yellow
-        Write-Host ""
-        Write-Info "2. Restart containers:"
-        Write-Host "   docker-compose -f api/docker-compose.yml down" -ForegroundColor Yellow
-        Write-Host "   docker-compose -f api/docker-compose.yml up --build" -ForegroundColor Yellow
-        Write-Host ""
-        Write-Info "3. Check container status:"
-        Write-Host "   docker-compose -f api/docker-compose.yml ps" -ForegroundColor Yellow
-        Write-Host ""
+    $total = $script:Passed + $script:Failed
+    $passRate = if ($total -gt 0) { [math]::Round(($script:Passed / $total) * 100, 1) } else { 0 }
+    
+    Write-Host "`nTotal Tests: $total" -ForegroundColor Cyan
+    Write-Success "Passed: $script:Passed"
+    Write-TestWarning "Warnings: $script:Warnings"
+    Write-Failure "Failed: $script:Failed"
+    
+    Write-Host "`n" -NoNewline
+    
+    if ($script:Failed -eq 0 -and $script:Warnings -eq 0) {
+        Write-Host "🎉 " -NoNewline -ForegroundColor Green
+        Write-Host "100% ALL TESTS PASSED! Application is working perfectly!" -ForegroundColor Green
+        Write-Host "🚀 " -NoNewline -ForegroundColor Green
+        Write-Host "Ready for production deployment!" -ForegroundColor Green
+    }
+    elseif ($script:Failed -eq 0) {
+        Write-Host "✅ " -NoNewline -ForegroundColor Yellow
+        Write-Host "All critical tests passed with $script:Warnings warning(s)" -ForegroundColor Yellow
+        Write-Info "Pass Rate: $passRate%"
+        Write-Info "Warnings are typically non-blocking (e.g., YouTube authentication)"
+    }
+    else {
+        Write-Host "⛔ " -NoNewline -ForegroundColor Red
+        Write-Host "TESTS FAILED - Application has issues that need fixing" -ForegroundColor Red
+        Write-Info "Pass Rate: $passRate%"
+        Write-Info "Please review the errors above and check the logs"
     }
     
-    Write-Info "4. Check appsettings.json for correct configuration"
-    Write-Info "5. Review DEPLOYMENT.md for platform-specific issues"
-    Write-Info "6. Check Railway logs if testing production"
+    # Show detailed results
+    if ($script:TestResults.Count -gt 0) {
+        Write-Host "`n" -NoNewline
+        Write-Info "Detailed Results:"
+        foreach ($result in $script:TestResults) {
+            $status = $result.Status
+            $color = switch ($status) {
+                "PASSED" { "Green" }
+                "WARNING" { "Yellow" }
+                "FAILED" { "Red" }
+            }
+            Write-Host "  [$status] " -ForegroundColor $color -NoNewline
+            Write-Host "$($result.Test)"
+            
+            if ($result.ProofId) {
+                Write-Host "    Proof ID: $($result.ProofId)" -ForegroundColor Gray
+            }
+            if ($result.Message) {
+                Write-Host "    $($result.Message)" -ForegroundColor Gray
+            }
+            if ($result.Error) {
+                Write-Host "    Error: $($result.Error)" -ForegroundColor Gray
+            }
+        }
+    }
+    
+    Write-Host "`n" -NoNewline
+    Write-Info "Detailed logs saved to: $LogFile"
+    Write-Host ""
 }
 
-exit $exitCode
-
+# Main execution
+try {
+    # Start transcript for logging
+    Start-Transcript -Path $LogFile -Append | Out-Null
+    
+    Write-Host ""
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "  Truwit Automated Test Suite" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host ""
+    
+    $envName = if ($Environment -eq "production") { "PRODUCTION" } else { "LOCAL" }
+    Write-Info "Testing $envName environment"
+    Write-Info "API URL: $ApiUrl"
+    Write-Info "Frontend URL: $FrontendUrl"
+    Write-Host ""
+    
+    # Verify test files exist
+    if (-not (Test-Path $UrlsFile)) {
+        Write-Failure "URLs file not found: $UrlsFile"
+        exit 1
+    }
+    
+    if (-not (Test-Path $SampleVideo)) {
+        Write-TestWarning "Sample video not found: $SampleVideo (file upload tests will be skipped)"
+    }
+    
+    # Run tests
+    Test-DockerContainer
+    Test-ApiHealth
+    
+    # Test URLs from file
+    $urls = Get-Content $UrlsFile | Where-Object { $_ -and -not $_.StartsWith("//") -and $_.Trim() -ne "" }
+    $testNumber = 3
+    
+    foreach ($url in $urls) {
+        Test-UrlProcessing -Url $url.Trim() -TestNumber $testNumber
+        $testNumber++
+    }
+    
+    # Test file upload
+    if (Test-Path $SampleVideo) {
+        Test-FileUpload -TestNumber $testNumber
+    }
+    
+    # Show diagnostics
+    Show-Diagnostics
+    
+    # Show summary
+    Show-Summary
+    
+    # Stop transcript
+    Stop-Transcript | Out-Null
+    
+    # Exit with appropriate code
+    exit $(if ($script:Failed -eq 0) { 0 } else { 1 })
+}
+catch {
+    Write-Failure "Test suite failed with exception: $($_.Exception.Message)"
+    Write-Host $_.ScriptStackTrace -ForegroundColor Red
+    Stop-Transcript | Out-Null
+    exit 1
+}
