@@ -21,7 +21,8 @@ RUN apt-get update && \
     chmod a+rx /usr/local/bin/yt-dlp && \
     rm -rf /var/lib/apt/lists/* && \
     yt-dlp --version && \
-    ffmpeg -version
+    ffmpeg -version && \
+    mkdir -p /tmp/truwit_dl && chmod 777 /tmp/truwit_dl
 
 COPY --from=build /app/publish .
 EXPOSE 8080
