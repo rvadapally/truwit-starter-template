@@ -123,6 +123,15 @@
           &.unknown {
             color: #eab308;
           }
+
+          .status-explanation {
+            display: block;
+            font-size: 0.75rem;
+            color: #9fb3d9;
+            margin-top: 0.25rem;
+            font-style: italic;
+            font-family: system-ui, -apple-system, sans-serif;
+          }
         }
 
         .copy-btn {

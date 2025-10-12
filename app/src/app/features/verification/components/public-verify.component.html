@@ -65,12 +65,25 @@
       <div class="detail-card">
         <h3>Verification Details</h3>
         <div class="detail-row">
-          <span class="label">Issued At:</span>
+          <span class="label">Issued At (Central Time):</span>
+          <span class="value">{{ verifyData.issuedAt | date:'medium':'CST' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Issued At (UTC):</span>
+          <span class="value">{{ verifyData.issuedAt | date:'medium':'UTC' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Issued At (Your Local Time):</span>
           <span class="value">{{ verifyData.issuedAt | date:'medium' }}</span>
         </div>
         <div class="detail-row">
-          <span class="label">Signature Status:</span>
-          <span class="value" [class]="verifyData.signatureStatus">{{ verifyData.signatureStatus }}</span>
+          <span class="label">C2PA Signature Status:</span>
+          <span class="value" [class]="verifyData.signatureStatus">
+            {{ verifyData.signatureStatus }}
+            <span class="status-explanation" *ngIf="verifyData.signatureStatus === 'invalid'">
+              (No C2PA data found - video not signed)
+            </span>
+          </span>
         </div>
       </div>
     </div>
