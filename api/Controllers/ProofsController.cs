@@ -806,26 +806,26 @@ public class ProofsController : ControllerBase
                 });
             }
 
-            var declaredData = System.Text.Json.JsonSerializer.Deserialize<DeclaredDataDto>(declared);
-
-            if (declaredData == null ||
-                string.IsNullOrEmpty(declaredData.Generator) ||
-                string.IsNullOrEmpty(declaredData.License))
+            // Parse declared data (optional for file uploads)
+            DeclaredDataDto? declaredData = null;
+            if (!string.IsNullOrEmpty(declared))
             {
-                return BadRequest(new ApiResponse<object>
+                try
                 {
-                    Success = false,
-                    Message = "Declared data with generator and license is required",
-                    Status = StatusCodes.Status400BadRequest
-                });
+                    declaredData = System.Text.Json.JsonSerializer.Deserialize<DeclaredDataDto>(declared);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to parse declared data: {Declared}", declared);
+                }
             }
 
-            // Provide default prompt if empty
-            var prompt = string.IsNullOrEmpty(declaredData.Prompt)
-                ? "Content verification request"
-                : declaredData.Prompt;
+            // Use defaults if not provided
+            var generator = declaredData?.Generator ?? "Unknown";
+            var licenseType = declaredData?.License ?? "creator-owned";
 
-            _logger.LogInformation("Creating proof for file: {FileName}", file.FileName);
+            _logger.LogInformation("Creating proof for file: {FileName} with generator: {Generator}, license: {License}", 
+                file.FileName, generator, licenseType);
 
             // Convert to internal format
             var verificationRequest = new VerificationRequestDto
@@ -833,9 +833,9 @@ public class ProofsController : ControllerBase
                 File = file,
                 Metadata = new VerificationMetadataDto
                 {
-                    Prompt = prompt,
-                    ToolName = declaredData.Generator,
-                    License = ParseLicenseType(declaredData.License)
+                    Prompt = declaredData?.Prompt ?? "Content verification request",
+                    ToolName = generator,
+                    License = ParseLicenseType(licenseType)
                 }
             };
 
