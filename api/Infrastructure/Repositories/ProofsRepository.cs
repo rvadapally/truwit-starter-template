@@ -22,7 +22,13 @@ public class ProofsRepository : IProofsRepository
 
     public async Task<string> InsertAsync(Proof proof)
     {
+        _logger.LogInformation("💾 InsertAsync called - Id: {Id}, TrustmarkId: {TrustmarkId}", proof.Id, proof.TrustmarkId);
+        _logger.LogInformation("📁 Connection string: {ConnectionString}", _connectionString);
+        
         using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        _logger.LogInformation("✅ Database connection opened for insert");
 
         var sql = @"
             INSERT INTO Proofs (Id, TrustmarkId, AssetId, C2paPresent, C2paJson, OriginStatus, PolicyResult, PolicyJson, MetadataId, ReceiptId, CreatedAt, UpdatedAt)
@@ -38,7 +44,9 @@ public class ProofsRepository : IProofsRepository
                 ReceiptId = excluded.ReceiptId,
                 UpdatedAt = excluded.UpdatedAt";
 
-        await connection.ExecuteAsync(sql, proof);
+        var rowsAffected = await connection.ExecuteAsync(sql, proof);
+        
+        _logger.LogInformation("✅ Proof inserted/updated - Rows affected: {RowsAffected}", rowsAffected);
 
         return proof.Id;
     }
@@ -57,13 +65,35 @@ public class ProofsRepository : IProofsRepository
 
     public async Task<Proof?> GetByTrustmarkIdAsync(string trustmarkId)
     {
+        _logger.LogInformation("🔍 GetByTrustmarkIdAsync called with trustmarkId: {TrustmarkId}", trustmarkId);
+        _logger.LogInformation("📁 Connection string: {ConnectionString}", _connectionString);
+        
         using var connection = new SqliteConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        _logger.LogInformation("✅ Database connection opened successfully");
 
         var sql = @"
             SELECT Id, TrustmarkId, AssetId, C2paPresent, C2paJson, OriginStatus, PolicyResult, PolicyJson, MetadataId, ReceiptId, CreatedAt, UpdatedAt
             FROM Proofs 
             WHERE TrustmarkId = @TrustmarkId";
 
-        return await connection.QueryFirstOrDefaultAsync<Proof>(sql, new { TrustmarkId = trustmarkId });
+        var result = await connection.QueryFirstOrDefaultAsync<Proof>(sql, new { TrustmarkId = trustmarkId });
+        
+        if (result == null)
+        {
+            _logger.LogWarning("❌ No proof found for trustmarkId: {TrustmarkId}", trustmarkId);
+            
+            // Count total proofs to see if table is empty
+            var countSql = "SELECT COUNT(*) FROM Proofs";
+            var count = await connection.ExecuteScalarAsync<int>(countSql);
+            _logger.LogInformation("📊 Total proofs in database: {Count}", count);
+        }
+        else
+        {
+            _logger.LogInformation("✅ Found proof: Id={Id}, TrustmarkId={TrustmarkId}", result.Id, result.TrustmarkId);
+        }
+        
+        return result;
     }
 }
