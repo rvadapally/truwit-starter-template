@@ -445,20 +445,20 @@ function Show-Summary {
     
     if ($script:Failed -eq 0 -and $script:Warnings -eq 0) {
         Write-Host "🎉 " -NoNewline -ForegroundColor Green
-        Write-Host "100% ALL TESTS PASSED! Application is working perfectly!" -ForegroundColor Green
+        Write-Host "ALL TESTS PASSED! Application is working perfectly!" -ForegroundColor Green
         Write-Host "🚀 " -NoNewline -ForegroundColor Green
         Write-Host "Ready for production deployment!" -ForegroundColor Green
     }
     elseif ($script:Failed -eq 0) {
         Write-Host "✅ " -NoNewline -ForegroundColor Yellow
         Write-Host "All critical tests passed with $script:Warnings warning(s)" -ForegroundColor Yellow
-        Write-Info "Pass Rate: $passRate%"
+        Write-Info "Pass Rate: $passRate percent"
         Write-Info "Warnings are typically non-blocking - e.g. YouTube authentication"
     }
     else {
         Write-Host "⛔ " -NoNewline -ForegroundColor Red
         Write-Host "TESTS FAILED - Application has issues that need fixing" -ForegroundColor Red
-        Write-Info "Pass Rate: $passRate%"
+        Write-Info "Pass Rate: $passRate percent"
         Write-Info "Please review the errors above and check the logs"
     }
     
