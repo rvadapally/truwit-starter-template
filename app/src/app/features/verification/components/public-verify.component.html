@@ -65,15 +65,11 @@
       <div class="detail-card">
         <h3>Verification Details</h3>
         <div class="detail-row">
-          <span class="label">Issued At (Central Time):</span>
-          <span class="value">{{ verifyData.issuedAt | date:'medium':'CST' }}</span>
-        </div>
-        <div class="detail-row">
           <span class="label">Issued At (UTC):</span>
           <span class="value">{{ verifyData.issuedAt | date:'medium':'UTC' }}</span>
         </div>
         <div class="detail-row">
-          <span class="label">Issued At (Your Local Time):</span>
+          <span class="label">Issued At (Your Time):</span>
           <span class="value">{{ verifyData.issuedAt | date:'medium' }}</span>
         </div>
         <div class="detail-row">
