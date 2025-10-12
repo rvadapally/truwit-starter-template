@@ -9,7 +9,7 @@ echo.
 echo Running automated tests against production...
 echo.
 
-powershell -ExecutionPolicy Bypass -File test-suite.ps1 -Environment production
+powershell -ExecutionPolicy Bypass -File test-suite-v2.ps1 -Environment production
 
 echo.
 pause

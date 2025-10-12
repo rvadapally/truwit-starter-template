@@ -107,7 +107,7 @@ pause >nul
 
 echo.
 echo Running automated tests...
-powershell -ExecutionPolicy Bypass -File test-suite.ps1
+powershell -ExecutionPolicy Bypass -File test-suite-v2.ps1
 echo.
 
 pause
