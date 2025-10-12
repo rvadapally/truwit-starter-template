@@ -453,7 +453,7 @@ function Show-Summary {
         Write-Host "✅ " -NoNewline -ForegroundColor Yellow
         Write-Host "All critical tests passed with $script:Warnings warning(s)" -ForegroundColor Yellow
         Write-Info "Pass Rate: $passRate%"
-        Write-Info "Warnings are typically non-blocking (e.g., YouTube authentication)"
+        Write-Info "Warnings are typically non-blocking - e.g. YouTube authentication"
     }
     else {
         Write-Host "⛔ " -NoNewline -ForegroundColor Red
