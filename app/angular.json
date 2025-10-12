@@ -60,7 +60,16 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "buildTarget": "humanproof-web:build"
+            "buildTarget": "humanproof-web:build",
+            "disableHostCheck": true,
+            "liveReload": true,
+            "watch": true,
+            "poll": 1000
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "humanproof-web:build:production"
+            }
           }
         }
       }
