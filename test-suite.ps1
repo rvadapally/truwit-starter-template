@@ -231,7 +231,7 @@ function Test-UrlProcessing {
         }
         elseif ($result.StatusCode -eq 500) {
             # Check if it's a known YouTube bot protection issue
-            if ($result.Error -match "Sign in to confirm you're not a bot") {
+            if ($result.Error -match "Sign in to confirm you") {
                 Write-TestWarning "YouTube requires authentication cookies"
                 Write-Info "This is expected behavior for YouTube videos without cookies"
                 Write-Info "Solution: Configure YouTube cookies in appsettings.json"
