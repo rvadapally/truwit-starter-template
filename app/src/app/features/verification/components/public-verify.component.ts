@@ -25,12 +25,10 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('🎯 PublicVerifyComponent ngOnInit called');
     this.route.params
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         this.proofId = params['id'];
-        console.log('📍 Route params received:', params, 'Proof ID:', this.proofId);
         if (this.proofId) {
           this.loadVerifyData();
         }
@@ -46,7 +44,6 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
   private loadVerifyData(): void {
     if (!this.proofId) return;
     
-    console.log('🔍 Loading verify data for proof:', this.proofId);
     this.isLoading = true;
     this.error = null;
     this.cdr.markForCheck();
@@ -55,13 +52,11 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
-          console.log('✅ Verify data received:', data);
           this.verifyData = data;
           this.isLoading = false;
           this.cdr.markForCheck();
         },
         error: (error) => {
-          console.error('❌ Error loading verify data:', error);
           this.error = error.message || 'Failed to load verification data';
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -72,7 +67,6 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
       // TODO: Show toast notification
-      console.log('Copied to clipboard:', text);
     });
   }
 

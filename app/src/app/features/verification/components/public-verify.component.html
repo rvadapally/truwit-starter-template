@@ -1,14 +1,4 @@
 <div class="public-verify-container">
-  <!-- DEBUG INFO -->
-  <div style="background: yellow; padding: 10px; margin: 10px;">
-    <p><strong>DEBUG INFO:</strong></p>
-    <p>Component Loaded: YES</p>
-    <p>Proof ID: {{ proofId || 'NOT SET' }}</p>
-    <p>Is Loading: {{ isLoading }}</p>
-    <p>Has Error: {{ error ? 'YES - ' + error : 'NO' }}</p>
-    <p>Has Data: {{ verifyData ? 'YES' : 'NO' }}</p>
-  </div>
-
   <!-- Loading State -->
   <div *ngIf="isLoading" class="loading-state">
     <div class="spinner"></div>

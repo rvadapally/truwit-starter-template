@@ -20,7 +20,6 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    console.log('🚀 AppComponent initialized');
     // Track route changes
     this.router.events
       .pipe(
@@ -29,7 +28,6 @@ export class AppComponent implements OnInit, OnDestroy {
       )
       .subscribe((event) => {
         const url = (event as NavigationEnd).url;
-        console.log('🔄 Route changed to:', url);
         this.currentRoute = url;
         this.cdr.markForCheck();
       });
