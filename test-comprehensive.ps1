@@ -107,14 +107,15 @@ $createResult = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/url" -Method POST -Body @
 
 if ($createResult.Success) {
     $proofId = $createResult.Data.proofId
-    Write-Info "Proof created: $proofId"
+    $trustmarkId = $createResult.Data.trustmarkId
+    Write-Info "Proof created - ProofId: $proofId, TrustmarkId: $trustmarkId"
     
-    # Test 1.1: Verify API endpoint returns proof data
-    Write-Info "Testing API endpoint: GET /v1/proofs/verify/$proofId"
-    $verifyResult = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$proofId"
+    # Test 1.1: Verify API endpoint returns proof data (use trustmarkId)
+    Write-Info "Testing API endpoint: GET /v1/proofs/verify/$trustmarkId"
+    $verifyResult = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$trustmarkId"
     
     if ($verifyResult.Success -and $verifyResult.Data.proofId) {
-        Add-TestResult -TestName "API /v1/proofs/verify/$proofId returns proof data" -Passed $true -Details "ProofId: $($verifyResult.Data.proofId)"
+        Add-TestResult -TestName "API /v1/proofs/verify/$trustmarkId returns proof data" -Passed $true -Details "ProofId: $($verifyResult.Data.proofId)"
         
         # Validate response structure
         $requiredFields = @('proofId', 'verdict', 'contentHash', 'declared', 'issuedAt', 'signatureStatus', 'badgeUrl')
@@ -134,20 +135,20 @@ if ($createResult.Success) {
             Add-TestResult -TestName "Badge URL is present in response" -Passed $false
         }
         
-        # Test 1.3: Test badge endpoint
+        # Test 1.3: Test badge endpoint (use trustmarkId)
         Write-Info "Testing badge endpoint..."
-        $badgeResult = Invoke-ApiTest -Url "$ApiUrl/v1/badge/$proofId.svg"
+        $badgeResult = Invoke-ApiTest -Url "$ApiUrl/v1/badge/$trustmarkId.svg"
         Add-TestResult -TestName "Badge SVG endpoint accessible" -Passed $badgeResult.Success
         
     } else {
-        Add-TestResult -TestName "API /v1/proofs/verify/$proofId returns proof data" -Passed $false
+        Add-TestResult -TestName "API /v1/proofs/verify/$trustmarkId returns proof data" -Passed $false
     }
     
-    # Test 1.4: Frontend routing (only in local environment)
+    # Test 1.4: Frontend routing (only in local environment, use trustmarkId)
     if ($Environment -eq "local") {
-        Write-Info "Frontend routing test: $FrontendUrl/#/t/$proofId"
-        Write-Warning "Manual verification required: Open $FrontendUrl/#/t/$proofId in browser"
-        Add-TestResult -TestName "Frontend routing (manual verification)" -Passed $true -Details "URL: $FrontendUrl/#/t/$proofId"
+        Write-Info "Frontend routing test: $FrontendUrl/#/t/$trustmarkId"
+        Write-Warning "Manual verification required: Open $FrontendUrl/#/t/$trustmarkId in browser"
+        Add-TestResult -TestName "Frontend routing (manual verification)" -Passed $true -Details "URL: $FrontendUrl/#/t/$trustmarkId"
     }
     
 } else {
@@ -182,24 +183,24 @@ if ($createdProofs.Count -gt 0) {
     $allProofIds = $createdProofs.Count
     Add-TestResult -TestName "All proof IDs are unique" -Passed ($uniqueProofIds -eq $allProofIds) -Details "Unique: $uniqueProofIds, Total: $allProofIds"
     
-    # Test 2.2: Validate each proof has required relationships
+    # Test 2.2: Validate each proof has required relationships (use trustmarkId)
     foreach ($proof in $createdProofs) {
-        $verifyResult = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$($proof.proofId)"
+        $verifyResult = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$($proof.trustmarkId)"
         if ($verifyResult.Success) {
             $hasContentHash = $verifyResult.Data.contentHash -ne $null -and $verifyResult.Data.contentHash -ne "unknown"
             $hasDeclared = $verifyResult.Data.declared -ne $null
             $hasIssuedAt = $verifyResult.Data.issuedAt -ne $null
             
             $isValid = $hasContentHash -and $hasDeclared -and $hasIssuedAt
-            Add-TestResult -TestName "Proof $($proof.proofId) has valid relationships" -Passed $isValid
+            Add-TestResult -TestName "Proof $($proof.trustmarkId) has valid relationships" -Passed $isValid
         }
     }
     
-    # Test 2.3: Validate verify URL matches proof ID
+    # Test 2.3: Validate verify URL matches trustmark ID
     foreach ($proof in $createdProofs) {
         if ($proof.verifyUrl) {
-            $urlContainsId = $proof.verifyUrl -match $proof.proofId
-            Add-TestResult -TestName "Verify URL contains proof ID for $($proof.proofId)" -Passed $urlContainsId
+            $urlContainsId = $proof.verifyUrl -match $proof.trustmarkId
+            Add-TestResult -TestName "Verify URL contains trustmark ID for $($proof.trustmarkId)" -Passed $urlContainsId
         }
     }
     
@@ -220,10 +221,11 @@ $afterCreate = Get-Date
 
 if ($tzResult.Success) {
     $proofId = $tzResult.Data.proofId
-    Write-Info "Proof created: $proofId"
+    $trustmarkId = $tzResult.Data.trustmarkId
+    Write-Info "Proof created - ProofId: $proofId, TrustmarkId: $trustmarkId"
     
-    # Get proof details
-    $proofDetails = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$proofId"
+    # Get proof details (use trustmarkId)
+    $proofDetails = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$trustmarkId"
     
     if ($proofDetails.Success -and $proofDetails.Data.issuedAt) {
         $issuedAt = $proofDetails.Data.issuedAt
@@ -278,7 +280,8 @@ $firstResult = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/url" -Method POST -Body @{
 
 if ($firstResult.Success) {
     $firstProofId = $firstResult.Data.proofId
-    Write-Info "First proof created: $firstProofId"
+    $firstTrustmarkId = $firstResult.Data.trustmarkId
+    Write-Info "First proof created - ProofId: $firstProofId, TrustmarkId: $firstTrustmarkId"
     
     # Wait a moment
     Start-Sleep -Seconds 2
@@ -289,15 +292,16 @@ if ($firstResult.Success) {
     
     if ($secondResult.Success) {
         $secondProofId = $secondResult.Data.proofId
-        Write-Info "Second proof result: $secondProofId"
+        $secondTrustmarkId = $secondResult.Data.trustmarkId
+        Write-Info "Second proof result - ProofId: $secondProofId, TrustmarkId: $secondTrustmarkId"
         
         # Test 4.1: Check if same proof ID returned
         $isSameProof = $firstProofId -eq $secondProofId
         Add-TestResult -TestName "Duplicate URL returns same proof ID (idempotency)" -Passed $isSameProof -Details "First: $firstProofId, Second: $secondProofId"
         
-        # Test 4.2: Verify both requests return valid proof
-        $firstVerify = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$firstProofId"
-        $secondVerify = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$secondProofId"
+        # Test 4.2: Verify both requests return valid proof (use trustmarkId)
+        $firstVerify = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$firstTrustmarkId"
+        $secondVerify = Invoke-ApiTest -Url "$ApiUrl/v1/proofs/verify/$secondTrustmarkId"
         
         $bothValid = $firstVerify.Success -and $secondVerify.Success
         Add-TestResult -TestName "Both proof IDs resolve to valid proofs" -Passed $bothValid
