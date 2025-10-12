@@ -15,22 +15,10 @@ export class VerificationService {
 
   // New API methods matching your specification
   createProofFromUrl(url: string, generator: string, prompt: string, license: string): Observable<CreateProofResponse> {
-    console.log('🔗 VerificationService.createProofFromUrl called with:', { url, generator, prompt, license });
+    const request = { Url: url };  // New endpoint only needs URL
     
-    const request: CreateProofRequest = {
-      input: { url },
-      declared: { generator, prompt, license }
-    };
-    
-    console.log('📤 Sending request to API:', request);
-    
-    return this.apiService.post<CreateProofResponse>('/v1/proofs', request).pipe(
-      map(response => {
-        console.log('📥 API Response received:', response);
-        console.log('📥 Extracted data:', response.data);
-        // The API returns the data directly, not wrapped in a data property
-        return response.data || response;
-      })
+    return this.apiService.post<CreateProofResponse>('/v1/proofs/url', request).pipe(
+      map(response => response.data || response)
     );
   }
 
