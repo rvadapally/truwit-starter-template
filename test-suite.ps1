@@ -190,7 +190,7 @@ function Test-ApiHealth {
 function Test-UrlProcessing {
     param([string]$Url, [int]$TestNumber)
     
-    Write-TestHeader "Test $TestNumber: URL Processing - $Url"
+    Write-TestHeader "Test ${TestNumber}: URL Processing - $Url"
     
     $body = @{
         url = $Url
@@ -285,7 +285,7 @@ function Test-UrlProcessing {
 function Test-FileUpload {
     param([int]$TestNumber)
     
-    Write-TestHeader "Test $TestNumber: File Upload - sample.mp4"
+    Write-TestHeader "Test ${TestNumber}: File Upload - sample.mp4"
     
     if (-not (Test-Path $SampleVideo)) {
         Write-Failure "Sample video file not found: $SampleVideo"
@@ -392,7 +392,7 @@ function Show-Diagnostics {
     # Check yt-dlp
     try {
         $ytdlpVersion = docker-compose -f api/docker-compose.yml exec -T api yt-dlp --version 2>&1
-        if ($ytdlpVersion -match '\d{4}\.\d{2}\.\d{2}') {
+        if ($ytdlpVersion -match "\d{4}\.\d{2}\.\d{2}") {
             Write-Success "yt-dlp version: $ytdlpVersion"
         }
     }
