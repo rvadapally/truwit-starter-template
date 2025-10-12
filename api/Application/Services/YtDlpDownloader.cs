@@ -37,6 +37,18 @@ public sealed class YtDlpDownloader : IMediaDownloader
 
             // Build yt-dlp command
             var args = $"--no-playlist -f \"bv*+ba/b\" --merge-output-format mp4 -o \"{outputTemplate}\" \"{url}\"";
+            
+            // Add cookies if available (for YouTube bot detection)
+            var cookiesPath = Environment.GetEnvironmentVariable("YTDLP_COOKIES");
+            if (!string.IsNullOrEmpty(cookiesPath) && File.Exists(cookiesPath))
+            {
+                args = $"--cookies \"{cookiesPath}\" {args}";
+                _logger.LogInformation("Using cookies from: {CookiesPath}", cookiesPath);
+            }
+            else
+            {
+                _logger.LogDebug("No cookies configured (YTDLP_COOKIES not set or file not found)");
+            }
 
             _logger.LogDebug("Running yt-dlp with args: {Args}", args);
 
