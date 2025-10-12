@@ -26,5 +26,10 @@ RUN apt-get update && \
     mkdir -p /app/data && chmod 777 /app/data
 
 COPY --from=build /app/publish .
+
+# Copy YouTube cookies for yt-dlp authentication (bypasses bot detection)
+COPY cookies.txt /app/cookies.txt
+RUN chmod 644 /app/cookies.txt
+
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "HumanProof.Api.dll"]
