@@ -20,6 +20,18 @@ public class AssetsRepository : IAssetsRepository
         _logger = logger;
     }
 
+    public async Task<Asset?> GetByIdAsync(string assetId)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+
+        var sql = @"
+            SELECT AssetId, Sha256, MediaType, Bytes, DurationSec, Width, Height, CreatedAt
+            FROM Assets 
+            WHERE AssetId = @AssetId";
+
+        return await connection.QueryFirstOrDefaultAsync<Asset>(sql, new { AssetId = assetId });
+    }
+
     public async Task<Asset?> GetBySha256Async(string sha256)
     {
         using var connection = new SqliteConnection(_connectionString);

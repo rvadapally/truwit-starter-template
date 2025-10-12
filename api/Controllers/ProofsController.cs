@@ -1094,7 +1094,7 @@ public class ProofsController : ControllerBase
             var proof = await _proofsRepo.GetByTrustmarkIdAsync(id);
             if (proof != null)
             {
-                var asset = proof.AssetId != null ? await _assetsRepo.GetBySha256Async(proof.AssetId) : null;
+                var asset = proof.AssetId != null ? await _assetsRepo.GetByIdAsync(proof.AssetId) : null;
 
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 var response = new VerifyResponseDto

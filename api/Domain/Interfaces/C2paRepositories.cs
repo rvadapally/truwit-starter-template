@@ -16,6 +16,7 @@ public interface ILinkIndexRepository
 /// </summary>
 public interface IAssetsRepository
 {
+    Task<Asset?> GetByIdAsync(string assetId);
     Task<Asset?> GetBySha256Async(string sha256);
     Task<string> InsertAsync(Asset asset);
 }
