@@ -1,0 +1,40 @@
+# Build artifacts
+bin/
+obj/
+out/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+data/
+
+# Temp/cache
+temp_downloads/
+uploads/
+.vs/
+.vscode/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README*.md
+*.md
+
+# Tests
+Tests/
+test-*.sh
+test-*.ps1
+
+# Git
+.git/
+.gitignore
+
