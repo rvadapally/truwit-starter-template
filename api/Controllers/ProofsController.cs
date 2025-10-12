@@ -1080,7 +1080,7 @@ public class ProofsController : ControllerBase
         }
     }
 
-    [HttpGet("verify/{id}")]
+    [HttpGet("proofs/verify/{id}")]
     [ProducesResponseType(typeof(VerifyResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<VerifyResponseDto>> VerifyProof(string id)
