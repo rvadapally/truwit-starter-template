@@ -111,3 +111,16 @@ temp/
 
 # Cloudflare
 wrangler.toml
+
+# .NET specific
+api/bin/
+api/obj/
+api/temp_downloads/
+api/uploads/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.user
+*.userosscache
+*.sln.docstates
