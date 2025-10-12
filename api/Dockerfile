@@ -21,6 +21,7 @@ RUN dotnet publish "HumanProof.Api.csproj" -c Release -o /app/publish /p:UseAppH
 FROM base AS final
 WORKDIR /app
 
+# Force rebuild - Updated 2025-10-12
 # Install system dependencies: yt-dlp, ffmpeg, c2patool, python3, and curl
 RUN apt-get update && apt-get install -y \
     python3 \
