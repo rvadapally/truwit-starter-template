@@ -1,4 +1,5 @@
 using HumanProof.Api.Application.DTOs;
+using HumanProof.Api.Domain.Common;
 using HumanProof.Api.Domain.Interfaces;
 using HumanProof.Api.Domain.Entities;
 using HumanProof.Api.Domain.Enums;
@@ -61,8 +62,8 @@ public class VerificationService : IVerificationService
                 FileSize = request.File?.Length,
                 ContentType = request.File?.ContentType,
                 Status = Domain.Enums.VerificationStatus.Processing,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                CreatedAt = DateTimeProvider.Now,
+                UpdatedAt = DateTimeProvider.Now
             };
 
             // Use ContentIngestService for real processing
@@ -84,8 +85,8 @@ public class VerificationService : IVerificationService
                     ? string.Join(",", request.Metadata.LikenessConsent)
                     : null,
                 License = request.Metadata?.License ?? LicenseType.CreatorOwned,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                CreatedAt = DateTimeProvider.Now,
+                UpdatedAt = DateTimeProvider.Now
             };
 
             // Create proof with all data
@@ -98,15 +99,15 @@ public class VerificationService : IVerificationService
                 MetadataId = metadata.Id,
                 Metadata = metadata,
                 Signature = await _hashService.GenerateSignatureAsync(ingestResult.ContentHash),
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTimeProvider.Now,
+                UpdatedAt = DateTimeProvider.Now,
                 IsDeleted = false
             };
 
             // Update VerificationRequest with proof reference
             verificationRequest.ProofId = proof.Id;
             verificationRequest.Status = Domain.Enums.VerificationStatus.Completed;
-            verificationRequest.UpdatedAt = DateTime.Now;
+            verificationRequest.UpdatedAt = DateTimeProvider.Now;
 
             // Save the complete proof to repository
             await _repository.CreateAsync(proof);

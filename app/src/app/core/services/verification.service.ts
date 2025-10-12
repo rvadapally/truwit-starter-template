@@ -45,7 +45,7 @@ export class VerificationService {
   }
 
   verifyProof(proofId: string): Observable<VerifyResponse> {
-    return this.apiService.get<VerifyResponse>(`/v1/verify/${proofId}`).pipe(
+    return this.apiService.get<VerifyResponse>(`/v1/proofs/verify/${proofId}`).pipe(
       map(response => response.data || response)
     );
   }

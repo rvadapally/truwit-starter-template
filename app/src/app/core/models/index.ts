@@ -82,6 +82,7 @@ export interface VerifyResponse {
   };
   issuedAt: string;
   signatureStatus: 'valid' | 'invalid' | 'unknown';
+  badgeUrl: string;
 }
 
 // Legacy models for backward compatibility

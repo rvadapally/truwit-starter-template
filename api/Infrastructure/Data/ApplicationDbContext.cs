@@ -12,6 +12,12 @@ public class ApplicationDbContext : DbContext
     public DbSet<VerificationProof> VerificationProofs { get; set; } = null!;
     public DbSet<VerificationMetadata> VerificationMetadata { get; set; } = null!;
     public DbSet<VerificationRequest> VerificationRequests { get; set; } = null!;
+    
+    // C2PA entities
+    public DbSet<Proof> Proofs { get; set; } = null!;
+    public DbSet<Asset> Assets { get; set; } = null!;
+    public DbSet<Receipt> Receipts { get; set; } = null!;
+    public DbSet<LinkIndex> LinkIndex { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -69,6 +75,44 @@ public class ApplicationDbContext : DbContext
                   .WithMany()
                   .HasForeignKey(e => e.ProofId)
                   .OnDelete(DeleteBehavior.SetNull);
+        });
+        
+        // Configure C2PA entities
+        modelBuilder.Entity<Proof>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasMaxLength(50);
+            entity.Property(e => e.TrustmarkId).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.AssetId).HasMaxLength(50);
+            entity.Property(e => e.ReceiptId).HasMaxLength(50);
+            entity.HasIndex(e => e.TrustmarkId).IsUnique();
+            entity.HasIndex(e => e.AssetId);
+        });
+        
+        modelBuilder.Entity<Asset>(entity =>
+        {
+            entity.HasKey(e => e.AssetId);
+            entity.Property(e => e.AssetId).HasMaxLength(50);
+            entity.Property(e => e.Sha256).HasMaxLength(64).IsRequired();
+            entity.Property(e => e.MediaType).HasMaxLength(100);
+            entity.HasIndex(e => e.Sha256).IsUnique();
+        });
+        
+        modelBuilder.Entity<Receipt>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasMaxLength(50);
+            entity.Property(e => e.ProofId).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.ReceiptHash).HasMaxLength(64);
+            entity.HasIndex(e => e.ProofId);
+        });
+        
+        modelBuilder.Entity<LinkIndex>(entity =>
+        {
+            entity.HasKey(e => new { e.Platform, e.CanonicalId });
+            entity.Property(e => e.Platform).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.CanonicalId).HasMaxLength(200).IsRequired();
+            entity.Property(e => e.ProofId).HasMaxLength(50).IsRequired();
         });
     }
 }

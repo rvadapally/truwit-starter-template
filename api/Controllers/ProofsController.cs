@@ -1095,6 +1095,7 @@ public class ProofsController : ControllerBase
             {
                 var asset = proof.AssetId != null ? await _assetsRepo.GetBySha256Async(proof.AssetId) : null;
 
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 var response = new VerifyResponseDto
                 {
                     ProofId = proof.Id,
@@ -1111,6 +1112,7 @@ public class ProofsController : ControllerBase
                     },
                     IssuedAt = proof.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
                     SignatureStatus = proof.C2paPresent ? "valid" : "invalid",
+                    BadgeUrl = $"{baseUrl}/v1/badge/{proof.TrustmarkId}.svg",
                     Origin = new OriginInfo(
                         C2pa: proof.C2paPresent,
                         Status: proof.OriginStatus,
@@ -1137,6 +1139,7 @@ public class ProofsController : ControllerBase
                 });
             }
 
+            var fallbackBaseUrl = $"{Request.Scheme}://{Request.Host}";
             var fallbackResponse = new VerifyResponseDto
             {
                 ProofId = result.ProofId,
@@ -1153,6 +1156,7 @@ public class ProofsController : ControllerBase
                 },
                 IssuedAt = result.Timestamp.ToString("yyyy-MM-ddTHH:mm:ssZ"),
                 SignatureStatus = result.IsValid ? "valid" : "invalid",
+                BadgeUrl = $"{fallbackBaseUrl}/v1/badge/{id}.svg",
                 Origin = new OriginInfo(
                     C2pa: false,
                     Status: "not_found",
@@ -1227,5 +1231,6 @@ public class VerifyResponseDto
     public DeclaredDataDto Declared { get; set; } = null!;
     public string IssuedAt { get; set; } = string.Empty;
     public string SignatureStatus { get; set; } = string.Empty;
+    public string BadgeUrl { get; set; } = string.Empty;
     public OriginInfo? Origin { get; set; }
 }
