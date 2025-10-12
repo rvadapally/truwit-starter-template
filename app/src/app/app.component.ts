@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, type OnInit, type OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subject, takeUntil, filter } from 'rxjs';
 
@@ -14,9 +14,13 @@ export class AppComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
+    console.log('🚀 AppComponent initialized');
     // Track route changes
     this.router.events
       .pipe(
@@ -24,7 +28,10 @@ export class AppComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe((event) => {
-        this.currentRoute = (event as NavigationEnd).url;
+        const url = (event as NavigationEnd).url;
+        console.log('🔄 Route changed to:', url);
+        this.currentRoute = url;
+        this.cdr.markForCheck();
       });
   }
 

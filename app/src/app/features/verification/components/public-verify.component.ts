@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, type OnInit, type OnDestroy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
@@ -20,17 +20,21 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private verificationService: VerificationService
+    private verificationService: VerificationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    console.log('🎯 PublicVerifyComponent ngOnInit called');
     this.route.params
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
         this.proofId = params['id'];
+        console.log('📍 Route params received:', params, 'Proof ID:', this.proofId);
         if (this.proofId) {
           this.loadVerifyData();
         }
+        this.cdr.markForCheck();
       });
   }
 
@@ -42,19 +46,25 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
   private loadVerifyData(): void {
     if (!this.proofId) return;
     
+    console.log('🔍 Loading verify data for proof:', this.proofId);
     this.isLoading = true;
     this.error = null;
+    this.cdr.markForCheck();
     
     this.verificationService.verifyProof(this.proofId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
+          console.log('✅ Verify data received:', data);
           this.verifyData = data;
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         error: (error) => {
+          console.error('❌ Error loading verify data:', error);
           this.error = error.message || 'Failed to load verification data';
           this.isLoading = false;
+          this.cdr.markForCheck();
         }
       });
   }
