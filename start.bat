@@ -1,6 +1,7 @@
 @echo off
 echo ========================================
 echo    Starting Truwit Verification App
+echo      (Docker + Angular Development)
 echo ========================================
 echo.
 
@@ -12,30 +13,22 @@ if not exist "api\HumanProof.Api.csproj" (
     exit /b 1
 )
 
-echo [1/4] Checking prerequisites...
+echo [1/5] Checking prerequisites...
 echo.
 
-REM Clean up any existing processes on ports 4200 and 5000
-echo Cleaning up existing processes...
-netstat -ano | findstr :4200 >nul 2>&1
-if not errorlevel 1 (
-    echo Stopping process on port 4200...
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :4200') do taskkill /f /pid %%a >nul 2>&1
-)
-
-netstat -ano | findstr :5000 >nul 2>&1
-if not errorlevel 1 (
-    echo Stopping process on port 5000...
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5000') do taskkill /f /pid %%a >nul 2>&1
-)
-
-echo ✅ Port cleanup completed
-echo.
-
-REM Check if dotnet is installed
-dotnet --version >nul 2>&1
+REM Check if Docker is installed
+docker --version >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: .NET SDK not found. Please install .NET 8.0 SDK
+    echo ERROR: Docker not found. Please install Docker Desktop
+    echo Download from: https://www.docker.com/products/docker-desktop
+    pause
+    exit /b 1
+)
+
+REM Check if Docker is running
+docker info >nul 2>&1
+if errorlevel 1 (
+    echo ERROR: Docker is not running. Please start Docker Desktop
     pause
     exit /b 1
 )
@@ -51,48 +44,70 @@ if errorlevel 1 (
 echo ✅ Prerequisites check passed
 echo.
 
-echo [2/4] Installing Angular dependencies...
-cd truwit-integrated\app
+echo [2/5] Cleaning up existing services...
+REM Clean up any existing Docker containers
+cd api
+docker-compose down >nul 2>&1
+cd ..
+
+REM Clean up Angular processes on port 4200
+netstat -ano | findstr :4200 >nul 2>&1
+if not errorlevel 1 (
+    echo Stopping process on port 4200...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :4200') do taskkill /f /pid %%a >nul 2>&1
+)
+
+echo ✅ Cleanup completed
+echo.
+
+echo [3/5] Installing Angular dependencies...
+cd app
 call npm install
 if errorlevel 1 (
     echo ERROR: Failed to install Angular dependencies
+    cd ..
     pause
     exit /b 1
 )
-cd ..\..
+cd ..
 echo ✅ Angular dependencies installed
 echo.
 
-echo [3/4] Starting .NET API server...
-start "Truwit API" cmd /k "cd api && echo Starting API server... && dotnet run --urls http://localhost:5000"
-echo ✅ API server starting on http://localhost:5000
+echo [4/5] Starting API in Docker (Linux environment)...
+cd api
+start "Truwit API (Docker)" cmd /k "echo Starting API in Docker container... && echo. && docker-compose up --build"
+cd ..
+echo ✅ API container starting on http://localhost:5000
+echo ⏳ Waiting for API to be ready (15 seconds)...
+timeout /t 15 /nobreak >nul
 echo.
 
-echo [4/4] Starting Angular development server...
-cd truwit-integrated\app
-start "Truwit Angular" cmd /k "echo Starting Angular app... && npm start"
-cd ..\..
+echo [5/5] Starting Angular development server...
+cd app
+start "Truwit Angular" cmd /k "echo Starting Angular app... && echo. && npm start"
+cd ..
 echo ✅ Angular app starting on http://localhost:4200
+echo ⏳ Waiting for Angular to be ready (10 seconds)...
+timeout /t 10 /nobreak >nul
 echo.
 
 echo ========================================
-echo    Servers are starting up...
+echo    Servers are running!
 echo ========================================
 echo.
-echo 🌐 Main App:     http://localhost:4200
-echo 🔧 API Swagger:  http://localhost:5000/swagger
-echo ❤️  API Health:   http://localhost:5000/health
+echo 🌐 Frontend:     http://localhost:4200
+echo 🔧 API:          http://localhost:5000
+echo ❤️  Health:       http://localhost:5000/health
+echo 📋 Docker Logs:  docker-compose -f api\docker-compose.yml logs -f
 echo.
-echo Press any key to open the main app in your browser...
+echo 🐳 API running in Docker (same as production!)
+echo.
+echo Press any key to run automated tests...
 pause >nul
 
-REM Open the main app in browser
-start http://localhost:4200
+echo.
+echo Running automated tests...
+powershell -ExecutionPolicy Bypass -File test-suite.ps1
+echo.
 
-echo.
-echo 🎉 Enjoy testing the Truwit Verification App!
-echo.
-echo Note: Both servers will continue running in separate windows.
-echo Close those windows to stop the servers.
-echo.
 pause
