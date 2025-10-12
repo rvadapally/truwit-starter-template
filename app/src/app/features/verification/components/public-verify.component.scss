@@ -96,21 +96,25 @@
 
       .detail-row {
         display: flex;
-        align-items: center;
-        margin-bottom: 0.75rem;
+        align-items: flex-start;
+        margin-bottom: 1rem;
         gap: 1rem;
 
         .label {
           font-weight: 600;
-          min-width: 120px;
+          min-width: 180px;
           color: #9fb3d9;
+          flex-shrink: 0;
+          padding-top: 2px;
         }
 
         .value {
           flex: 1;
           font-family: 'Courier New', monospace;
-          font-size: 0.9rem;
-          word-break: break-all;
+          font-size: 0.85rem;
+          word-break: break-word;
+          overflow-wrap: break-word;
+          line-height: 1.6;
 
           &.valid {
             color: #22c55e;
@@ -134,15 +138,46 @@
           }
         }
 
+        &:has(.copy-btn) {
+          .value {
+            max-width: calc(100% - 80px);
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(14, 165, 233, 0.5) rgba(255, 255, 255, 0.1);
+            
+            &::-webkit-scrollbar {
+              height: 6px;
+            }
+            
+            &::-webkit-scrollbar-track {
+              background: rgba(255, 255, 255, 0.1);
+              border-radius: 3px;
+            }
+            
+            &::-webkit-scrollbar-thumb {
+              background: rgba(14, 165, 233, 0.5);
+              border-radius: 3px;
+              
+              &:hover {
+                background: rgba(14, 165, 233, 0.7);
+              }
+            }
+          }
+        }
+
         .copy-btn {
           background: rgba(14, 165, 233, 0.2);
           border: 1px solid #0ea5e9;
           color: #0ea5e9;
-          padding: 0.25rem 0.5rem;
+          padding: 0.25rem 0.75rem;
           border-radius: 4px;
           font-size: 0.8rem;
           cursor: pointer;
           transition: all 0.2s;
+          white-space: nowrap;
+          flex-shrink: 0;
+          margin-left: auto;
 
           &:hover {
             background: rgba(14, 165, 233, 0.3);
@@ -250,6 +285,17 @@
 
         .label {
           min-width: auto;
+          width: 100%;
+        }
+
+        .value {
+          width: 100%;
+          max-width: 100% !important;
+        }
+
+        .copy-btn {
+          margin-left: 0;
+          margin-top: 0.5rem;
         }
       }
     }
