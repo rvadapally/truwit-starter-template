@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const AUTH0_DOMAIN = 'YOUR_AUTH0_DOMAIN.us.auth0.com';\nexport const AUTH0_CLIENT_ID = 'YOUR_CLIENT_ID';\nexport const AUTH0_AUDIENCE = 'https://api.humanproof.local';\nexport const API_BASE = 'http://localhost:5299';","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

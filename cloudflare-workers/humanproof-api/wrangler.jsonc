@@ -1,0 +1,52 @@
+/**
+ * HumanProof API - Cloudflare Workers Configuration
+ * For more details on how to configure Wrangler, refer to:
+ * https://developers.cloudflare.com/workers/wrangler/configuration/
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "humanproof-api",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-10-08",
+	"compatibility_flags": [
+		"global_fetch_strictly_public"
+	],
+	"observability": {
+		"enabled": true
+	},
+	/**
+	 * Environment Variables for HumanProof API
+	 */
+	"vars": {
+		"ENVIRONMENT": "production",
+		"API_VERSION": "v1",
+		"MAX_FILE_SIZE": "500000000",
+		"REQUEST_TIMEOUT": "300"
+	},
+	/**
+	 * Secrets (set via wrangler secret put)
+	 * - HMAC_SECRET: For receipt signing
+	 * - DATABASE_URL: For database connection
+	 * - AUTH0_DOMAIN: Auth0 domain
+	 * - AUTH0_AUDIENCE: Auth0 audience
+	 */
+	/**
+	 * D1 Database binding for SQLite-compatible database
+	 */
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "humanproof-db",
+			"database_id": "your-database-id-here"
+		}
+	],
+	/**
+	 * R2 Storage for file uploads
+	 */
+	// "r2_buckets": [
+	//   {
+	//     "binding": "ASSETS_BUCKET",
+	//     "bucket_name": "humanproof-assets"
+	//   }
+	// ]
+}

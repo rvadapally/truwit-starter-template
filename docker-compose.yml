@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  truwit-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Database__Type=sqlite
+      - ConnectionStrings__Sqlite=Data Source=/app/data/truwit.db
+    volumes:
+      - ./api/data:/app/data
+      - ./api/temp_downloads:/tmp/truwit_dl
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add a database service if you want to use Postgres
+  # postgres:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_DB: truwit
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: password
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+
+# volumes:
+#   postgres_data:

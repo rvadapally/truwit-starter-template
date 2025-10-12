@@ -1,0 +1,188 @@
+{
+    "info": {
+        "name": "Truwit Video C2PA API",
+        "description": "API collection for testing C2PA video verification features",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/health/tools",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "health",
+                        "tools"
+                    ]
+                },
+                "description": "Check toolchain versions (yt-dlp, c2patool, ffmpeg)"
+            },
+            "response": []
+        },
+        {
+            "name": "Dev Sign File",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "file",
+                            "type": "file",
+                            "src": []
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/dev/sign",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "dev",
+                        "sign"
+                    ]
+                },
+                "description": "Sign an MP4 file with C2PA (dev-only endpoint)"
+            },
+            "response": []
+        },
+        {
+            "name": "Create Proof from File",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "formdata",
+                    "formdata": [
+                        {
+                            "key": "file",
+                            "type": "file",
+                            "src": []
+                        },
+                        {
+                            "key": "likenessOwnerName",
+                            "value": "Test User",
+                            "type": "text"
+                        },
+                        {
+                            "key": "consentEvidenceUrl",
+                            "value": "https://example.com/consent",
+                            "type": "text"
+                        }
+                    ]
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/v1/proofs/file-upload",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "v1",
+                        "proofs",
+                        "file-upload"
+                    ]
+                },
+                "description": "Upload a file and create a proof with C2PA verification"
+            },
+            "response": []
+        },
+        {
+            "name": "Create Proof from URL",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    },
+                    {
+                        "key": "Idempotency-Key",
+                        "value": "{{$guid}}",
+                        "description": "Optional idempotency key"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n  \"url\": \"https://www.youtube.com/watch?v=dQw4w9WgXcQ\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/v1/proofs/url",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "v1",
+                        "proofs",
+                        "url"
+                    ]
+                },
+                "description": "Create proof from a video URL"
+            },
+            "response": []
+        },
+        {
+            "name": "Verify Proof by Trustmark",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/v1/verify-trustmark/{{trustmarkId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "v1",
+                        "verify-trustmark",
+                        "{{trustmarkId}}"
+                    ]
+                },
+                "description": "Get verification details by trustmark ID"
+            },
+            "response": []
+        },
+        {
+            "name": "Verify Proof by ID",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{baseUrl}}/v1/verify/{{proofId}}",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "v1",
+                        "verify",
+                        "{{proofId}}"
+                    ]
+                },
+                "description": "Get verification details by proof ID"
+            },
+            "response": []
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5080",
+            "description": "Base URL for the API"
+        },
+        {
+            "key": "trustmarkId",
+            "value": "abc12345",
+            "description": "Sample trustmark ID for testing"
+        },
+        {
+            "key": "proofId",
+            "value": "def67890",
+            "description": "Sample proof ID for testing"
+        }
+    ]
+}

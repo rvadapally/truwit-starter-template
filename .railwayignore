@@ -1,0 +1,11 @@
+# Ignore frontend files
+truwit-integrated/
+web/
+.github/
+*.md
+node_modules/
+dist/
+build/
+
+# Only include API files
+!api/
