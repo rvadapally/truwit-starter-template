@@ -83,9 +83,7 @@ timeout /t 15 /nobreak >nul
 echo.
 
 echo [5/5] Starting Angular development server...
-cd app
-start "Truwit Angular" cmd /k "echo Starting Angular app... && echo. && npm start"
-cd ..
+start "Truwit Angular" cmd /k "cd app && echo Starting Angular app... && echo. && npm start"
 echo ✅ Angular app starting on http://localhost:4200
 echo ⏳ Waiting for Angular to be ready (10 seconds)...
 timeout /t 10 /nobreak >nul
