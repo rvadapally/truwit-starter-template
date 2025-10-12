@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000'  // .NET API port
+  apiUrl: 'https://truwit-starter-template-production.up.railway.app'  // Railway deployed .NET API
 };
