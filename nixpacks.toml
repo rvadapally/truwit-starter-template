@@ -1,0 +1,8 @@
+[phases.setup]
+nixPkgs = ["dotnet-sdk_8"]
+
+[phases.build]
+cmds = ["cd api && dotnet publish -c Release -o /app"]
+
+[phases.start]
+cmd = "dotnet /app/HumanProof.Api.dll"
