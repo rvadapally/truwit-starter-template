@@ -17,11 +17,18 @@ if ($Environment -eq "production") {
 }
 
 # Colors for output
-function Write-Success { param($Message) Write-Host "✅ $Message" -ForegroundColor Green }
-function Write-Failure { param($Message) Write-Host "❌ $Message" -ForegroundColor Red }
-function Write-Info { param($Message) Write-Host "ℹ️  $Message" -ForegroundColor Cyan }
-function Write-Warning { param($Message) Write-Host "⚠️  $Message" -ForegroundColor Yellow }
-function Write-Section { param($Message) Write-Host "`n========================================`n$Message`n========================================" -ForegroundColor Magenta }
+function Write-Success { param($Message) Write-Host "[PASS] $Message" -ForegroundColor Green }
+function Write-Failure { param($Message) Write-Host "[FAIL] $Message" -ForegroundColor Red }
+function Write-Info { param($Message) Write-Host "[INFO] $Message" -ForegroundColor Cyan }
+function Write-Warning { param($Message) Write-Host "[WARN] $Message" -ForegroundColor Yellow }
+function Write-Section { 
+    param($Message) 
+    Write-Host "" -ForegroundColor Magenta
+    Write-Host "========================================" -ForegroundColor Magenta
+    Write-Host "$Message" -ForegroundColor Magenta
+    Write-Host "========================================" -ForegroundColor Magenta
+    Write-Host "" -ForegroundColor Magenta
+}
 
 # Test results tracking
 $script:TotalTests = 0
@@ -329,10 +336,11 @@ Write-Host ""
 $passRate = if ($script:TotalTests -gt 0) { [math]::Round(($script:PassedTests / $script:TotalTests) * 100, 2) } else { 0 }
 Write-Host "Pass Rate: $passRate%" -ForegroundColor $(if ($passRate -ge 80) { "Green" } elseif ($passRate -ge 60) { "Yellow" } else { "Red" })
 
-Write-Host "`nDetailed Results:" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Detailed Results:" -ForegroundColor Cyan
 Write-Host "==================" -ForegroundColor Cyan
 foreach ($result in $script:TestResults) {
-    $status = if ($result.Passed) { "✅ PASS" } else { "❌ FAIL" }
+    $status = if ($result.Passed) { "[PASS]" } else { "[FAIL]" }
     $color = if ($result.Passed) { "Green" } else { "Red" }
     Write-Host "$status - $($result.Test)" -ForegroundColor $color
     if ($result.Details) {
@@ -340,13 +348,15 @@ foreach ($result in $script:TestResults) {
     }
 }
 
-Write-Host "`n========================================" -ForegroundColor Magenta
+Write-Host ""
+Write-Host "========================================" -ForegroundColor Magenta
 if ($script:FailedTests -eq 0) {
-    Write-Success "🎉 ALL TESTS PASSED! 🎉"
+    Write-Success "ALL TESTS PASSED!"
 } else {
     Write-Warning "Some tests failed. Please review the results above."
 }
-Write-Host "========================================`n" -ForegroundColor Magenta
+Write-Host "========================================" -ForegroundColor Magenta
+Write-Host ""
 
 # Exit with appropriate code
 exit $script:FailedTests
