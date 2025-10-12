@@ -1,0 +1,18 @@
+[phases.setup]
+nixPkgs = ["...", "yt-dlp", "ffmpeg"]
+
+[phases.install]
+cmds = [
+    "wget -q https://github.com/contentauth/c2patool/releases/latest/download/c2patool-linux-x64.tar.gz -O /tmp/c2patool.tar.gz",
+    "tar -xzf /tmp/c2patool.tar.gz -C /tmp",
+    "cp /tmp/c2patool /usr/local/bin/c2patool",
+    "chmod +x /usr/local/bin/c2patool",
+    "rm /tmp/c2patool.tar.gz"
+]
+
+[phases.build]
+cmds = ["dotnet publish -c Release -o /app"]
+
+[start]
+cmd = "dotnet /app/HumanProof.Api.dll"
+
