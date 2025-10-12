@@ -5,6 +5,7 @@ using HumanProof.Api.Application.Services;
 using HumanProof.Api.Domain.Interfaces;
 using HumanProof.Api.Domain.Entities;
 using HumanProof.Api.Domain.Enums;
+using HumanProof.Api.Domain.Common;
 using HumanProof.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -175,7 +176,7 @@ public class ProofsController : ControllerBase
                     DurationSec = null, // We don't have duration info from yt-dlp
                     Width = null, // We don't have dimensions info from yt-dlp
                     Height = null,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTimeProvider.Now
                 };
                 await _assetsRepo.InsertAsync(asset);
                 _logger.LogInformation("🆕 Created new asset: {AssetId}", assetId);
@@ -198,8 +199,8 @@ public class ProofsController : ControllerBase
                 OriginStatus = c2paResult.Status ?? "not_found",
                 PolicyResult = "pass", // Stub for now
                 PolicyJson = "{}",
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                CreatedAt = DateTimeProvider.Now,
+                UpdatedAt = DateTimeProvider.Now
             };
 
             await _proofsRepo.InsertAsync(proof);
@@ -215,7 +216,7 @@ public class ProofsController : ControllerBase
                 c2paPresent = c2paResult.ManifestFound,
                 originStatus = c2paResult.Status,
                 policyResult = "pass",
-                timestamp = DateTime.Now
+                timestamp = DateTimeProvider.Now
             };
 
             var (signature, publicKey) = await _receiptSigner.SignReceiptAsync(receiptData);
@@ -229,7 +230,7 @@ public class ProofsController : ControllerBase
                 ReceiptHash = receiptHash,
                 Signature = signature,
                 SignerPubKey = publicKey,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTimeProvider.Now
             };
 
             await _receiptsRepo.InsertAsync(receipt);
@@ -330,7 +331,7 @@ public class ProofsController : ControllerBase
                         Sha256 = sha256,
                         MediaType = file.ContentType,
                         Bytes = file.Length,
-                        CreatedAt = DateTime.Now
+                        CreatedAt = DateTimeProvider.Now
                     };
                     await _assetsRepo.InsertAsync(asset);
                 }
@@ -354,8 +355,8 @@ public class ProofsController : ControllerBase
                     OriginStatus = c2paResult.ManifestFound ? "verified" : "not_found",
                     PolicyResult = "pass",
                     PolicyJson = "{}",
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeProvider.Now,
+                    UpdatedAt = DateTimeProvider.Now
                 };
 
                 await _proofsRepo.InsertAsync(proof);
@@ -372,7 +373,7 @@ public class ProofsController : ControllerBase
                     fileSize = file.Length,
                     likenessOwnerName = request.LikenessOwnerName,
                     consentEvidenceUrl = request.ConsentEvidenceUrl,
-                    timestamp = DateTime.Now
+                    timestamp = DateTimeProvider.Now
                 };
 
                 var (signature, publicKey) = await _receiptSigner.SignReceiptAsync(receiptData);
@@ -386,7 +387,7 @@ public class ProofsController : ControllerBase
                     ReceiptHash = receiptHash,
                     Signature = signature,
                     SignerPubKey = publicKey,
-                    CreatedAt = DateTime.Now
+                    CreatedAt = DateTimeProvider.Now
                 };
 
                 await _receiptsRepo.InsertAsync(receipt);
@@ -1040,8 +1041,8 @@ public class ProofsController : ControllerBase
                 ContentHash = "test-hash-" + DateTime.Now.Ticks,
                 PerceptualHash = "test-perceptual-" + DateTime.Now.Ticks,
                 Signature = "test-signature-" + DateTime.Now.Ticks,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now,
+                CreatedAt = DateTimeProvider.Now,
+                UpdatedAt = DateTimeProvider.Now,
                 IsDeleted = false,
                 MetadataId = Guid.NewGuid(),
                 Metadata = new Domain.Entities.VerificationMetadata
@@ -1051,8 +1052,8 @@ public class ProofsController : ControllerBase
                     ToolName = "Test Tool",
                     ToolVersion = "1.0",
                     License = Domain.Enums.LicenseType.CreatorOwned,
-                    CreatedAt = DateTime.Now,
-                    UpdatedAt = DateTime.Now
+                    CreatedAt = DateTimeProvider.Now,
+                    UpdatedAt = DateTimeProvider.Now
                 }
             };
 
