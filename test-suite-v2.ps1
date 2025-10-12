@@ -145,12 +145,10 @@ if (Test-Path $UrlsFile) {
         Write-TestInfo "This may take 30-60 seconds..."
         
         $body = @{
-            url = $urlTrimmed
-            includeMetadata = $true
-            performDeepAnalysis = $false
+            Url = $urlTrimmed
         }
         
-        $result = Test-ApiCall -Endpoint "/v1/proofs" -Method "POST" -Body $body -Timeout 120
+        $result = Test-ApiCall -Endpoint "/v1/proofs/url" -Method "POST" -Body $body -Timeout 120
         
         if ($result.Success -and ($result.StatusCode -eq 200 -or $result.StatusCode -eq 201)) {
             Write-TestSuccess "URL processed successfully"
