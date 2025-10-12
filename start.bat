@@ -77,7 +77,7 @@ echo [4/5] Starting API in Docker (Linux environment)...
 cd api
 start "Truwit API (Docker)" cmd /k "echo Starting API in Docker container... && echo. && docker-compose up --build"
 cd ..
-echo ✅ API container starting on http://localhost:5000
+echo ✅ API container starting on http://localhost:5001
 echo ⏳ Waiting for API to be ready (15 seconds)...
 timeout /t 15 /nobreak >nul
 echo.
@@ -96,8 +96,8 @@ echo    Servers are running!
 echo ========================================
 echo.
 echo 🌐 Frontend:     http://localhost:4200
-echo 🔧 API:          http://localhost:5000
-echo ❤️  Health:       http://localhost:5000/health
+echo 🔧 API:          http://localhost:5001
+echo ❤️  Health:       http://localhost:5001/health
 echo 📋 Docker Logs:  docker-compose -f api\docker-compose.yml logs -f
 echo.
 echo 🐳 API running in Docker (same as production!)

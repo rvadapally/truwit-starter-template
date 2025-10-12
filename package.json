@@ -9,7 +9,7 @@
     "dev": "astro dev",
     "dev:app": "cd app && npm start",
     "dev:both": "concurrently \"npm run dev:app\" \"npm run dev\"",
-    "start": "astro dev",
+    "start": "echo ❌ ERROR: Don't run npm start here! && echo ✅ Use start.bat instead! && exit 1",
     "build": "npm run build:app && npm run build:astro && npm run integrate",
     "build:astro": "astro build",
     "build:app": "cd app && npm install && npm run build",
