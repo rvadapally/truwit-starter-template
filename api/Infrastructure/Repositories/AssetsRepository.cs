@@ -1,64 +1,70 @@
 using Dapper;
 using HumanProof.Api.Domain.Entities;
 using HumanProof.Api.Domain.Interfaces;
-using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using HumanProof.Api.Infrastructure.Data;
 
 namespace HumanProof.Api.Infrastructure.Repositories;
 
 /// <summary>
-/// Dapper-based Assets repository
+/// Dapper-based Assets repository (database-agnostic)
 /// </summary>
 public class AssetsRepository : IAssetsRepository
 {
-    private readonly string _connectionString;
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<AssetsRepository> _logger;
+    private readonly bool _isPostgres;
 
-    public AssetsRepository(IConfiguration configuration, ILogger<AssetsRepository> logger)
+    public AssetsRepository(ApplicationDbContext context, ILogger<AssetsRepository> logger)
     {
-        _connectionString = configuration.GetConnectionString("Sqlite") ?? "Data Source=truwit.db";
+        _context = context;
         _logger = logger;
+        _isPostgres = context.Database.IsNpgsql();
     }
 
     public async Task<Asset?> GetByIdAsync(string assetId)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        var connection = _context.Database.GetDbConnection();
 
-        var sql = @"
-            SELECT AssetId, Sha256, MediaType, Bytes, DurationSec, Width, Height, CreatedAt
-            FROM Assets 
-            WHERE AssetId = @AssetId";
+        var sql = _isPostgres
+            ? @"SELECT ""AssetId"", ""Sha256"", ""MediaType"", ""Bytes"", ""DurationSec"", ""Width"", ""Height"", ""CreatedAt""
+                FROM ""Assets"" WHERE ""AssetId"" = @AssetId"
+            : @"SELECT AssetId, Sha256, MediaType, Bytes, DurationSec, Width, Height, CreatedAt
+                FROM Assets WHERE AssetId = @AssetId";
 
         return await connection.QueryFirstOrDefaultAsync<Asset>(sql, new { AssetId = assetId });
     }
 
     public async Task<Asset?> GetBySha256Async(string sha256)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        var connection = _context.Database.GetDbConnection();
 
-        var sql = @"
-            SELECT AssetId, Sha256, MediaType, Bytes, DurationSec, Width, Height, CreatedAt
-            FROM Assets 
-            WHERE Sha256 = @Sha256";
+        var sql = _isPostgres
+            ? @"SELECT ""AssetId"", ""Sha256"", ""MediaType"", ""Bytes"", ""DurationSec"", ""Width"", ""Height"", ""CreatedAt""
+                FROM ""Assets"" WHERE ""Sha256"" = @Sha256"
+            : @"SELECT AssetId, Sha256, MediaType, Bytes, DurationSec, Width, Height, CreatedAt
+                FROM Assets WHERE Sha256 = @Sha256";
 
         return await connection.QueryFirstOrDefaultAsync<Asset>(sql, new { Sha256 = sha256 });
     }
 
     public async Task<string> InsertAsync(Asset asset)
     {
-        using var connection = new SqliteConnection(_connectionString);
+        var connection = _context.Database.GetDbConnection();
 
         try
         {
-            var sql = @"
-                INSERT INTO Assets (AssetId, Sha256, MediaType, Bytes, DurationSec, Width, Height, CreatedAt)
-                VALUES (@AssetId, @Sha256, @MediaType, @Bytes, @DurationSec, @Width, @Height, @CreatedAt)";
+            var sql = _isPostgres
+                ? @"INSERT INTO ""Assets"" (""AssetId"", ""Sha256"", ""MediaType"", ""Bytes"", ""DurationSec"", ""Width"", ""Height"", ""CreatedAt"")
+                    VALUES (@AssetId, @Sha256, @MediaType, @Bytes, @DurationSec, @Width, @Height, @CreatedAt)"
+                : @"INSERT INTO Assets (AssetId, Sha256, MediaType, Bytes, DurationSec, Width, Height, CreatedAt)
+                    VALUES (@AssetId, @Sha256, @MediaType, @Bytes, @DurationSec, @Width, @Height, @CreatedAt)";
 
             await connection.ExecuteAsync(sql, asset);
 
             return asset.AssetId;
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode == 19) // UNIQUE constraint violation
+        catch (Exception ex) when (ex.Message.Contains("duplicate key") || ex.Message.Contains("UNIQUE constraint"))
         {
             _logger.LogInformation("Asset already exists for SHA256 {Sha256}, returning existing AssetId", asset.Sha256);
 
