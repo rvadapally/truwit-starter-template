@@ -1,0 +1,266 @@
+{
+  "config": {
+    "configFile": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\playwright.config.ts",
+    "rootDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium-desktop",
+        "name": "chromium-desktop",
+        "testDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox-desktop",
+        "name": "firefox-desktop",
+        "testDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit-desktop",
+        "name": "webkit-desktop",
+        "testDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-chrome",
+        "name": "mobile-chrome",
+        "testDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "mobile-safari",
+        "name": "mobile-safari",
+        "testDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "tablet-ipad",
+        "name": "tablet-ipad",
+        "testDir": "C:/HareKrishna/Raghu/Truwit/humanproof-starter/app/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.0",
+    "workers": 16,
+    "webServer": {
+      "command": "npm start",
+      "url": "http://localhost:4200",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "file-upload.spec.ts",
+      "file": "file-upload.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "File Upload Flow",
+          "file": "file-upload.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "successfully uploads and verifies MP4 file",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium-desktop",
+                  "projectName": "chromium-desktop",
+                  "results": [
+                    {
+                      "workerIndex": 20,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 468,
+                      "error": {
+                        "message": "Error: ENOENT: no such file or directory, stat 'C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\fixtures\\sample.mp4'",
+                        "stack": "Error: ENOENT: no such file or directory, stat 'C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\fixtures\\sample.mp4'\n    at C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\file-upload.spec.ts:22:5",
+                        "location": {
+                          "file": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\file-upload.spec.ts",
+                          "column": 5,
+                          "line": 22
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Upload file\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m fileInput\u001b[33m.\u001b[39msetInputFiles(testFilePath)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 23 |\u001b[39m     \n \u001b[90m 24 |\u001b[39m     \u001b[90m// Optional: Fill metadata\u001b[39m\n \u001b[90m 25 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"toolName\"], input[placeholder*=\"generator\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Test Video Editor'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\file-upload.spec.ts",
+                            "column": 5,
+                            "line": 22
+                          },
+                          "message": "Error: ENOENT: no such file or directory, stat 'C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\fixtures\\sample.mp4'\n\n\u001b[0m \u001b[90m 20 |\u001b[39m     \n \u001b[90m 21 |\u001b[39m     \u001b[90m// Upload file\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 22 |\u001b[39m     \u001b[36mawait\u001b[39m fileInput\u001b[33m.\u001b[39msetInputFiles(testFilePath)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m     \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 23 |\u001b[39m     \n \u001b[90m 24 |\u001b[39m     \u001b[90m// Optional: Fill metadata\u001b[39m\n \u001b[90m 25 |\u001b[39m     \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mfill(\u001b[32m'input[name=\"toolName\"], input[placeholder*=\"generator\"]'\u001b[39m\u001b[33m,\u001b[39m \u001b[32m'Test Video Editor'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\file-upload.spec.ts:22:5\u001b[22m"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-12T23:38:18.581Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\test-results\\file-upload-File-Upload-Fl-fcdc2-loads-and-verifies-MP4-file-chromium-desktop\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\test-results\\file-upload-File-Upload-Fl-fcdc2-loads-and-verifies-MP4-file-chromium-desktop\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\test-results\\file-upload-File-Upload-Fl-fcdc2-loads-and-verifies-MP4-file-chromium-desktop\\error-context.md"
+                        },
+                        {
+                          "name": "trace",
+                          "contentType": "application/zip",
+                          "path": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\test-results\\file-upload-File-Upload-Fl-fcdc2-loads-and-verifies-MP4-file-chromium-desktop\\trace.zip"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\file-upload.spec.ts",
+                        "column": 5,
+                        "line": 22
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "d240948938e2e45fd2aa-49dbbcda1647107b732e",
+              "file": "file-upload.spec.ts",
+              "line": 12,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "message": "SyntaxError: C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\deduplication.spec.ts: Missing initializer in const declaration. (61:18)\n\n\u001b[0m \u001b[90m 59 |\u001b[39m     \u001b[90m// Should mention it's a duplicate or already exists\u001b[39m\n \u001b[90m 60 |\u001b[39m     \u001b[36mconst\u001b[39m bodyText \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mtextContent(\u001b[32m'body'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 61 |\u001b[39m     \u001b[36mconst\u001b[39m mentions \u001b[33mDuplicate\u001b[39m \u001b[33m=\u001b[39m bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'duplicate'\u001b[39m) \u001b[33m||\u001b[39m \n \u001b[90m    |\u001b[39m                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 62 |\u001b[39m                              bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'already'\u001b[39m) \u001b[33m||\u001b[39m\n \u001b[90m 63 |\u001b[39m                              bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'existing'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 64 |\u001b[39m     \u001b[0m",
+      "stack": "SyntaxError: C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\deduplication.spec.ts: Missing initializer in const declaration. (61:18)\n\n\u001b[0m \u001b[90m 59 |\u001b[39m     \u001b[90m// Should mention it's a duplicate or already exists\u001b[39m\n \u001b[90m 60 |\u001b[39m     \u001b[36mconst\u001b[39m bodyText \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mtextContent(\u001b[32m'body'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 61 |\u001b[39m     \u001b[36mconst\u001b[39m mentions \u001b[33mDuplicate\u001b[39m \u001b[33m=\u001b[39m bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'duplicate'\u001b[39m) \u001b[33m||\u001b[39m \n \u001b[90m    |\u001b[39m                   \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 62 |\u001b[39m                              bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'already'\u001b[39m) \u001b[33m||\u001b[39m\n \u001b[90m 63 |\u001b[39m                              bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'existing'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 64 |\u001b[39m     \u001b[0m",
+      "location": {
+        "file": "C:\\HareKrishna\\Raghu\\Truwit\\humanproof-starter\\app\\tests\\e2e\\deduplication.spec.ts",
+        "line": 61,
+        "column": 18
+      },
+      "snippet": "\u001b[90m   at \u001b[39mdeduplication.spec.ts:61\n\n\u001b[0m \u001b[90m 59 |\u001b[39m     \u001b[90m// Should mention it's a duplicate or already exists\u001b[39m\n \u001b[90m 60 |\u001b[39m     \u001b[36mconst\u001b[39m bodyText \u001b[33m=\u001b[39m \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mtextContent(\u001b[32m'body'\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 61 |\u001b[39m     \u001b[36mconst\u001b[39m mentions \u001b[33mDuplicate\u001b[39m \u001b[33m=\u001b[39m bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'duplicate'\u001b[39m) \u001b[33m||\u001b[39m \n \u001b[90m    |\u001b[39m                  \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 62 |\u001b[39m                              bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'already'\u001b[39m) \u001b[33m||\u001b[39m\n \u001b[90m 63 |\u001b[39m                              bodyText\u001b[33m?\u001b[39m\u001b[33m.\u001b[39mtoLowerCase()\u001b[33m.\u001b[39mincludes(\u001b[32m'existing'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 64 |\u001b[39m     \u001b[0m"
+    }
+  ],
+  "stats": {
+    "startTime": "2025-10-12T23:38:17.271Z",
+    "duration": 1995.576000000001,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}
