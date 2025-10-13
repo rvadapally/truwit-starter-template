@@ -116,7 +116,7 @@ public sealed class C2paVerifier : IC2paVerifier
                     FileSizeBytes: null
                 ));
 
-                downloadedFile = await _downloader.DownloadAsync(url, ct);
+                downloadedFile = await _downloader.DownloadAsync(url, userCookies: null, ct: ct);
                 
                 var fileInfo = new FileInfo(downloadedFile);
                 _statusTracker.UpdateStatus(verificationId, new VerificationStatus(
