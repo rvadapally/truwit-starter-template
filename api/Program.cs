@@ -102,6 +102,9 @@ try
             var postgresConnectionString = builder.Configuration.GetConnectionString("Postgres")
                 ?? "Host=localhost;Database=truwit;Username=postgres;Password=password";
 
+            // Configure AppContext to use UTC timestamps for PostgreSQL
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(postgresConnectionString));
 
