@@ -1111,11 +1111,8 @@ public class ProofsController : ControllerBase
                         Prompt = "",
                         License = "creator-owned"
                     },
-                    // CreatedAt is in Central Time, convert to UTC for ISO 8601 format
-                    IssuedAt = TimeZoneInfo.ConvertTimeToUtc(
-                        proof.CreatedAt, 
-                        TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time")
-                    ).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    // CreatedAt is stored in UTC in the database, just specify the kind and format
+                    IssuedAt = DateTime.SpecifyKind(proof.CreatedAt, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
                     SignatureStatus = proof.C2paPresent ? "valid" : "invalid",
                     BadgeUrl = $"{baseUrl}/v1/badge/{proof.TrustmarkId}.svg",
                     Origin = new OriginInfo(
@@ -1159,11 +1156,8 @@ public class ProofsController : ControllerBase
                     Prompt = result.Metadata.Prompt ?? "",
                     License = result.Metadata.License.ToString().ToLower().Replace("owned", "-owned")
                 },
-                // Timestamp is in Central Time, convert to UTC for ISO 8601 format
-                IssuedAt = TimeZoneInfo.ConvertTimeToUtc(
-                    result.Timestamp,
-                    TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time")
-                ).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                // Timestamp is stored in UTC in the database, just specify the kind and format
+                IssuedAt = DateTime.SpecifyKind(result.Timestamp, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
                 SignatureStatus = result.IsValid ? "valid" : "invalid",
                 BadgeUrl = $"{fallbackBaseUrl}/v1/badge/{id}.svg",
                 Origin = new OriginInfo(
