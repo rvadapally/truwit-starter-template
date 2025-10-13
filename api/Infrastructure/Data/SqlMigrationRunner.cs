@@ -64,22 +64,37 @@ public class SqlMigrationRunner
                 // Create migrations tracking table
                 await CreateMigrationsTableAsync(connection);
 
-                foreach (var migrationFile in migrationFiles)
+            foreach (var migrationFile in migrationFiles)
+            {
+                var fileName = Path.GetFileName(migrationFile);
+                
+                // Skip SQLite-specific migrations when using PostgreSQL
+                if (_isPostgres && !fileName.Contains("postgres", StringComparison.OrdinalIgnoreCase))
                 {
-                    var fileName = Path.GetFileName(migrationFile);
-                    if (await IsMigrationExecutedAsync(connection, fileName))
-                    {
-                        _logger.LogDebug("Migration {FileName} already executed, skipping", fileName);
-                        continue;
-                    }
-
-                    _logger.LogInformation("✅ Migration: {FileName} - EXECUTING", fileName);
-
-                    var sql = await File.ReadAllTextAsync(migrationFile);
-                    await ExecuteMigrationAsync(connection, fileName, sql);
-
-                    _logger.LogInformation("✅ Migration: {FileName} - SUCCESS", fileName);
+                    _logger.LogDebug("Skipping SQLite migration {FileName} (using PostgreSQL)", fileName);
+                    continue;
                 }
+                
+                // Skip PostgreSQL-specific migrations when using SQLite
+                if (!_isPostgres && fileName.Contains("postgres", StringComparison.OrdinalIgnoreCase))
+                {
+                    _logger.LogDebug("Skipping PostgreSQL migration {FileName} (using SQLite)", fileName);
+                    continue;
+                }
+                
+                if (await IsMigrationExecutedAsync(connection, fileName))
+                {
+                    _logger.LogDebug("Migration {FileName} already executed, skipping", fileName);
+                    continue;
+                }
+
+                _logger.LogInformation("✅ Migration: {FileName} - EXECUTING", fileName);
+
+                var sql = await File.ReadAllTextAsync(migrationFile);
+                await ExecuteMigrationAsync(connection, fileName, sql);
+
+                _logger.LogInformation("✅ Migration: {FileName} - SUCCESS", fileName);
+            }
                 
                 _logger.LogInformation("✅ All migrations completed successfully");
             }
