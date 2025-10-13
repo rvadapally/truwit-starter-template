@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.Sqlite;
+using System.Data.Common;
 
 namespace HumanProof.Api.Infrastructure.Data;
 
@@ -11,6 +11,7 @@ public class SqlMigrationRunner
     private readonly ApplicationDbContext _context;
     private readonly ILogger<SqlMigrationRunner> _logger;
     private readonly string _migrationsPath;
+    private readonly bool _isPostgres;
 
     public SqlMigrationRunner(ApplicationDbContext context, ILogger<SqlMigrationRunner> logger)
     {
@@ -19,6 +20,9 @@ public class SqlMigrationRunner
         // Look for migrations in the project root, not the bin directory
         var projectRoot = Directory.GetCurrentDirectory();
         _migrationsPath = Path.Combine(projectRoot, "Data", "Migrations");
+        
+        // Detect database provider
+        _isPostgres = _context.Database.IsNpgsql();
     }
 
     /// <summary>
@@ -44,34 +48,47 @@ public class SqlMigrationRunner
                 return;
             }
 
-            var connectionString = _context.Database.GetConnectionString();
-            if (string.IsNullOrEmpty(connectionString))
+            _logger.LogInformation("Running SQL migrations...");
+
+            // Use the database connection from the context
+            var connection = _context.Database.GetDbConnection();
+            var shouldCloseConnection = connection.State != System.Data.ConnectionState.Open;
+            
+            if (shouldCloseConnection)
             {
-                _logger.LogError("Database connection string is null or empty");
-                return;
+                await connection.OpenAsync();
             }
 
-            using var connection = new SqliteConnection(connectionString);
-            await connection.OpenAsync();
-
-            // Create migrations tracking table
-            await CreateMigrationsTableAsync(connection);
-
-            foreach (var migrationFile in migrationFiles)
+            try
             {
-                var fileName = Path.GetFileName(migrationFile);
-                if (await IsMigrationExecutedAsync(connection, fileName))
+                // Create migrations tracking table
+                await CreateMigrationsTableAsync(connection);
+
+                foreach (var migrationFile in migrationFiles)
                 {
-                    _logger.LogDebug("Migration {FileName} already executed, skipping", fileName);
-                    continue;
+                    var fileName = Path.GetFileName(migrationFile);
+                    if (await IsMigrationExecutedAsync(connection, fileName))
+                    {
+                        _logger.LogDebug("Migration {FileName} already executed, skipping", fileName);
+                        continue;
+                    }
+
+                    _logger.LogInformation("✅ Migration: {FileName} - EXECUTING", fileName);
+
+                    var sql = await File.ReadAllTextAsync(migrationFile);
+                    await ExecuteMigrationAsync(connection, fileName, sql);
+
+                    _logger.LogInformation("✅ Migration: {FileName} - SUCCESS", fileName);
                 }
-
-                _logger.LogInformation("Executing migration: {FileName}", fileName);
-
-                var sql = await File.ReadAllTextAsync(migrationFile);
-                await ExecuteMigrationAsync(connection, fileName, sql);
-
-                _logger.LogInformation("Successfully executed migration: {FileName}", fileName);
+                
+                _logger.LogInformation("✅ All migrations completed successfully");
+            }
+            finally
+            {
+                if (shouldCloseConnection)
+                {
+                    await connection.CloseAsync();
+                }
             }
         }
         catch (Exception ex)
@@ -81,49 +98,76 @@ public class SqlMigrationRunner
         }
     }
 
-    private async Task CreateMigrationsTableAsync(SqliteConnection connection)
+    private async Task CreateMigrationsTableAsync(DbConnection connection)
     {
-        var createTableSql = @"
-            CREATE TABLE IF NOT EXISTS __SqlMigrations (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                FileName TEXT NOT NULL UNIQUE,
-                ExecutedAt TEXT NOT NULL DEFAULT (datetime('now'))
-            )";
+        var createTableSql = _isPostgres 
+            ? @"CREATE TABLE IF NOT EXISTS ""__SqlMigrations"" (
+                    ""Id"" SERIAL PRIMARY KEY,
+                    ""FileName"" TEXT NOT NULL UNIQUE,
+                    ""ExecutedAt"" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )"
+            : @"CREATE TABLE IF NOT EXISTS __SqlMigrations (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    FileName TEXT NOT NULL UNIQUE,
+                    ExecutedAt TEXT NOT NULL DEFAULT (datetime('now'))
+                )";
 
-        using var command = new SqliteCommand(createTableSql, connection);
+        using var command = connection.CreateCommand();
+        command.CommandText = createTableSql;
         await command.ExecuteNonQueryAsync();
     }
 
-    private async Task<bool> IsMigrationExecutedAsync(SqliteConnection connection, string fileName)
+    private async Task<bool> IsMigrationExecutedAsync(DbConnection connection, string fileName)
     {
-        var checkSql = "SELECT COUNT(*) FROM __SqlMigrations WHERE FileName = @fileName";
-        using var command = new SqliteCommand(checkSql, connection);
-        command.Parameters.AddWithValue("@fileName", fileName);
+        var checkSql = _isPostgres
+            ? @"SELECT COUNT(*) FROM ""__SqlMigrations"" WHERE ""FileName"" = @fileName"
+            : "SELECT COUNT(*) FROM __SqlMigrations WHERE FileName = @fileName";
+            
+        using var command = connection.CreateCommand();
+        command.CommandText = checkSql;
+        
+        var parameter = command.CreateParameter();
+        parameter.ParameterName = "@fileName";
+        parameter.Value = fileName;
+        command.Parameters.Add(parameter);
 
-        var count = Convert.ToInt32(await command.ExecuteScalarAsync());
+        var result = await command.ExecuteScalarAsync();
+        var count = Convert.ToInt32(result);
         return count > 0;
     }
 
-    private async Task ExecuteMigrationAsync(SqliteConnection connection, string fileName, string sql)
+    private async Task ExecuteMigrationAsync(DbConnection connection, string fileName, string sql)
     {
-        using var transaction = connection.BeginTransaction();
+        using var transaction = await connection.BeginTransactionAsync();
         try
         {
             // Execute the migration SQL
-            using var command = new SqliteCommand(sql, connection, transaction);
+            using var command = connection.CreateCommand();
+            command.Transaction = transaction;
+            command.CommandText = sql;
             await command.ExecuteNonQueryAsync();
 
             // Record the migration as executed
-            var recordSql = "INSERT INTO __SqlMigrations (FileName) VALUES (@fileName)";
-            using var recordCommand = new SqliteCommand(recordSql, connection, transaction);
-            recordCommand.Parameters.AddWithValue("@fileName", fileName);
+            var recordSql = _isPostgres
+                ? @"INSERT INTO ""__SqlMigrations"" (""FileName"") VALUES (@fileName)"
+                : "INSERT INTO __SqlMigrations (FileName) VALUES (@fileName)";
+                
+            using var recordCommand = connection.CreateCommand();
+            recordCommand.Transaction = transaction;
+            recordCommand.CommandText = recordSql;
+            
+            var parameter = recordCommand.CreateParameter();
+            parameter.ParameterName = "@fileName";
+            parameter.Value = fileName;
+            recordCommand.Parameters.Add(parameter);
+            
             await recordCommand.ExecuteNonQueryAsync();
 
-            transaction.Commit();
+            await transaction.CommitAsync();
         }
         catch
         {
-            transaction.Rollback();
+            await transaction.RollbackAsync();
             throw;
         }
     }
