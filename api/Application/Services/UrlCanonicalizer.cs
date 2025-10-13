@@ -31,22 +31,29 @@ public class UrlCanonicalizer : IUrlCanonicalizer
         if (string.IsNullOrWhiteSpace(url))
             throw new ArgumentException("URL cannot be null or empty", nameof(url));
 
-        // Normalize URL
-        var normalizedUrl = url.Trim().ToLowerInvariant();
-
-        // Check YouTube
-        var youtubeMatch = YouTubeVideoRegex.Match(normalizedUrl);
+        // Trim whitespace but preserve case for video ID extraction
+        var trimmedUrl = url.Trim();
+        
+        // Try matching with case-insensitive regex
+        var youtubeMatch = YouTubeVideoRegex.Match(trimmedUrl);
         if (youtubeMatch.Success)
         {
+            // Extract video ID from original URL (preserves case)
             var videoId = youtubeMatch.Groups[1].Value;
-            return (MediaPlatform.YouTube, $"yt:{videoId}");
+            // Normalize video ID to lowercase for consistent deduplication
+            var normalizedVideoId = videoId.ToLowerInvariant();
+            return (MediaPlatform.YouTube, $"yt:{normalizedVideoId}");
         }
+
+        // For other platforms, normalize URL for matching
+        var normalizedUrl = trimmedUrl.ToLowerInvariant();
 
         // Check TikTok
         var tiktokMatch = TikTokVideoRegex.Match(normalizedUrl);
         if (tiktokMatch.Success)
         {
-            var username = tiktokMatch.Groups[1].Value;
+            // Normalize username and video ID for consistent deduplication
+            var username = tiktokMatch.Groups[1].Value.ToLowerInvariant();
             var videoId = tiktokMatch.Groups[2].Value;
             return (MediaPlatform.TikTok, $"tt:{username}:{videoId}");
         }
