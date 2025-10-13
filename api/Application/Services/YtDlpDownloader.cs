@@ -22,8 +22,10 @@ public sealed class YtDlpDownloader : IMediaDownloader
         _logger = logger;
     }
 
-    public async Task<string> DownloadAsync(string url, CancellationToken ct = default)
+    public async Task<string> DownloadAsync(string url, string? userCookies = null, CancellationToken ct = default)
     {
+        string? tempCookiesPath = null;
+        
         try
         {
             _logger.LogInformation("Starting download for URL: {Url}", url);
@@ -38,16 +40,27 @@ public sealed class YtDlpDownloader : IMediaDownloader
             // Build yt-dlp command
             var args = $"--no-playlist -f \"bv*+ba/b\" --merge-output-format mp4 -o \"{outputTemplate}\" \"{url}\"";
             
-            // Add cookies if available (for YouTube bot detection)
-            var cookiesPath = Environment.GetEnvironmentVariable("YTDLP_COOKIES");
-            if (!string.IsNullOrEmpty(cookiesPath) && File.Exists(cookiesPath))
+            // Priority 1: User-supplied cookies (if provided)
+            if (!string.IsNullOrWhiteSpace(userCookies))
             {
-                args = $"--cookies \"{cookiesPath}\" {args}";
-                _logger.LogInformation("Using cookies from: {CookiesPath}", cookiesPath);
+                tempCookiesPath = Path.Combine(_options.TempDir, $"cookies-{safeName}.txt");
+                await File.WriteAllTextAsync(tempCookiesPath, userCookies, ct);
+                args = $"--cookies \"{tempCookiesPath}\" {args}";
+                _logger.LogInformation("Using user-supplied cookies for this request");
             }
+            // Priority 2: Server-configured cookies (fallback)
             else
             {
-                _logger.LogDebug("No cookies configured (YTDLP_COOKIES not set or file not found)");
+                var cookiesPath = Environment.GetEnvironmentVariable("YTDLP_COOKIES");
+                if (!string.IsNullOrEmpty(cookiesPath) && File.Exists(cookiesPath))
+                {
+                    args = $"--cookies \"{cookiesPath}\" {args}";
+                    _logger.LogInformation("Using server cookies from: {CookiesPath}", cookiesPath);
+                }
+                else
+                {
+                    _logger.LogDebug("No cookies configured (neither user-supplied nor server YTDLP_COOKIES)");
+                }
             }
 
             _logger.LogDebug("Running yt-dlp with args: {Args}", args);
@@ -90,6 +103,22 @@ public sealed class YtDlpDownloader : IMediaDownloader
         {
             _logger.LogError(ex, "Unexpected error during download for URL: {Url}", url);
             throw new InvalidOperationException($"Download failed: {ex.Message}", ex);
+        }
+        finally
+        {
+            // Clean up temporary cookies file (user-supplied cookies only)
+            if (!string.IsNullOrEmpty(tempCookiesPath) && File.Exists(tempCookiesPath))
+            {
+                try
+                {
+                    File.Delete(tempCookiesPath);
+                    _logger.LogDebug("Cleaned up temporary cookies file: {Path}", tempCookiesPath);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to delete temporary cookies file: {Path}", tempCookiesPath);
+                }
+            }
         }
     }
 }

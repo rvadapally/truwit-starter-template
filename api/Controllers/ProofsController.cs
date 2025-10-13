@@ -146,7 +146,7 @@ public class ProofsController : ControllerBase
 
             // Download and create asset
             _logger.LogInformation("📥 Downloading video from URL: {Url}", request.Url);
-            var downloadedFilePath = await _downloader.DownloadAsync(request.Url);
+            var downloadedFilePath = await _downloader.DownloadAsync(request.Url, request.UserCookies);
             var fileInfo = new FileInfo(downloadedFilePath);
             _logger.LogInformation("✅ Download completed. File: {FilePath}, Size: {Size} bytes", downloadedFilePath, fileInfo.Length);
 

@@ -5,7 +5,10 @@ namespace HumanProof.Api.Application.DTOs;
 /// <summary>
 /// Request to create proof from URL
 /// </summary>
-public record CreateProofFromUrlRequest(string Url);
+public record CreateProofFromUrlRequest(
+    string Url,
+    string? UserCookies = null // Optional: User-supplied cookies for platforms requiring auth (e.g., YouTube private videos)
+);
 
 /// <summary>
 /// Response for proof creation from URL

@@ -27,7 +27,10 @@ public interface IMediaDownloader
     /// <summary>
     /// Downloads media from URL and returns absolute path to downloaded file
     /// </summary>
-    Task<string> DownloadAsync(string url, CancellationToken ct = default);
+    /// <param name="url">Media URL to download</param>
+    /// <param name="userCookies">Optional user-supplied cookies (Netscape format) for authenticated downloads</param>
+    /// <param name="ct">Cancellation token</param>
+    Task<string> DownloadAsync(string url, string? userCookies = null, CancellationToken ct = default);
 }
 
 /// <summary>
