@@ -197,10 +197,10 @@ public class ProofsController : ControllerBase
                 {
                     AssetId = assetId,
                     Sha256 = sha256,
-                    MediaType = "video/mp4", // Default for downloaded videos
+                    MediaType = platform == MediaPlatform.YouTube ? "image/jpeg" : "video/mp4",
                     Bytes = fileInfo.Length,
-                    DurationSec = null, // We don't have duration info from yt-dlp
-                    Width = null, // We don't have dimensions info from yt-dlp
+                    DurationSec = null, // Duration not applicable for thumbnails
+                    Width = null, // Dimensions not extracted for thumbnails
                     Height = null,
                     CreatedAt = DateTimeProvider.Now
                 };
