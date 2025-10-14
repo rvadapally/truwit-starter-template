@@ -5,6 +5,7 @@ namespace HumanProof.Api.Application.Services;
 /// <summary>
 /// Downloads YouTube thumbnails for content verification
 /// This is 100% reliable - no cookies, no bot detection, no datacenter IP issues
+/// Uses public YouTube CDN - works from any IP including Railway datacenters
 /// </summary>
 public interface IYouTubeThumbnailDownloader
 {
