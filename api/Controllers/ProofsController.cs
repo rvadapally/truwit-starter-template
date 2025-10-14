@@ -208,11 +208,28 @@ public class ProofsController : ControllerBase
                 _logger.LogInformation("🆕 Created new asset: {AssetId}", assetId);
             }
 
-            // Try hosted verifier first
-            _logger.LogInformation("🔍 Starting C2PA verification for URL: {Url}", request.Url);
-            var c2paResult = await _c2paVerifier.VerifyFromUrlAsync(request.Url);
-            _logger.LogInformation("✅ C2PA verification completed. Manifest found: {ManifestFound}, Status: {Status}",
-                c2paResult.ManifestFound, c2paResult.Status);
+            // C2PA verification
+            C2paVerificationResult c2paResult;
+            
+            if (platform == MediaPlatform.YouTube)
+            {
+                // Skip C2PA verification for YouTube thumbnails (thumbnails don't have C2PA data)
+                _logger.LogInformation("⏭️ Skipping C2PA verification for YouTube thumbnail (thumbnails don't contain C2PA manifests)");
+                c2paResult = new C2paVerificationResult
+                {
+                    ManifestFound = false,
+                    Status = "not_applicable_thumbnail",
+                    RawJson = null
+                };
+            }
+            else
+            {
+                // Try hosted verifier first for other platforms
+                _logger.LogInformation("🔍 Starting C2PA verification for URL: {Url}", request.Url);
+                c2paResult = await _c2paVerifier.VerifyFromUrlAsync(request.Url);
+                _logger.LogInformation("✅ C2PA verification completed. Manifest found: {ManifestFound}, Status: {Status}",
+                    c2paResult.ManifestFound, c2paResult.Status);
+            }
 
             // Create proof record
             var proof = new Proof
