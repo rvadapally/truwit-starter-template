@@ -753,7 +753,7 @@ public class ProofsController : ControllerBase
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
-                VerifyUrl = $"http://localhost:4200/#/t/{result.ProofId}",
+                VerifyUrl = $"/t/{result.ProofId}",
                 BadgeUrl = $"http://localhost:5000/badges/{result.ProofId}.png"
             };
 
@@ -892,7 +892,7 @@ public class ProofsController : ControllerBase
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
-                VerifyUrl = $"http://localhost:4200/#/t/{result.ProofId}",
+                VerifyUrl = $"/t/{result.ProofId}",
                 BadgeUrl = $"http://localhost:5000/badges/{result.ProofId}.png",
                 DevTestMode = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&
                              _featureFlags.Value.DevImageTestMode

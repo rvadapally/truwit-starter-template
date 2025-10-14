@@ -256,8 +256,8 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
 
           visitVerificationPage(): void {
             if (this.createdProof && this.createdProof.verifyUrl) {
-              // Navigate using Angular Router instead of window.open
-              this.router.navigate([this.createdProof.verifyUrl]);
+              // Navigate to verification page using the URL string
+              this.router.navigateByUrl(this.createdProof.verifyUrl);
             }
           }
 
