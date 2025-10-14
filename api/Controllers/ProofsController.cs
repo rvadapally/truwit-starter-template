@@ -209,13 +209,13 @@ public class ProofsController : ControllerBase
             }
 
             // C2PA verification
-            C2paVerificationResult c2paResult;
+            C2paCheckResult c2paResult;
             
             if (platform == MediaPlatform.YouTube)
             {
                 // Skip C2PA verification for YouTube thumbnails (thumbnails don't have C2PA data)
                 _logger.LogInformation("⏭️ Skipping C2PA verification for YouTube thumbnail (thumbnails don't contain C2PA manifests)");
-                c2paResult = new C2paVerificationResult
+                c2paResult = new C2paCheckResult
                 {
                     ManifestFound = false,
                     Status = "not_applicable_thumbnail",
