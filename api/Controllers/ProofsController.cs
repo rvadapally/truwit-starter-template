@@ -215,12 +215,17 @@ public class ProofsController : ControllerBase
             {
                 // Skip C2PA verification for YouTube thumbnails (thumbnails don't have C2PA data)
                 _logger.LogInformation("⏭️ Skipping C2PA verification for YouTube thumbnail (thumbnails don't contain C2PA manifests)");
-                c2paResult = new C2paCheckResult
-                {
-                    ManifestFound = false,
-                    Status = "not_applicable_thumbnail",
-                    RawJson = null
-                };
+                c2paResult = new C2paCheckResult(
+                    ManifestFound: false,
+                    Status: "not_applicable_thumbnail",
+                    ClaimGenerator: null,
+                    ClaimTimestamp: null,
+                    Assertions: new List<C2paAssertion>(),
+                    SigningIssuer: null,
+                    RawJson: null,
+                    MediaSha256: sha256,  // Use thumbnail hash as media identifier
+                    Notes: "Thumbnail-based verification (YouTube)"
+                );
             }
             else
             {
