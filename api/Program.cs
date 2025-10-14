@@ -67,6 +67,7 @@ try
     builder.Services.AddScoped<IC2paVerifier, C2paVerifier>();
     builder.Services.AddScoped<IHostedC2paVerifier, HostedC2paVerifier>();
     builder.Services.AddScoped<IMediaDownloader, YtDlpDownloader>();
+    builder.Services.AddScoped<IYouTubeThumbnailDownloader, YouTubeThumbnailDownloader>();
     builder.Services.AddScoped<IC2paToolRunner, C2paToolRunner>();
     builder.Services.AddScoped<IC2paLocalParser, C2paLocalParser>();
     builder.Services.AddScoped<DevC2paSigner>();

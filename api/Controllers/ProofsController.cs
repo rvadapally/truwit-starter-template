@@ -30,6 +30,7 @@ public class ProofsController : ControllerBase
     private readonly IReceiptSigner _receiptSigner;
     private readonly IHasher _hasher;
     private readonly IMediaDownloader _downloader;
+    private readonly IYouTubeThumbnailDownloader _thumbnailDownloader;
     private readonly ILogger<ProofsController> _logger;
     private readonly IOptionsSnapshot<FeatureFlags> _featureFlags;
     private readonly DevC2paSigner _devC2paSigner;
@@ -48,6 +49,7 @@ public class ProofsController : ControllerBase
         IReceiptSigner receiptSigner,
         IHasher hasher,
         IMediaDownloader downloader,
+        IYouTubeThumbnailDownloader thumbnailDownloader,
         ILogger<ProofsController> logger,
         IOptionsSnapshot<FeatureFlags> featureFlags,
         DevC2paSigner devC2paSigner,
@@ -65,6 +67,7 @@ public class ProofsController : ControllerBase
         _receiptSigner = receiptSigner;
         _hasher = hasher;
         _downloader = downloader;
+        _thumbnailDownloader = thumbnailDownloader;
         _logger = logger;
         _featureFlags = featureFlags;
         _devC2paSigner = devC2paSigner;
@@ -145,10 +148,33 @@ public class ProofsController : ControllerBase
             _logger.LogInformation("🆔 Generated ProofId: {ProofId}, TrustmarkId: {TrustmarkId}", proofId, trustmarkId);
 
             // Download and create asset
-            _logger.LogInformation("📥 Downloading video from URL: {Url}", request.Url);
-            var downloadedFilePath = await _downloader.DownloadAsync(request.Url, request.UserCookies);
-            var fileInfo = new FileInfo(downloadedFilePath);
-            _logger.LogInformation("✅ Download completed. File: {FilePath}, Size: {Size} bytes", downloadedFilePath, fileInfo.Length);
+            string downloadedFilePath;
+            FileInfo fileInfo;
+            
+            if (platform == MediaPlatform.YouTube)
+            {
+                // For YouTube: Download thumbnail instead of full video (100% reliable, no bot detection)
+                // Extract original video ID (case-sensitive) from URL for thumbnail download
+                var videoIdMatch = Regex.Match(request.Url, @"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})");
+                if (!videoIdMatch.Success)
+                {
+                    throw new InvalidOperationException($"Could not extract YouTube video ID from URL: {request.Url}");
+                }
+                var videoId = videoIdMatch.Groups[1].Value; // Preserve original case for thumbnails
+                
+                _logger.LogInformation("📸 Downloading YouTube thumbnail for reliable verification (video ID: {VideoId})", videoId);
+                downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
+                fileInfo = new FileInfo(downloadedFilePath);
+                _logger.LogInformation("✅ Thumbnail downloaded successfully. File: {FilePath}, Size: {Size} bytes", downloadedFilePath, fileInfo.Length);
+            }
+            else
+            {
+                // For other platforms: Download full video
+                _logger.LogInformation("📥 Downloading video from URL: {Url}", request.Url);
+                downloadedFilePath = await _downloader.DownloadAsync(request.Url, request.UserCookies);
+                fileInfo = new FileInfo(downloadedFilePath);
+                _logger.LogInformation("✅ Download completed. File: {FilePath}, Size: {Size} bytes", downloadedFilePath, fileInfo.Length);
+            }
 
             // Calculate SHA256 hash
             var sha256 = await _hasher.Sha256Async(downloadedFilePath);
