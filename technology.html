@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Truwit's technology stack - Built on battle-tested cryptography, C2PA standards, and enterprise-grade infrastructure.">
+    <title>Technology - Truwit</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav-container">
+            <a href="/" class="nav-logo">Truwit</a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span>☰</span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/how-it-works.html">How It Works</a></li>
+                <li><a href="/use-cases.html">Use Cases</a></li>
+                <li><a href="/technology.html">Technology</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/investors.html">Investors</a></li>
+                <li><a href="/app/" class="nav-cta">Try App</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Built on Battle-Tested Cryptography</h1>
+            <p>Open standards, open source principles</p>
+        </div>
+    </section>
+
+    <!-- Content Authenticity Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Industry Standards</h2>
+                <p>Interoperable with the content authenticity ecosystem</p>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h3>C2PA (Content Authenticity Initiative)</h3>
+                    <p><strong>What it is:</strong> Open standard developed by Adobe, Microsoft, The New York Times, BBC, and others to combat misinformation.</p>
+                    <p><strong>Why it matters:</strong> Embeds metadata directly into media files. Works across all platforms and tools.</p>
+                    <p style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(0, 212, 255, 0.1); border-radius: var(--border-radius);">
+                        <strong>Backed by:</strong> Adobe, Microsoft, NYT, BBC, Arm, Intel, Truepic
+                    </p>
+                    <p style="margin-top: var(--spacing-sm);">
+                        <a href="https://c2pa.org" target="_blank" rel="noopener" style="color: var(--color-accent); font-weight: 600; text-decoration: none;">Learn more at c2pa.org →</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cryptography Section -->
+    <section class="section bg-white">
+        <div class="container">
+            <div class="section-header">
+                <h2>Cryptographic Security</h2>
+                <p>Military-grade algorithms protecting your content</p>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h3>SHA-256 Hashing</h3>
+                    <p><strong>What it does:</strong> Creates a unique "fingerprint" of your content. Even a single pixel change produces a completely different hash.</p>
+                    <p><strong>Security level:</strong> Same algorithm used by Bitcoin and NSA-approved for classified documents.</p>
+                    <p style="margin-top: var(--spacing-md); font-family: var(--font-mono); font-size: 0.75rem; background: rgba(0, 0, 0, 0.05); padding: var(--spacing-sm); border-radius: var(--border-radius); word-break: break-all;">
+                        Example hash:<br>
+                        a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>Ed25519 Signing</h3>
+                    <p><strong>What it does:</strong> Creates a digital signature that proves the hash hasn't been tampered with.</p>
+                    <p><strong>Security level:</strong> 128-bit security. Breaking it would require more computing power than exists on Earth.</p>
+                    <p style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(0, 212, 255, 0.1); border-radius: var(--border-radius);">
+                        <strong>Impossible to fake:</strong> Only our private key can create valid signatures. Even quantum computers can't break it (yet).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Infrastructure Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Enterprise-Grade Infrastructure</h2>
+                <p>Built for scale, security, and reliability</p>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h3>.NET 8 Backend</h3>
+                    <p>Microsoft's enterprise-grade framework. Powers Fortune 500 companies and millions of applications worldwide.</p>
+                    <ul style="margin-top: var(--spacing-md); color: var(--color-text-light); padding-left: var(--spacing-md);">
+                        <li>High performance: 10x faster than Node.js</li>
+                        <li>Battle-tested: 20+ years of production use</li>
+                        <li>Secure by default: Regular security patches</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>PostgreSQL Database</h3>
+                    <p>World's most advanced open source database. ACID compliant with 99.99% uptime guarantees.</p>
+                    <ul style="margin-top: var(--spacing-md); color: var(--color-text-light); padding-left: var(--spacing-md);">
+                        <li>Data integrity: Transactions never lost</li>
+                        <li>Scalable: Handles billions of records</li>
+                        <li>Proven: Used by Instagram, Spotify, Uber</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>Railway Hosting</h3>
+                    <p>Modern cloud platform with auto-scaling and global CDN. Optimized for developer experience.</p>
+                    <ul style="margin-top: var(--spacing-md); color: var(--color-text-light); padding-left: var(--spacing-md);">
+                        <li>Auto-scaling: Handles traffic spikes</li>
+                        <li>Global CDN: Fast anywhere in the world</li>
+                        <li>99.9% uptime SLA</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security & Privacy Section -->
+    <section class="section bg-white">
+        <div class="container">
+            <div class="section-header">
+                <h2>Security & Privacy</h2>
+                <p>Your data, your control</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl); max-width: 1000px; margin: 0 auto;">
+                <div style="background: white; padding: var(--spacing-xl); border-radius: var(--border-radius); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <h3 style="color: var(--color-accent); margin-bottom: var(--spacing-md);">✓ What We Store</h3>
+                    <ul style="color: var(--color-text-light); padding-left: var(--spacing-md);">
+                        <li style="margin-bottom: var(--spacing-sm);">Content hash (NOT the content itself)</li>
+                        <li style="margin-bottom: var(--spacing-sm);">Metadata you choose to attach</li>
+                        <li style="margin-bottom: var(--spacing-sm);">Cryptographic signature</li>
+                        <li style="margin-bottom: var(--spacing-sm);">Timestamp of proof creation</li>
+                    </ul>
+                </div>
+
+                <div style="background: white; padding: var(--spacing-xl); border-radius: var(--border-radius); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                    <h3 style="color: #EF4444; margin-bottom: var(--spacing-md);">✗ What We DON'T Store</h3>
+                    <ul style="color: var(--color-text-light); padding-left: var(--spacing-md);">
+                        <li style="margin-bottom: var(--spacing-sm);">The actual media files (deleted after hashing)</li>
+                        <li style="margin-bottom: var(--spacing-sm);">Personal information (unless you add it)</li>
+                        <li style="margin-bottom: var(--spacing-sm);">Usage analytics or tracking data</li>
+                        <li style="margin-bottom: var(--spacing-sm);">IP addresses or browser fingerprints</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="max-width: 800px; margin: var(--spacing-xl) auto 0; padding: var(--spacing-xl); background: rgba(0, 212, 255, 0.1); border-radius: var(--border-radius);">
+                <h3 style="margin-bottom: var(--spacing-md);">Privacy by Design</h3>
+                <p style="color: var(--color-text-light); margin-bottom: var(--spacing-md);">
+                    We can't read your content. The hash is a one-way function—mathematically impossible to reverse. Even if our database was compromised, attackers would only see random strings of characters.
+                </p>
+                <p style="color: var(--color-text-light);">
+                    <strong>Think of it like this:</strong> We're storing your content's DNA, not your content. The DNA proves it's yours, but doesn't contain the actual data.
+                </p>
+            </div>
+
+            <style>
+                @media (max-width: 768px) {
+                    section .container > div[style*="grid-template-columns"] {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+            </style>
+        </div>
+    </section>
+
+    <!-- Compliance Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Compliance & Certifications</h2>
+                <p>Meeting industry standards</p>
+            </div>
+            <div class="cards">
+                <div class="card">
+                    <h3>GDPR Compliant</h3>
+                    <p>Fully compliant with EU General Data Protection Regulation. Right to access, rectify, and delete your data.</p>
+                </div>
+
+                <div class="card">
+                    <h3>SOC 2 Type II</h3>
+                    <p><strong>Status:</strong> In progress (Q2 2025)</p>
+                    <p>Third-party audit of our security, availability, and confidentiality controls.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Open to Audits</h3>
+                    <p>We welcome security researchers and enterprise customers to audit our infrastructure and code.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- For Developers Section -->
+    <section class="section bg-dark">
+        <div class="container text-center">
+            <h2 style="font-size: 2.5rem; margin-bottom: var(--spacing-md);">Built for Developers</h2>
+            <p style="color: rgba(255, 255, 255, 0.8); font-size: 1.125rem; margin-bottom: var(--spacing-xl); max-width: 600px; margin-left: auto; margin-right: auto;">
+                Simple API, clear documentation, and responsive support
+            </p>
+            <div style="max-width: 700px; margin: 0 auto; background: rgba(255, 255, 255, 0.1); padding: var(--spacing-xl); border-radius: var(--border-radius);">
+                <pre style="text-align: left; background: var(--color-dark); border: 1px solid rgba(255, 255, 255, 0.2);"><code style="color: #00FFA3; font-size: 0.875rem;"># Create a proof via API (coming soon)
+curl -X POST https://api.truwit.ai/v1/proofs/url \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://youtube.com/watch?v=..."}'
+
+# Response
+{
+  "proofId": "abc123...",
+  "trustmarkId": "xyz789",
+  "verifyUrl": "/t/xyz789",
+  "contentHash": "a1b2c3d4..."
+}</code></pre>
+            </div>
+            <div style="margin-top: var(--spacing-xl);">
+                <a href="/docs.html" class="btn btn-primary">View Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/how-it-works.html">How It Works</a></li>
+                        <li><a href="/use-cases.html">Use Cases</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/app/">Try App</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Technology</h4>
+                    <ul>
+                        <li><a href="/technology.html">Our Stack</a></li>
+                        <li><a href="/docs.html">Documentation</a></li>
+                        <li><a href="https://c2pa.org" target="_blank" rel="noopener">C2PA Standard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="/about.html">About Us</a></li>
+                        <li><a href="/investors.html">For Investors</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://x.com/TruwitAi" target="_blank" rel="noopener">Twitter/X</a></li>
+                        <li><a href="mailto:hello@truwit.ai">hello@truwit.ai</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Truwit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
+

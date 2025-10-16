@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn how Truwit creates cryptographic proofs for digital content in three simple steps. No technical knowledge required.">
+    <title>How It Works - Truwit</title>
+    <link rel="icon" type="image/png" href="/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="container nav-container">
+            <a href="/" class="nav-logo">Truwit</a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span>☰</span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="/how-it-works.html">How It Works</a></li>
+                <li><a href="/use-cases.html">Use Cases</a></li>
+                <li><a href="/technology.html">Technology</a></li>
+                <li><a href="/pricing.html">Pricing</a></li>
+                <li><a href="/about.html">About</a></li>
+                <li><a href="/investors.html">Investors</a></li>
+                <li><a href="/app/" class="nav-cta">Try App</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Cryptographic Proof in Three Steps</h1>
+            <p>No technical knowledge required</p>
+        </div>
+    </section>
+
+    <!-- Step-by-Step Process -->
+    <section class="section">
+        <div class="container">
+            <div class="cards">
+                <div class="card">
+                    <div class="card-icon">📤</div>
+                    <h3>Step 1: Upload or Link</h3>
+                    <p><strong>What you do:</strong> Drag & drop a file or paste a URL from YouTube, TikTok, Instagram, or X.</p>
+                    <p><strong>What happens:</strong> We securely download or reference your content without storing it permanently.</p>
+                    <p style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(0, 212, 255, 0.1); border-radius: var(--border-radius);">
+                        <strong>Privacy First:</strong> We never keep your media files. They're deleted after verification.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">🔐</div>
+                    <h3>Step 2: Cryptographic Signing</h3>
+                    <p><strong>What we do:</strong> Compute a SHA-256 hash (content fingerprint), attach C2PA metadata, and sign it with Ed25519.</p>
+                    <p><strong>Why it matters:</strong> This creates a tamper-proof record that mathematically proves the content existed at this moment in time.</p>
+                    <p style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(0, 212, 255, 0.1); border-radius: var(--border-radius);">
+                        <strong>Can't be faked:</strong> The signature is mathematically impossible to forge without our private key.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-icon">✓</div>
+                    <h3>Step 3: Immutable Proof</h3>
+                    <p><strong>What you get:</strong> A trustmark ID, embeddable badge, and public verification page.</p>
+                    <p><strong>How to use it:</strong> Share the verification link, embed the badge on your website, or show it to clients/platforms.</p>
+                    <p style="margin-top: var(--spacing-md); padding: var(--spacing-sm); background: rgba(0, 212, 255, 0.1); border-radius: var(--border-radius);">
+                        <strong>Forever yours:</strong> Your proof persists indefinitely. No one can delete or alter it.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Diagram Section -->
+    <section class="section bg-white">
+        <div class="container">
+            <div class="section-header">
+                <h2>The Verification Flow</h2>
+                <p>From upload to proof in seconds</p>
+            </div>
+            <div style="max-width: 800px; margin: 0 auto; text-align: center;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--spacing-md);">
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto var(--spacing-sm); background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            📁
+                        </div>
+                        <p><strong>Your Content</strong></p>
+                        <p style="font-size: 0.875rem; color: var(--color-text-light);">File or URL</p>
+                    </div>
+                    <div style="font-size: 2rem; color: var(--color-accent);">→</div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto var(--spacing-sm); background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            #️⃣
+                        </div>
+                        <p><strong>SHA-256 Hash</strong></p>
+                        <p style="font-size: 0.875rem; color: var(--color-text-light);">Content fingerprint</p>
+                    </div>
+                    <div style="font-size: 2rem; color: var(--color-accent);">→</div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto var(--spacing-sm); background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            🔏
+                        </div>
+                        <p><strong>Ed25519 Signature</strong></p>
+                        <p style="font-size: 0.875rem; color: var(--color-text-light);">Cryptographic proof</p>
+                    </div>
+                    <div style="font-size: 2rem; color: var(--color-accent);">→</div>
+                    <div style="flex: 1; min-width: 150px;">
+                        <div style="width: 80px; height: 80px; margin: 0 auto var(--spacing-sm); background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                            ✓
+                        </div>
+                        <p><strong>Trustmark</strong></p>
+                        <p style="font-size: 0.875rem; color: var(--color-text-light);">Public verification</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Deep Dive -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Technical Deep Dive</h2>
+                <p>For the technically curious</p>
+            </div>
+            
+            <div style="max-width: 800px; margin: 0 auto;">
+                <details style="margin-bottom: var(--spacing-md); padding: var(--spacing-md); background: white; border-radius: var(--border-radius); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    <summary style="font-weight: 600; cursor: pointer; user-select: none;">What is C2PA?</summary>
+                    <p style="margin-top: var(--spacing-sm); color: var(--color-text-light);">
+                        C2PA (Coalition for Content Provenance and Authenticity) is an open standard developed by Adobe, Microsoft, The New York Times, and others. It defines how to embed cryptographic metadata directly into media files, creating a tamper-evident record of content creation and modifications. Truwit implements C2PA to ensure our proofs are interoperable with other tools in the content authenticity ecosystem.
+                    </p>
+                </details>
+
+                <details style="margin-bottom: var(--spacing-md); padding: var(--spacing-md); background: white; border-radius: var(--border-radius); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    <summary style="font-weight: 600; cursor: pointer; user-select: none;">How does cryptographic signing work?</summary>
+                    <p style="margin-top: var(--spacing-sm); color: var(--color-text-light);">
+                        We use Ed25519, a public-key signature system. Here's how it works: We have a private key (kept secret on our servers) and a public key (available to anyone). When we sign your content's hash with our private key, we create a signature that can only be verified with the matching public key. Anyone can verify the signature is authentic, but only we can create it. This proves the content hasn't been altered since we signed it.
+                    </p>
+                </details>
+
+                <details style="margin-bottom: var(--spacing-md); padding: var(--spacing-md); background: white; border-radius: var(--border-radius); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    <summary style="font-weight: 600; cursor: pointer; user-select: none;">Where is the data stored?</summary>
+                    <p style="margin-top: var(--spacing-sm); color: var(--color-text-light);">
+                        We store three things: (1) the SHA-256 hash of your content, (2) optional metadata you choose to attach, and (3) the cryptographic signature. We do NOT store the actual media file—it's deleted immediately after hashing. The hash is a one-way function, meaning it's mathematically impossible to reverse it back to your original content. Your data is stored in a PostgreSQL database hosted on Railway with enterprise-grade security.
+                    </p>
+                </details>
+
+                <details style="margin-bottom: var(--spacing-md); padding: var(--spacing-md); background: white; border-radius: var(--border-radius); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                    <summary style="font-weight: 600; cursor: pointer; user-select: none;">Can proofs be faked?</summary>
+                    <p style="margin-top: var(--spacing-sm); color: var(--color-text-light);">
+                        No. The Ed25519 signature can only be created with our private key, which never leaves our secure servers. Even if someone tried to claim they created a proof, they couldn't produce a valid signature. Additionally, our proofs include timestamps and are stored immutably—no one, not even us, can alter them after creation. The only way to "fake" a proof would be to steal our private key, which is protected by multiple layers of security and would be immediately detected.
+                    </p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section bg-dark">
+        <div class="container text-center">
+            <h2 style="font-size: 2.5rem; margin-bottom: var(--spacing-md);">Try It Yourself</h2>
+            <p style="color: rgba(255, 255, 255, 0.8); font-size: 1.125rem; margin-bottom: var(--spacing-xl);">
+                Create your first cryptographic proof in under 30 seconds
+            </p>
+            <a href="/app/" class="btn btn-primary">Try Verification App</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="/how-it-works.html">How It Works</a></li>
+                        <li><a href="/use-cases.html">Use Cases</a></li>
+                        <li><a href="/pricing.html">Pricing</a></li>
+                        <li><a href="/app/">Try App</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Technology</h4>
+                    <ul>
+                        <li><a href="/technology.html">Our Stack</a></li>
+                        <li><a href="/docs.html">Documentation</a></li>
+                        <li><a href="https://c2pa.org" target="_blank" rel="noopener">C2PA Standard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="/about.html">About Us</a></li>
+                        <li><a href="/investors.html">For Investors</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <ul>
+                        <li><a href="https://x.com/TruwitAi" target="_blank" rel="noopener">Twitter/X</a></li>
+                        <li><a href="mailto:hello@truwit.ai">hello@truwit.ai</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 Truwit. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>
+
