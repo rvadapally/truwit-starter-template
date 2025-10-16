@@ -8,7 +8,7 @@ namespace HumanProof.Api.Controllers;
 /// Admin endpoints for managing application settings
 /// </summary>
 [ApiController]
-[Route("api/v1/admin")]
+[Route("v1/admin")]
 public class AdminController : ControllerBase
 {
     private readonly ISettingsService _settingsService;
