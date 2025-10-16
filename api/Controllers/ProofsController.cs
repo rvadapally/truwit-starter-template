@@ -157,6 +157,7 @@ public class ProofsController : ControllerBase
             // Download and create asset
             string downloadedFilePath;
             FileInfo fileInfo;
+            bool useFullVideo = false;
             
             if (platform == MediaPlatform.YouTube)
             {
@@ -171,8 +172,6 @@ public class ProofsController : ControllerBase
                 // Check admin-configured verification mode
                 var verificationMode = await _settingsService.GetSettingAsync("YOUTUBE_VERIFICATION_MODE") ?? "thumbnail";
                 _logger.LogInformation("🎬 YouTube verification mode: {Mode} (video ID: {VideoId})", verificationMode, videoId);
-                
-                bool useFullVideo = false;
                 
                 if (verificationMode == "full_video")
                 {
@@ -190,17 +189,24 @@ public class ProofsController : ControllerBase
                     {
                         _logger.LogError(ex, "🚫 Cookie authentication failed, falling back to thumbnail mode");
                         // Will fall through to thumbnail mode below
+                        downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
+                        fileInfo = new FileInfo(downloadedFilePath);
+                        _logger.LogInformation("✅ Thumbnail downloaded successfully (fallback). File: {FilePath}, Size: {Size} bytes", 
+                            downloadedFilePath, fileInfo.Length);
                     }
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "❌ Full video hash failed, falling back to thumbnail mode");
                         // Will fall through to thumbnail mode below
+                        downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
+                        fileInfo = new FileInfo(downloadedFilePath);
+                        _logger.LogInformation("✅ Thumbnail downloaded successfully (fallback). File: {FilePath}, Size: {Size} bytes", 
+                            downloadedFilePath, fileInfo.Length);
                     }
                 }
-                
-                // Use thumbnail mode if configured or if full video failed
-                if (!useFullVideo)
+                else
                 {
+                    // Thumbnail mode
                     _logger.LogInformation("📸 Downloading YouTube thumbnail for reliable verification");
                     downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
                     fileInfo = new FileInfo(downloadedFilePath);
@@ -238,7 +244,7 @@ public class ProofsController : ControllerBase
                 {
                     AssetId = assetId,
                     Sha256 = sha256,
-                    MediaType = platform == MediaPlatform.YouTube ? "image/jpeg" : "video/mp4",
+                    MediaType = (platform == MediaPlatform.YouTube && !useFullVideo) ? "image/jpeg" : "video/mp4",
                     Bytes = fileInfo.Length,
                     DurationSec = null, // Duration not applicable for thumbnails
                     Width = null, // Dimensions not extracted for thumbnails
@@ -252,7 +258,7 @@ public class ProofsController : ControllerBase
             // C2PA verification
             C2paCheckResult c2paResult;
             
-            if (platform == MediaPlatform.YouTube)
+            if (platform == MediaPlatform.YouTube && !useFullVideo)
             {
                 // Skip C2PA verification for YouTube thumbnails (thumbnails don't have C2PA data)
                 _logger.LogInformation("⏭️ Skipping C2PA verification for YouTube thumbnail (thumbnails don't contain C2PA manifests)");
@@ -270,7 +276,7 @@ public class ProofsController : ControllerBase
             }
             else
             {
-                // Try hosted verifier first for other platforms
+                // C2PA verification for full videos (including YouTube full_video mode)
                 _logger.LogInformation("🔍 Starting C2PA verification for URL: {Url}", request.Url);
                 c2paResult = await _c2paVerifier.VerifyFromUrlAsync(request.Url);
                 _logger.LogInformation("✅ C2PA verification completed. Manifest found: {ManifestFound}, Status: {Status}",

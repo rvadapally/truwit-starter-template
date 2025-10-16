@@ -191,25 +191,25 @@ public class YouTubeVideoHasher : IYouTubeVideoHasher
     {
         _logger.LogDebug("Running yt-dlp with args: {Args}", args);
 
-        var result = await _processRunner.RunProcessAsync(_ytDlpBin, args, _timeoutSeconds, ct);
+        var (exitCode, stdout, stderr) = await _processRunner.RunAsync(_ytDlpBin, args, _timeoutSeconds, ct);
 
         // Check for cookie authentication errors
-        if (result.StandardError.Contains("Sign in to confirm you're not a bot", StringComparison.OrdinalIgnoreCase) ||
-            result.StandardError.Contains("Sign in to confirm your age", StringComparison.OrdinalIgnoreCase) ||
-            result.StandardError.Contains("This video is private", StringComparison.OrdinalIgnoreCase) ||
-            result.StandardError.Contains("This video is unavailable", StringComparison.OrdinalIgnoreCase))
+        if (stderr.Contains("Sign in to confirm you're not a bot", StringComparison.OrdinalIgnoreCase) ||
+            stderr.Contains("Sign in to confirm your age", StringComparison.OrdinalIgnoreCase) ||
+            stderr.Contains("This video is private", StringComparison.OrdinalIgnoreCase) ||
+            stderr.Contains("This video is unavailable", StringComparison.OrdinalIgnoreCase))
         {
-            _logger.LogError("🚫 YouTube cookie authentication failed: {Error}", result.StandardError);
-            throw new YouTubeCookieException($"YouTube authentication failed. Cookies may be expired or invalid. Error: {result.StandardError}");
+            _logger.LogError("🚫 YouTube cookie authentication failed: {Error}", stderr);
+            throw new YouTubeCookieException($"YouTube authentication failed. Cookies may be expired or invalid. Error: {stderr}");
         }
 
-        if (result.ExitCode != 0)
+        if (exitCode != 0)
         {
-            _logger.LogError("yt-dlp failed with exit code {ExitCode}. Stderr: {Error}", result.ExitCode, result.StandardError);
-            throw new InvalidOperationException($"yt-dlp failed with exit code {result.ExitCode}. Error: {result.StandardError}");
+            _logger.LogError("yt-dlp failed with exit code {ExitCode}. Stderr: {Error}", exitCode, stderr);
+            throw new InvalidOperationException($"yt-dlp failed with exit code {exitCode}. Error: {stderr}");
         }
 
-        return result.StandardOutput;
+        return stdout;
     }
 
     private async Task<string> CalculateSha256Async(string filePath, CancellationToken ct)
