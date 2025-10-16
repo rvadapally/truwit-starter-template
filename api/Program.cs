@@ -54,6 +54,9 @@ try
         o.MultipartBodyLengthLimit = 1024L * 1024L * 200L;
     });
 
+    // Register Memory Cache (required by SettingsService)
+    builder.Services.AddMemoryCache();
+
     // Register application services
     builder.Services.AddScoped<IVerificationService, VerificationService>();
     builder.Services.AddScoped<IProofService, ProofService>();
