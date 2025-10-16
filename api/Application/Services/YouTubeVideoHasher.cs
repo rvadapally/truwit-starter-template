@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using HumanProof.Api.Application.DTOs;
+using HumanProof.Api.Domain.Common;
 using HumanProof.Api.Domain.Exceptions;
 using Microsoft.Extensions.Options;
 
@@ -13,6 +15,8 @@ public class YouTubeVideoHasher : IYouTubeVideoHasher
 {
     private readonly ISettingsService _settingsService;
     private readonly ILogger<YouTubeVideoHasher> _logger;
+    private readonly IProcessRunner _processRunner;
+    private readonly string _ytDlpBin;
     private readonly string _tempDir;
     private readonly int _timeoutSeconds;
     private const double MAX_DURATION_SECONDS = 900.0; // 15 minutes
@@ -20,12 +24,15 @@ public class YouTubeVideoHasher : IYouTubeVideoHasher
     public YouTubeVideoHasher(
         ISettingsService settingsService,
         ILogger<YouTubeVideoHasher> logger,
-        IOptions<AppOptions> options)
+        IProcessRunner processRunner,
+        IOptions<DownloaderOptions> options)
     {
         _settingsService = settingsService;
         _logger = logger;
+        _processRunner = processRunner;
+        _ytDlpBin = options.Value.Bin;
         _tempDir = options.Value.TempDir;
-        _timeoutSeconds = 300; // 5 minutes timeout
+        _timeoutSeconds = options.Value.TimeoutSeconds;
         Directory.CreateDirectory(_tempDir);
     }
 
@@ -182,84 +189,27 @@ public class YouTubeVideoHasher : IYouTubeVideoHasher
 
     private async Task<string> RunYtDlpAsync(string args, CancellationToken ct)
     {
-        var psi = new ProcessStartInfo
-        {
-            FileName = "yt-dlp",
-            Arguments = args,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
+        _logger.LogDebug("Running yt-dlp with args: {Args}", args);
 
-        using var process = new Process { StartInfo = psi };
-        var outputBuilder = new System.Text.StringBuilder();
-        var errorBuilder = new System.Text.StringBuilder();
-
-        process.OutputDataReceived += (sender, e) =>
-        {
-            if (e.Data != null)
-            {
-                outputBuilder.AppendLine(e.Data);
-                _logger.LogDebug("yt-dlp output: {Output}", e.Data);
-            }
-        };
-
-        process.ErrorDataReceived += (sender, e) =>
-        {
-            if (e.Data != null)
-            {
-                errorBuilder.AppendLine(e.Data);
-                _logger.LogDebug("yt-dlp error: {Error}", e.Data);
-            }
-        };
-
-        process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-
-        using var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(_timeoutSeconds));
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token);
-
-        try
-        {
-            await process.WaitForExitAsync(linkedCts.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            try
-            {
-                process.Kill(true);
-            }
-            catch { }
-
-            if (timeoutCts.IsCancellationRequested)
-            {
-                throw new TimeoutException($"yt-dlp process timed out after {_timeoutSeconds} seconds");
-            }
-
-            throw;
-        }
-
-        var output = outputBuilder.ToString();
-        var error = errorBuilder.ToString();
+        var result = await _processRunner.RunProcessAsync(_ytDlpBin, args, _timeoutSeconds, ct);
 
         // Check for cookie authentication errors
-        if (error.Contains("Sign in to confirm you're not a bot") ||
-            error.Contains("Sign in to confirm your age") ||
-            error.Contains("This video is private") ||
-            error.Contains("This video is unavailable"))
+        if (result.StandardError.Contains("Sign in to confirm you're not a bot", StringComparison.OrdinalIgnoreCase) ||
+            result.StandardError.Contains("Sign in to confirm your age", StringComparison.OrdinalIgnoreCase) ||
+            result.StandardError.Contains("This video is private", StringComparison.OrdinalIgnoreCase) ||
+            result.StandardError.Contains("This video is unavailable", StringComparison.OrdinalIgnoreCase))
         {
-            _logger.LogError("🚫 YouTube cookie authentication failed: {Error}", error);
-            throw new YouTubeCookieException($"YouTube authentication failed. Cookies may be expired or invalid. Error: {error}");
+            _logger.LogError("🚫 YouTube cookie authentication failed: {Error}", result.StandardError);
+            throw new YouTubeCookieException($"YouTube authentication failed. Cookies may be expired or invalid. Error: {result.StandardError}");
         }
 
-        if (process.ExitCode != 0)
+        if (result.ExitCode != 0)
         {
-            throw new InvalidOperationException($"yt-dlp failed with exit code {process.ExitCode}. Error: {error}");
+            _logger.LogError("yt-dlp failed with exit code {ExitCode}. Stderr: {Error}", result.ExitCode, result.StandardError);
+            throw new InvalidOperationException($"yt-dlp failed with exit code {result.ExitCode}. Error: {result.StandardError}");
         }
 
-        return output;
+        return result.StandardOutput;
     }
 
     private async Task<string> CalculateSha256Async(string filePath, CancellationToken ct)
