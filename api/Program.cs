@@ -76,6 +76,10 @@ try
     builder.Services.AddScoped<IProcessRunner, ProcessRunner>();
     builder.Services.AddScoped<IUrlCanonicalizer, UrlCanonicalizer>();
     builder.Services.AddSingleton<IVerificationStatusTracker, VerificationStatusTracker>();
+    
+    // Register Settings and YouTube Video Hasher services
+    builder.Services.AddScoped<ISettingsService, SettingsService>();
+    builder.Services.AddScoped<IYouTubeVideoHasher, YouTubeVideoHasher>();
 
     // Configure C2PA options
     builder.Services.Configure<C2paOptions>(builder.Configuration.GetSection("C2pa"));

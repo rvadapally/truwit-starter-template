@@ -6,6 +6,7 @@ using HumanProof.Api.Domain.Interfaces;
 using HumanProof.Api.Domain.Entities;
 using HumanProof.Api.Domain.Enums;
 using HumanProof.Api.Domain.Common;
+using HumanProof.Api.Domain.Exceptions;
 using HumanProof.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -31,6 +32,8 @@ public class ProofsController : ControllerBase
     private readonly IHasher _hasher;
     private readonly IMediaDownloader _downloader;
     private readonly IYouTubeThumbnailDownloader _thumbnailDownloader;
+    private readonly ISettingsService _settingsService;
+    private readonly IYouTubeVideoHasher _youtubeVideoHasher;
     private readonly ILogger<ProofsController> _logger;
     private readonly IOptionsSnapshot<FeatureFlags> _featureFlags;
     private readonly DevC2paSigner _devC2paSigner;
@@ -50,6 +53,8 @@ public class ProofsController : ControllerBase
         IHasher hasher,
         IMediaDownloader downloader,
         IYouTubeThumbnailDownloader thumbnailDownloader,
+        ISettingsService settingsService,
+        IYouTubeVideoHasher youtubeVideoHasher,
         ILogger<ProofsController> logger,
         IOptionsSnapshot<FeatureFlags> featureFlags,
         DevC2paSigner devC2paSigner,
@@ -68,6 +73,8 @@ public class ProofsController : ControllerBase
         _hasher = hasher;
         _downloader = downloader;
         _thumbnailDownloader = thumbnailDownloader;
+        _settingsService = settingsService;
+        _youtubeVideoHasher = youtubeVideoHasher;
         _logger = logger;
         _featureFlags = featureFlags;
         _devC2paSigner = devC2paSigner;
@@ -153,19 +160,53 @@ public class ProofsController : ControllerBase
             
             if (platform == MediaPlatform.YouTube)
             {
-                // For YouTube: Download thumbnail instead of full video (100% reliable, no bot detection)
-                // Extract original video ID (case-sensitive) from URL for thumbnail download
+                // Extract video ID for YouTube handling
                 var videoIdMatch = Regex.Match(request.Url, @"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})");
                 if (!videoIdMatch.Success)
                 {
                     throw new InvalidOperationException($"Could not extract YouTube video ID from URL: {request.Url}");
                 }
-                var videoId = videoIdMatch.Groups[1].Value; // Preserve original case for thumbnails
+                var videoId = videoIdMatch.Groups[1].Value; // Preserve original case
                 
-                _logger.LogInformation("📸 Downloading YouTube thumbnail for reliable verification (video ID: {VideoId})", videoId);
-                downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
-                fileInfo = new FileInfo(downloadedFilePath);
-                _logger.LogInformation("✅ Thumbnail downloaded successfully. File: {FilePath}, Size: {Size} bytes", downloadedFilePath, fileInfo.Length);
+                // Check admin-configured verification mode
+                var verificationMode = await _settingsService.GetSettingAsync("YOUTUBE_VERIFICATION_MODE") ?? "thumbnail";
+                _logger.LogInformation("🎬 YouTube verification mode: {Mode} (video ID: {VideoId})", verificationMode, videoId);
+                
+                bool useFullVideo = false;
+                
+                if (verificationMode == "full_video")
+                {
+                    try
+                    {
+                        _logger.LogInformation("🎥 Attempting full video hash for YouTube");
+                        var hashResult = await _youtubeVideoHasher.HashVideoAsync(videoId);
+                        downloadedFilePath = hashResult.FilePath;
+                        fileInfo = new FileInfo(downloadedFilePath);
+                        useFullVideo = true;
+                        _logger.LogInformation("✅ Full video hash completed. File: {FilePath}, Size: {Size} bytes, Truncated: {Truncated}", 
+                            downloadedFilePath, fileInfo.Length, hashResult.WasTruncated);
+                    }
+                    catch (YouTubeCookieException ex)
+                    {
+                        _logger.LogError(ex, "🚫 Cookie authentication failed, falling back to thumbnail mode");
+                        // Will fall through to thumbnail mode below
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "❌ Full video hash failed, falling back to thumbnail mode");
+                        // Will fall through to thumbnail mode below
+                    }
+                }
+                
+                // Use thumbnail mode if configured or if full video failed
+                if (!useFullVideo)
+                {
+                    _logger.LogInformation("📸 Downloading YouTube thumbnail for reliable verification");
+                    downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
+                    fileInfo = new FileInfo(downloadedFilePath);
+                    _logger.LogInformation("✅ Thumbnail downloaded successfully. File: {FilePath}, Size: {Size} bytes", 
+                        downloadedFilePath, fileInfo.Length);
+                }
             }
             else
             {

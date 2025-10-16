@@ -18,6 +18,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Asset> Assets { get; set; } = null!;
     public DbSet<Receipt> Receipts { get; set; } = null!;
     public DbSet<LinkIndex> LinkIndex { get; set; } = null!;
+    
+    // Service configuration
+    public DbSet<ServiceSetting> ServiceSettings { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -113,6 +116,15 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Platform).HasMaxLength(50).IsRequired();
             entity.Property(e => e.CanonicalId).HasMaxLength(200).IsRequired();
             entity.Property(e => e.ProofId).HasMaxLength(50).IsRequired();
+        });
+        
+        modelBuilder.Entity<ServiceSetting>(entity =>
+        {
+            entity.HasKey(e => e.Key);
+            entity.Property(e => e.Key).HasMaxLength(255).IsRequired();
+            entity.Property(e => e.Value).IsRequired();
+            entity.Property(e => e.UpdatedBy).HasMaxLength(255);
+            entity.HasIndex(e => e.Key);
         });
     }
 }
