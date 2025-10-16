@@ -23,6 +23,7 @@ RUN apt-get update && \
     yt-dlp --version && \
     ffmpeg -version && \
     mkdir -p /tmp/truwit_dl && chmod 777 /tmp/truwit_dl && \
+    mkdir -p /app/temp && chmod 777 /app/temp && \
     mkdir -p /app/data && chmod 777 /app/data && \
     mkdir -p /app/logs && chmod 777 /app/logs
 

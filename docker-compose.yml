@@ -36,7 +36,7 @@ services:
     volumes:
       - ./api/cookies.txt:/app/cookies.txt
       - api_data:/app/data
-      - api_temp:/tmp/truwit_dl
+      - api_temp:/app/temp
       - api_logs:/app/logs
     depends_on:
       postgres:
