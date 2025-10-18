@@ -156,6 +156,15 @@ import { Component, type OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
   ngOnInit(): void {
-    // Component initialized
+    console.log('🏠 HomeComponent initialized');
+    console.log('📁 Checking badge image path...');
+    
+    // Test if the image loads
+    const img = new Image();
+    img.onload = () => console.log('✅ Badge image loaded successfully:', img.src);
+    img.onerror = () => console.log('❌ Badge image failed to load:', img.src);
+    img.src = 'assets/verified-by-truwit.png';
+    
+    console.log('🖼️ Badge image src:', img.src);
   }
 }
