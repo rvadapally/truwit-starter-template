@@ -1,14 +1,18 @@
 ﻿---
 import BaseHead from '../components/BaseHead.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 import Section from '../components/Section.astro';
 ---
 <html lang="en">
   <BaseHead title="About TruWit — Our mission" />
   <body>
+    <Nav />
     <Section kicker="ABOUT" title="Our mission">
       <p>TruWit exists to make authenticity practical. We help creators claim their work and help audiences trust what they see—without forcing anyone to reveal more than they must.</p>
       <div class="hr"></div>
       <p class="small">We're a small, product-driven team. If you're building with us, reach out at <a href="mailto:hello@truwit.ai">hello@truwit.ai</a>.</p>
     </Section>
+    <Footer />
   </body>
 </html>

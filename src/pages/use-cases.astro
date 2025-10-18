@@ -1,5 +1,7 @@
 ﻿---
 import BaseHead from '../components/BaseHead.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 import Section from '../components/Section.astro';
 import FeatureCard from '../components/FeatureCard.astro';
 import CTA from '../components/CTA.astro';
@@ -7,6 +9,7 @@ import CTA from '../components/CTA.astro';
 <html lang="en">
   <BaseHead title="TruWit Use Cases — Real-world ways people use proofs" />
   <body>
+    <Nav />
     <Section kicker="SOLUTIONS" title="Use cases">
       <div class="grid-3">
         <FeatureCard icon="🎥" title="Creators & editors" body="Sign shorts, reels, and thumbnails before publishing. Keep attribution clear as clips are reposted."/>
@@ -20,5 +23,6 @@ import CTA from '../components/CTA.astro';
       </div>
     </Section>
     <CTA title="See it in action" body="Paste a link or upload a file—your first proofs are free during early access."/>
+    <Footer />
   </body>
 </html>

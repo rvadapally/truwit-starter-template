@@ -1,5 +1,7 @@
 ﻿---
 import BaseHead from '../components/BaseHead.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
 import Section from '../components/Section.astro';
 import FeatureCard from '../components/FeatureCard.astro';
 import CTA from '../components/CTA.astro';
@@ -7,6 +9,7 @@ import CTA from '../components/CTA.astro';
 <html lang="en">
   <BaseHead title="How TruWit Works — Sign & Verify in Seconds" />
   <body>
+    <Nav />
     <Section kicker="PRODUCT" title="How it works">
       <div class="grid-3">
         <FeatureCard icon="🖇️" title="1) Add your media" body="Paste a public link or upload your file. TruWit accepts popular video and image formats."/>
@@ -36,5 +39,6 @@ import CTA from '../components/CTA.astro';
       </div>
     </Section>
     <CTA />
+    <Footer />
   </body>
 </html>
