@@ -1,7 +1,7 @@
 
 ## 📌 Project: Truwit
 
-<!-- Test deployment: Cloudflare Pages build verification -->
+<!-- Test deployment: Cloudflare Pages build verification - Angular logo fix -->
 ### **Description**
 
 Truwit is a lightweight, extensible verification layer for digital media. It provides a way to attach cryptographic provenance, authenticity, and consent data to AI-generated or user-created content. With Truwit, creators, rightsholders, and audiences can easily distinguish verified content from synthetic or manipulated media.
