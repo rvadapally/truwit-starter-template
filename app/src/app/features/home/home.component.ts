@@ -32,6 +32,13 @@ import { Component, type OnInit } from '@angular/core';
             <h3>AI Detection</h3>
             <p>Identify and verify AI-generated content</p>
           </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <img src="assets/verified-by-truwit.png" alt="Verified by TruWit" style="width: 48px; height: 48px; object-fit: contain;">
+            </div>
+            <h3>Show Trust</h3>
+            <p>Use "Verified by TruWit" badges on posts, thumbnails, and sites</p>
+          </div>
         </div>
         
         <div class="cta-section">

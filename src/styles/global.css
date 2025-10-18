@@ -82,6 +82,7 @@ p{margin:0 0 var(--gap-2);color:var(--text-secondary)}
 .small{font-size:13px;color:var(--text-muted)}
 .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px;background:var(--btn-gradient); color:#051218;font-weight:600;box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1)}
 .btn.secondary{background:var(--bg-2);color:var(--text-primary);border:1px solid var(--border)}
+.btn.secondary:hover{background:var(--bg-1);color:var(--text-primary)}
 .container{max-width:var(--w-container);margin:0 auto;padding:40px 20px}
 .card{background:var(--bg-1);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px}
 
@@ -96,6 +97,17 @@ p{margin:0 0 var(--gap-2);color:var(--text-secondary)}
 [data-theme="dark"] .btn {
   box-shadow: 0 0 12px rgba(34, 224, 195, 0.18);
   color: #051218;
+}
+
+[data-theme="dark"] .btn.secondary {
+  background: var(--bg-2);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .btn.secondary:hover {
+  background: var(--bg-1);
+  color: var(--text-primary);
 }
 .grid-3{display:grid;gap:22px;grid-template-columns:repeat(3,1fr)}
 .grid-2{display:grid;gap:22px;grid-template-columns:repeat(2,1fr)}
