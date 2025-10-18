@@ -1,4 +1,6 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
+
 const links = [
   { href:'/', label:'Home' },
   { href:'/how-it-works', label:'How It Works' },
@@ -8,13 +10,14 @@ const links = [
   { href:'/investors', label:'Investors' },
 ];
 ---
-<nav style="background:#0A1218;border-bottom:1px solid #14202A">
+<nav style="background:var(--bg-1);border-bottom:1px solid var(--border)">
   <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px">
-    <a href="/" style="display:flex;align-items:center;gap:10px;color:#D9E6EE;font-weight:700">
+    <a href="/" style="display:flex;align-items:center;gap:10px;color:var(--text-primary);font-weight:700">
       <img src="/favicon-truwit.svg" alt="T" width="22" height="22"/> TruWit
     </a>
     <div style="display:flex;gap:18px;align-items:center">
-      {links.map(l => <a href={l.href}>{l.label}</a>)}
+      {links.map(l => <a href={l.href} style="color:var(--text-primary)">{l.label}</a>)}
+      <ThemeToggle />
       <a class="btn" href="/app">Launch App</a>
     </div>
   </div>

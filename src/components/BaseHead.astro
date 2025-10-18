@@ -26,6 +26,14 @@ const siteUrl = 'https://truwit.ai';
 <link rel="manifest" href="/manifest.webmanifest" />
 <meta name="generator" content={Astro.generator} />
 
+<!-- Theme initialization to prevent FOUC -->
+<script is:inline>
+  (function() {
+    const theme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
+
 <!-- Font preloads -->
 <link rel="preload" href="/fonts/Inter-Var.woff2" as="font" type="font/woff2" crossorigin />
 
