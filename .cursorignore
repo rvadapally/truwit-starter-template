@@ -1,0 +1,41 @@
+# Cursor IDE ignore file
+# Exclude directories that contain video files which Cursor tries to process as images
+
+# Test results containing video files
+app/test-results/
+app/playwright-report/
+
+# API test files and uploads
+api/docs/testfiles/
+api/uploads/
+api/temp_downloads/
+
+# Build and dist directories
+dist/
+app/dist/
+web/dist/
+
+# Node modules
+node_modules/
+app/node_modules/
+web/node_modules/
+truwit-api/node_modules/
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Video files that might be mistaken for images
+*.webm
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Large binary files
+*.zip
+*.tar.gz
+*.rar
