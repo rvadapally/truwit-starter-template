@@ -1,9 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Truwit API Documentation - Integrate cryptographic content verification into your application.">
     <title>Documentation - Truwit</title>
     <link rel="icon" type="image/png" href="/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +12,7 @@
     <nav class="nav">
         <div class="container nav-container">
             <a href="/" class="nav-logo">Truwit</a>
-            <button class="mobile-menu-toggle" aria-label="Toggle menu"><span>☰</span></button>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu"><span>â˜°</span></button>
             <ul class="nav-menu">
                 <li><a href="/how-it-works.html">How It Works</a></li>
                 <li><a href="/use-cases.html">Use Cases</a></li>
@@ -25,104 +24,44 @@
             </ul>
         </div>
     </nav>
-
     <section class="hero">
         <div class="container">
             <h1>Developer Documentation</h1>
-            <p>Integrate Truwit into your application</p>
+            <p>Integrate Truwit into your app (Coming Soon)</p>
         </div>
     </section>
-
     <section class="section">
         <div class="container">
             <div style="max-width: 800px; margin: 0 auto;">
-                <div style="background: white; padding: var(--spacing-xl); border-radius: var(--border-radius); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); margin-bottom: var(--spacing-xl);">
-                    <h2 style="margin-bottom: var(--spacing-md);">Quick Start</h2>
-                    <p style="color: var(--color-text-light); margin-bottom: var(--spacing-md);">
-                        The Truwit API allows you to programmatically create and verify cryptographic proofs for digital content.
-                    </p>
-                    <pre style="background: var(--color-dark); padding: var(--spacing-md); border-radius: var(--border-radius); overflow-x: auto;"><code style="color: #00FFA3; font-size: 0.875rem;"># Create a proof from URL (coming soon)
-curl -X POST https://api.truwit.ai/v1/proofs/url \
+                <h2 style="margin-bottom: var(--spacing-md);">API Reference (Coming Soon)</h2>
+                <p style="font-size: 1.125rem; color: var(--color-text-light); margin-bottom: var(--spacing-xl);">
+                    Our public API is currently in development. Sign up to be notified when it launches.
+                </p>
+                <div style="background: var(--color-dark); color: white; padding: var(--spacing-lg); border-radius: var(--border-radius); margin-bottom: var(--spacing-xl);">
+                    <p style="margin-bottom: var(--spacing-sm); opacity: 0.7;"># Create a proof via API (coming Q2 2025)</p>
+                    <pre style="background: none; padding: 0;"><code>curl -X POST https://api.truwit.ai/v1/proofs/url \
   -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "url": "https://youtube.com/watch?v=..."
-  }'
-
-# Response
-{
-  "proofId": "abc123def456...",
-  "trustmarkId": "xyz789",
-  "verifyUrl": "/t/xyz789",
-  "contentHash": "a1b2c3d4...",
-  "deduped": false
-}</code></pre>
+  -d '{"url": "https://youtube.com/watch?v=..."}'</code></pre>
                 </div>
-
-                <div style="background: rgba(0, 212, 255, 0.1); padding: var(--spacing-xl); border-radius: var(--border-radius); text-align: center;">
-                    <h2 style="margin-bottom: var(--spacing-md);">🚧 API Coming Q2 2025 🚧</h2>
-                    <p style="color: var(--color-text-light); margin-bottom: var(--spacing-lg);">
-                        We're currently working on our public API. It will launch alongside the Pro tier in Q2 2025.
-                    </p>
-                    <h3 style="margin-bottom: var(--spacing-md);">What's Coming:</h3>
-                    <ul style="text-align: left; max-width: 500px; margin: 0 auto var(--spacing-lg); color: var(--color-text-light);">
-                        <li style="margin-bottom: var(--spacing-sm);">RESTful API with full documentation</li>
-                        <li style="margin-bottom: var(--spacing-sm);">SDKs for JavaScript, Python, .NET, Go</li>
-                        <li style="margin-bottom: var(--spacing-sm);">Webhook support for async operations</li>
-                        <li style="margin-bottom: var(--spacing-sm);">Batch verification endpoints</li>
-                        <li style="margin-bottom: var(--spacing-sm);">OpenAPI spec for code generation</li>
-                    </ul>
-                    <p style="margin-bottom: var(--spacing-lg); color: var(--color-text-light);">
-                        <strong>Want early access?</strong> Join our developer waitlist.
-                    </p>
-                    <a href="/contact.html" class="btn btn-primary">Join Developer Waitlist</a>
-                </div>
-
-                <div style="margin-top: var(--spacing-xl); background: white; padding: var(--spacing-xl); border-radius: var(--border-radius); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-                    <h3 style="margin-bottom: var(--spacing-md);">Embed Trust Badge</h3>
-                    <p style="color: var(--color-text-light); margin-bottom: var(--spacing-md);">
-                        You can embed Truwit verification badges on your website today using an iframe:
-                    </p>
-                    <pre style="background: var(--color-dark); padding: var(--spacing-md); border-radius: var(--border-radius); overflow-x: auto; margin-bottom: var(--spacing-md);"><code style="color: #00FFA3; font-size: 0.875rem;">&lt;iframe 
-  src="https://truwit.ai/badge/{trustmarkId}" 
-  width="200" 
-  height="50" 
-  frameborder="0"&gt;
-&lt;/iframe&gt;</code></pre>
-                    <p style="color: var(--color-text-light);">
-                        Replace <code>{trustmarkId}</code> with your actual trustmark ID from the verification page.
-                    </p>
+                <h3 style="margin-bottom: var(--spacing-md);">Planned Features</h3>
+                <ul style="margin-bottom: var(--spacing-xl); color: var(--color-text-light);">
+                    <li style="margin-bottom: var(--spacing-sm);">âœ“ RESTful API with JSON responses</li>
+                    <li style="margin-bottom: var(--spacing-sm);">âœ“ Webhooks for verification events</li>
+                    <li style="margin-bottom: var(--spacing-sm);">âœ“ SDKs for JavaScript, Python, .NET, Go</li>
+                    <li style="margin-bottom: var(--spacing-sm);">âœ“ Batch processing endpoints</li>
+                    <li style="margin-bottom: var(--spacing-sm);">âœ“ Embeddable trust badges</li>
+                </ul>
+                <div class="text-center">
+                    <a href="/contact.html" class="btn btn-primary">Request Early Access</a>
                 </div>
             </div>
         </div>
     </section>
-
-    <section class="section bg-white">
-        <div class="container text-center">
-            <h2 style="margin-bottom: var(--spacing-md);">Need Help?</h2>
-            <p style="color: var(--color-text-light); margin-bottom: var(--spacing-xl); max-width: 600px; margin-left: auto; margin-right: auto;">
-                Have questions about integrating Truwit? Our team is here to help.
-            </p>
-            <div class="btn-group">
-                <a href="/contact.html" class="btn btn-primary">Contact Support</a>
-                <a href="mailto:developers@truwit.ai" class="btn btn-secondary" style="border-color: var(--color-dark); color: var(--color-dark);">Email Developers</a>
-            </div>
-        </div>
-    </section>
-
     <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-section"><h4>Product</h4><ul><li><a href="/how-it-works.html">How It Works</a></li><li><a href="/use-cases.html">Use Cases</a></li><li><a href="/pricing.html">Pricing</a></li><li><a href="/app/">Try App</a></li></ul></div>
-                <div class="footer-section"><h4>Technology</h4><ul><li><a href="/technology.html">Our Stack</a></li><li><a href="/docs.html">Documentation</a></li><li><a href="https://c2pa.org" target="_blank" rel="noopener">C2PA Standard</a></li></ul></div>
-                <div class="footer-section"><h4>Company</h4><ul><li><a href="/about.html">About Us</a></li><li><a href="/investors.html">For Investors</a></li><li><a href="/contact.html">Contact</a></li></ul></div>
-                <div class="footer-section"><h4>Connect</h4><ul><li><a href="https://x.com/TruwitAi" target="_blank" rel="noopener">Twitter/X</a></li><li><a href="mailto:hello@truwit.ai">hello@truwit.ai</a></li></ul></div>
-            </div>
-            <div class="footer-bottom"><p>© 2025 Truwit. All rights reserved.</p></div>
+            <div class="footer-bottom"><p>Â© 2025 Truwit. All rights reserved.</p></div>
         </div>
     </footer>
-
     <script src="/js/main.js"></script>
 </body>
 </html>
-
