@@ -1,0 +1,12 @@
+---
+const { icon = '✅', title, body } = Astro.props;
+---
+<div class="fcard card">
+  <div class="icon">{icon}</div>
+  <h3>{title}</h3>
+  <p>{body}</p>
+</div>
+<style>
+.fcard{display:flex;flex-direction:column;gap:10px}
+.icon{font-size:20px}
+</style>

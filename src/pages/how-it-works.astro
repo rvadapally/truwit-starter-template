@@ -1,10 +1,40 @@
 ﻿---
 import BaseHead from '../components/BaseHead.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
+import Section from '../components/Section.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+import CTA from '../components/CTA.astro';
 ---
 <html lang="en">
-<head><BaseHead title="HOW IT WORKS - Truwit" description="HOW IT WORKS" /></head>
-<body><Nav /><main><section class="hero"><div class="container"><h1>HOW IT WORKS</h1><p>Coming soon</p></div></section></main><Footer /></body>
+  <BaseHead title="How TruWit Works — Sign & Verify in Seconds" />
+  <body>
+    <Section kicker="PRODUCT" title="How it works">
+      <div class="grid-3">
+        <FeatureCard icon="🖇️" title="1) Add your media" body="Paste a public link or upload your file. TruWit accepts popular video and image formats."/>
+        <FeatureCard icon="🔐" title="2) Generate a proof" body="We create a proprietary cryptographic fingerprint bound to the key attributes that define origin."/>
+        <FeatureCard icon="✅" title="3) Share & verify" body="Publish your content with a TruWit badge. Anyone can check the proof and confirm authenticity."/>
+      </div>
+      <div class="hr"></div>
+      <div class="grid-2">
+        <div class="card">
+          <h3>For Creators</h3>
+          <p>Sign your content for free during early access. Keep control of attribution and consent while you grow.</p>
+          <div class="chips">
+            <span class="chip">No account required</span>
+            <span class="chip">Fast proof creation</span>
+            <span class="chip">Shareable badge</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>For Viewers & Teams</h3>
+          <p>Verify in one click. See source, timestamp, and proof status at a glance—without exposing personal data.</p>
+          <div class="chips">
+            <span class="chip">Instant check</span>
+            <span class="chip">Public-safe manifest</span>
+            <span class="chip">Works on links & files</span>
+          </div>
+        </div>
+      </div>
+    </Section>
+    <CTA />
+  </body>
 </html>
-<style>body{font-family:sans-serif;background:#0b1220;color:#e6eefc;margin:0}.container{max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero{background:linear-gradient(135deg,#0A1929,#1a2942);padding:4rem 0;text-align:center}.hero h1{font-size:3rem;font-weight:700;margin-bottom:1rem;background:linear-gradient(135deg,#00D4FF,#00FFA3);-webkit-background-clip:text;-webkit-text-fill-color:transparent}</style>

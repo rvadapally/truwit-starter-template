@@ -1,10 +1,24 @@
 ﻿---
 import BaseHead from '../components/BaseHead.astro';
-import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
+import Section from '../components/Section.astro';
+import FeatureCard from '../components/FeatureCard.astro';
+import CTA from '../components/CTA.astro';
 ---
 <html lang="en">
-<head><BaseHead title="USE CASES - Truwit" description="USE CASES" /></head>
-<body><Nav /><main><section class="hero"><div class="container"><h1>USE CASES</h1><p>Coming soon</p></div></section></main><Footer /></body>
+  <BaseHead title="TruWit Use Cases — Real-world ways people use proofs" />
+  <body>
+    <Section kicker="SOLUTIONS" title="Use cases">
+      <div class="grid-3">
+        <FeatureCard icon="🎥" title="Creators & editors" body="Sign shorts, reels, and thumbnails before publishing. Keep attribution clear as clips are reposted."/>
+        <FeatureCard icon="📰" title="Newsrooms" body="Verify audience submissions, archive manifests, and reduce takedown churn from misattributed media."/>
+        <FeatureCard icon="🏷️" title="Brands & agencies" body="Prove brand-safe origin for ads and UGC. Share proofs with partners without sharing raw files."/>
+      </div>
+      <div class="grid-3" style="margin-top:22px">
+        <FeatureCard icon="🎓" title="Education" body="Track coursework originality for media projects while protecting student privacy."/>
+        <FeatureCard icon="🏛️" title="Compliance" body="Attach immutable proofs to campaign archives and audits without revealing proprietary methods."/>
+        <FeatureCard icon="🤝" title="Talent & likeness" body="Store consent references alongside signed media to reduce disputes around AI likeness use."/>
+      </div>
+    </Section>
+    <CTA title="See it in action" body="Paste a link or upload a file—your first proofs are free during early access."/>
+  </body>
 </html>
-<style>body{font-family:sans-serif;background:#0b1220;color:#e6eefc;margin:0}.container{max-width:1200px;margin:0 auto;padding:0 1.5rem}.hero{background:linear-gradient(135deg,#0A1929,#1a2942);padding:4rem 0;text-align:center}.hero h1{font-size:3rem;font-weight:700;margin-bottom:1rem;background:linear-gradient(135deg,#00D4FF,#00FFA3);-webkit-background-clip:text;-webkit-text-fill-color:transparent}</style>

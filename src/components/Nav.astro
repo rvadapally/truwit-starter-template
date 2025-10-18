@@ -1,158 +1,21 @@
 ---
+const links = [
+  { href:'/', label:'Home' },
+  { href:'/how-it-works', label:'How It Works' },
+  { href:'/use-cases', label:'Use Cases' },
+  { href:'/technology', label:'Technology' },
+  { href:'/pricing', label:'Pricing' },
+  { href:'/investors', label:'Investors' },
+];
 ---
-
-<nav class="nav">
-  <div class="nav-container">
-    <a href="/" class="nav-logo">
-      <img src="/logo.svg" alt="Truwit Logo" class="nav-logo-img">
-      <span class="nav-logo-text">Truwit</span>
+<nav style="background:#0A1218;border-bottom:1px solid #14202A">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px">
+    <a href="/" style="display:flex;align-items:center;gap:10px;color:#D9E6EE;font-weight:700">
+      <img src="/favicon-truwit.svg" alt="T" width="22" height="22"/> TruWit
     </a>
-    <button class="mobile-menu-toggle" aria-label="Toggle menu" id="mobile-menu-toggle">
-      <span>☰</span>
-    </button>
-    <ul class="nav-menu" id="nav-menu">
-      <li><a href="/how-it-works">How It Works</a></li>
-      <li><a href="/use-cases">Use Cases</a></li>
-      <li><a href="/technology">Technology</a></li>
-      <li><a href="/pricing">Pricing</a></li>
-      <li><a href="/about">About</a></li>
-      <li><a href="/investors">Investors</a></li>
-      <li><a href="/app/" class="nav-cta">Try App</a></li>
-    </ul>
+    <div style="display:flex;gap:18px;align-items:center">
+      {links.map(l => <a href={l.href}>{l.label}</a>)}
+      <a class="btn" href="/app">Launch App</a>
+    </div>
   </div>
 </nav>
-
-<style>
-  .nav {
-    background: rgba(10, 25, 41, 0.95);
-    backdrop-filter: blur(10px);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.5rem;
-  }
-
-  .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #00D4FF, #00FFA3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-decoration: none;
-  }
-
-  .nav-logo-img {
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
-  }
-
-  .nav-logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #00D4FF, #00FFA3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .nav-menu {
-    display: flex;
-    list-style: none;
-    gap: 2rem;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-  }
-
-  .nav-menu a {
-    color: white;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-
-  .nav-menu a:hover {
-    color: #00D4FF;
-  }
-
-  .nav-cta {
-    background: linear-gradient(135deg, #00D4FF, #00FFA3);
-    color: #0A1929 !important;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-  }
-
-  .nav-cta:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
-  }
-
-  .mobile-menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  @media (max-width: 768px) {
-    .nav-logo-img {
-      width: 28px;
-      height: 28px;
-    }
-    
-    .nav-logo-text {
-      font-size: 1.25rem;
-    }
-    
-    .nav-menu {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: #0A1929;
-      flex-direction: column;
-      padding: 1rem;
-      gap: 1rem;
-    }
-    
-    .nav-menu.active {
-      display: flex;
-    }
-    
-    .mobile-menu-toggle {
-      display: block;
-    }
-  }
-</style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggle = document.getElementById('mobile-menu-toggle');
-    const menu = document.getElementById('nav-menu');
-    
-    if (toggle && menu) {
-      toggle.addEventListener('click', () => {
-        menu.classList.toggle('active');
-      });
-    }
-  });
-</script>
-

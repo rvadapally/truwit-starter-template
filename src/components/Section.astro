@@ -1,0 +1,13 @@
+---
+const { title, kicker, children } = Astro.props;
+---
+<section class="container">
+  {kicker && <div class="kicker">{kicker}</div>}
+  {title && <div class="hero"><h1>{title}</h1></div>}
+  <div class="content card">
+    <slot />
+  </div>
+</section>
+<style>
+.content{padding:26px}
+</style>

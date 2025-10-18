@@ -1,0 +1,10 @@
+---
+const { title="Ready to try TruWit?", body="Sign your video or image and get a verifiable proof in seconds.", ctaText="Launch App", ctaHref="/app"} = Astro.props;
+---
+<section class="container center">
+  <div class="card">
+    <h2>{title}</h2>
+    <p class="muted" style="margin:8px 0 18px">{body}</p>
+    <a class="btn" href={ctaHref}>{ctaText}</a>
+  </div>
+</section>
