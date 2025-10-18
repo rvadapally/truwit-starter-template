@@ -1,5 +1,4 @@
 import { Component, type OnInit } from '@angular/core';
-import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -35,7 +34,7 @@ import { environment } from '../../../environments/environment';
           </div>
           <div class="feature">
             <div class="feature-icon">
-              <img [src]="apiUrl + '/v1/badge/static'" alt="Verified by TruWit" style="width: 48px; height: 48px; object-fit: contain;">
+              <img src="assets/verified-by-truwit.png" alt="Verified by TruWit" style="width: 48px; height: 48px; object-fit: contain;">
             </div>
             <h3>Show Trust</h3>
             <p>Use "Verified by TruWit" badges on posts, thumbnails, and sites</p>
@@ -156,8 +155,6 @@ import { environment } from '../../../environments/environment';
   `]
 })
 export class HomeComponent implements OnInit {
-  apiUrl = environment.apiUrl;
-
   ngOnInit(): void {
     // Component initialized
   }
