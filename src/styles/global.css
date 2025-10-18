@@ -102,7 +102,7 @@ p{margin:0 0 var(--gap-2);color:var(--text-secondary)}
 .kicker{color:var(--teal);font-weight:600;letter-spacing:.6px;margin-bottom:10px}
 .hero{margin-top:18px;margin-bottom:28px}
 .hero h1{font-size:36px}
-.home-hero{padding:22px;border:1px solid #1c2a34;border-radius:var(--radius);background:var(--bg-1);box-shadow:var(--shadow)}
+.home-hero{padding:22px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-1);box-shadow:var(--shadow)}
 .home-grid{display:grid;gap:24px;grid-template-columns:1.8fr 1fr}
 .step-list{display:flex;flex-direction:column;gap:14px;margin-top:10px}
 .step{display:flex;gap:12px;align-items:flex-start;background:var(--bg-2);border:1px solid var(--border);border-radius:12px;padding:14px}
