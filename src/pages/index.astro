@@ -113,10 +113,17 @@ import Footer from '../components/Footer.astro';
     color: #e6eefc;
   }
 
+  main {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 0 2rem;
+    padding: 0 1.5rem;
   }
 
   /* Compact Hero */
@@ -151,8 +158,11 @@ import Footer from '../components/Footer.astro';
   .two-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    gap: 3rem;
     align-items: start;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .column h2 {
@@ -238,6 +248,9 @@ import Footer from '../components/Footer.astro';
     justify-content: space-between;
     align-items: center;
     gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .cta-content h2 {

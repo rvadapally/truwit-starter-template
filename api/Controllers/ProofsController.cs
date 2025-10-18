@@ -797,11 +797,12 @@ public class ProofsController : ControllerBase
             _logger.LogInformation("C2PA verification completed: ManifestFound={ManifestFound}, Status={Status}",
                 c2paResult.ManifestFound, c2paResult.Status);
 
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
                 VerifyUrl = $"/t/{result.ProofId}",
-                BadgeUrl = $"http://localhost:5000/badges/{result.ProofId}.png"
+                BadgeUrl = $"{baseUrl}/v1/badge/{result.ProofId}.svg"
             };
 
             _logger.LogInformation("Basic verification completed for URL: {Url}", request.Input.Url);
@@ -936,11 +937,12 @@ public class ProofsController : ControllerBase
 
             var result = await _verificationService.VerifyContentAsync(verificationRequest);
 
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
                 VerifyUrl = $"/t/{result.ProofId}",
-                BadgeUrl = $"http://localhost:5000/badges/{result.ProofId}.png",
+                BadgeUrl = $"{baseUrl}/v1/badge/{result.ProofId}.svg",
                 DevTestMode = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&
                              _featureFlags.Value.DevImageTestMode
             };

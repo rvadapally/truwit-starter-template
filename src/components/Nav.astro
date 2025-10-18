@@ -3,7 +3,10 @@
 
 <nav class="nav">
   <div class="nav-container">
-    <a href="/" class="nav-logo">Truwit</a>
+    <a href="/" class="nav-logo">
+      <img src="/logo.svg" alt="Truwit Logo" class="nav-logo-img">
+      <span class="nav-logo-text">Truwit</span>
+    </a>
     <button class="mobile-menu-toggle" aria-label="Toggle menu" id="mobile-menu-toggle">
       <span>☰</span>
     </button>
@@ -39,6 +42,9 @@
   }
 
   .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
     font-size: 1.5rem;
     font-weight: 700;
     background: linear-gradient(135deg, #00D4FF, #00FFA3);
@@ -46,6 +52,21 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     text-decoration: none;
+  }
+
+  .nav-logo-img {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+
+  .nav-logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #00D4FF, #00FFA3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .nav-menu {
@@ -91,6 +112,15 @@
   }
 
   @media (max-width: 768px) {
+    .nav-logo-img {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .nav-logo-text {
+      font-size: 1.25rem;
+    }
+    
     .nav-menu {
       display: none;
       position: absolute;
