@@ -103,6 +103,31 @@ public class BadgesController : ControllerBase
         }
     }
 
+    [HttpGet("badge/static")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public IActionResult GetStaticBadge()
+    {
+        try
+        {
+            var badgePath = Path.Combine(Directory.GetCurrentDirectory(), "uploads", "verified-by-truwit.png");
+            
+            if (!System.IO.File.Exists(badgePath))
+            {
+                return NotFound();
+            }
+
+            var fileBytes = System.IO.File.ReadAllBytes(badgePath);
+            Response.Headers["Cache-Control"] = "public, max-age=3600"; // Cache for 1 hour
+            return File(fileBytes, "image/png");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error serving static badge");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
     private string GenerateBadgeSvg(Domain.Entities.VerificationProof proof)
     {
         var text = "Verified by Truwit";
