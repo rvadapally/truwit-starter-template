@@ -72,6 +72,20 @@ p{margin:0 0 var(--gap-2);color:var(--text-secondary)}
 .kicker{color:var(--teal);font-weight:600;letter-spacing:.6px;margin-bottom:10px}
 .hero{margin-top:18px;margin-bottom:28px}
 .hero h1{font-size:36px}
+.home-hero{padding:22px;border:1px solid #1c2a34;border-radius:var(--radius);background:var(--bg-1);box-shadow:var(--shadow)}
+.home-grid{display:grid;gap:24px;grid-template-columns:1.1fr 1fr}
+.step-list{display:flex;flex-direction:column;gap:14px;margin-top:10px}
+.step{display:flex;gap:12px;align-items:flex-start;background:var(--bg-2);border:1px solid #1b2832;border-radius:12px;padding:12px}
+.step .ico{font-size:18px;min-width:20px;margin-top:2px}
+.action-cards{display:flex;flex-direction:column;gap:14px}
+.action-card{background:#0f1921;border:1px solid #1c2a34;border-radius:12px;padding:14px}
+.stat-row{display:flex;gap:12px;flex-wrap:wrap}
+.stat{flex:1;min-width:120px;background:#0f1921;border:1px solid #1c2a34;border-radius:12px;padding:12px;text-align:center}
+.stat h3{margin:0;color:var(--teal);font-size:22px}
+.mini-strip{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-top:16px}
+.mini-strip .badges{display:flex;gap:10px;align-items:center}
+.mini-strip img{height:26px;width:26px}
+.note{font-size:13px;color:var(--ink-3)}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .chip{padding:6px 10px;border-radius:999px;background:var(--bg-2);border:1px solid var(--border);color:var(--text-secondary);font-size:12px}
 .hr{height:1px;background:var(--border);margin:22px 0}
@@ -87,4 +101,5 @@ p{margin:0 0 var(--gap-2);color:var(--text-secondary)}
   .grid-3{grid-template-columns:1fr}
   .grid-2{grid-template-columns:1fr}
   .hero h1{font-size:28px}
+  .home-grid{grid-template-columns:1fr}
 }

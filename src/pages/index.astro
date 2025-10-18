@@ -3,364 +3,123 @@ import BaseHead from '../components/BaseHead.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 ---
-
 <html lang="en">
-  <head>
-    <BaseHead title="Truwit — Where Provenance Meets Proof" description="The cryptographic verification layer for digital media." />
-  </head>
+  <BaseHead
+    title="TruWit — Where Provenance Meets Proof"
+    description="The cryptographic verification layer for the AI age. Sign your media and verify origin in seconds."
+    ogImage="/images/og-truwit.png"
+  />
   <body>
     <Nav />
-    <main>
-      <!-- Compact Hero Section -->
-      <section class="hero-compact">
-        <div class="container">
-          <h1>Where Provenance Meets Proof</h1>
-          <p class="hero-subtitle">The cryptographic verification layer for the AI age</p>
-          <div class="cta-group">
-            <a href="/app/" class="btn btn-primary">Launch App</a>
-            <a href="/how-it-works" class="btn btn-secondary">How It Works</a>
-            <a href="/investors" class="btn btn-secondary">Investors</a>
-          </div>
-        </div>
-      </section>
 
-      <!-- Combined Problem + Solution Section (Side by Side on Desktop) -->
-      <section class="section-combined">
-        <div class="container">
-          <div class="two-column">
-            <!-- Left: Problem -->
-            <div class="column">
-              <h2>The AI Content Crisis</h2>
-              <p class="subtitle">Trust is broken. Truwit fixes it.</p>
-              <div class="stats-compact">
-                <div class="stat-compact">
-                  <div class="stat-value">90%</div>
-                  <div class="stat-label">AI content by 2026</div>
+    <!-- Above-the-fold hero -->
+    <section class="container">
+      <div class="center" style="margin-top:12px">
+        <h1 style="color:#b7fbe9">Where Provenance Meets Proof</h1>
+        <p class="muted">The cryptographic verification layer for the AI age</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin:16px 0 26px">
+          <a class="btn" href="/app">Launch App</a>
+          <a class="btn secondary" href="/how-it-works">How It Works</a>
+          <a class="btn secondary" href="/investors">Investors</a>
+        </div>
+      </div>
+
+      <!-- New compact hero card grid -->
+      <div class="home-hero">
+        <div class="home-grid">
+          <!-- LEFT: How TruWit Works -->
+          <div>
+            <div class="kicker">HOW TRUWIT WORKS</div>
+            <h2 style="margin-bottom:6px">Three steps, one proof</h2>
+            <p class="muted">Make origin and consent obvious — without oversharing your data or files.</p>
+
+            <div class="step-list">
+              <div class="step">
+                <div class="ico">🔗</div>
+                <div>
+                  <strong>1) Verify</strong>
+                  <p class="small">Paste a link or upload a file. TruWit accepts popular video and image formats.</p>
                 </div>
-                <div class="stat-compact">
-                  <div class="stat-value">900%</div>
-                  <div class="stat-label">deepfake increase</div>
+              </div>
+              <div class="step">
+                <div class="ico">🔐</div>
+                <div>
+                  <strong>2) Trust</strong>
+                  <p class="small">We generate a proprietary cryptographic fingerprint bound to origin-defining attributes.</p>
                 </div>
-                <div class="stat-compact">
-                  <div class="stat-value">73%</div>
-                  <div class="stat-label">can't identify AI</div>
+              </div>
+              <div class="step">
+                <div class="ico">✅</div>
+                <div>
+                  <strong>3) Share</strong>
+                  <p class="small">Publish with "Signed" / "Verified" badges and a downloadable, public-safe manifest.</p>
                 </div>
               </div>
             </div>
 
-            <!-- Right: Solution -->
-            <div class="column">
-              <h2>How Truwit Works</h2>
-              <p class="subtitle">Three simple steps</p>
-              <div class="steps-compact">
-                <div class="step">
-                  <span class="step-icon">🔗</span>
-                  <div>
-                    <h3>1. Verify</h3>
-                    <p>Upload or link content</p>
-                  </div>
-                </div>
-                <div class="step">
-                  <span class="step-icon">🔒</span>
-                  <div>
-                    <h3>2. Trust</h3>
-                    <p>Cryptographic proof created</p>
-                  </div>
-                </div>
-                <div class="step">
-                  <span class="step-icon">✓</span>
-                  <div>
-                    <h3>3. Share</h3>
-                    <p>Embeddable trust badges</p>
-                  </div>
-                </div>
+            <!-- micro stats strip fills space neatly on left -->
+            <div class="mini-strip">
+              <div class="stat-row" style="flex:1">
+                <div class="stat"><h3>90%</h3><div class="small">AI content by 2026</div></div>
+                <div class="stat"><h3>900%</h3><div class="small">deepfake increase</div></div>
+                <div class="stat"><h3>73%</h3><div class="small">can't identify AI</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Action cards (no dead space) -->
+          <div class="action-cards">
+            <div class="action-card">
+              <div class="kicker">VERIFY</div>
+              <h3>Check a link or file</h3>
+              <p class="small">Instant status: Valid • Derived • Mismatch. No login needed.</p>
+              <div class="hr"></div>
+              <a class="btn" href="/app">Start Verification</a>
+            </div>
+            <div class="action-card">
+              <div class="kicker">SIGN</div>
+              <h3>Create a proof</h3>
+              <p class="small">Free for creators during early access. Keep attribution and consent attached.</p>
+              <div class="hr"></div>
+              <a class="btn" href="/app">Generate Proof</a>
+            </div>
+            <div class="action-card">
+              <div class="kicker">BADGES</div>
+              <h3>Show trust, anywhere</h3>
+              <p class="small">Use "Verified by TruWit" and "Signed with TruWit" patches on posts, thumbnails, and sites.</p>
+              <div class="hr"></div>
+              <div class="badges">
+                <img src="/images/verified-by-truwit.png" alt="Verified" />
+                <img src="/images/verified-by-truwit.png" alt="Signed" />
               </div>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- Compact CTA Section -->
-      <section class="cta-compact">
-        <div class="container">
-          <div class="cta-content">
-            <div>
-              <h2>Start Verifying Content Today</h2>
-              <p>Free forever. No credit card required.</p>
-            </div>
-            <div class="cta-buttons">
-              <a href="/app/" class="btn btn-primary">Launch App</a>
-              <a href="/contact" class="btn btn-secondary">Contact Us</a>
-            </div>
+        <!-- Demo + reassurance row (fills horizontal space under grid) -->
+        <div class="mini-strip">
+          <div class="badges">
+            <span class="note">Public-safe • Privacy by default • Interoperable manifest</span>
+          </div>
+          <div>
+            <a class="btn secondary" href="/technology">Product Overview</a>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
+
+    <!-- CTA band -->
+    <section class="container center">
+      <div class="card">
+        <h2>Start verifying content today</h2>
+        <p class="muted">Free for creators during early access. No credit card required.</p>
+        <div style="display:flex;gap:10px;justify-content:center;margin-top:10px">
+          <a class="btn" href="/app">Launch App</a>
+          <a class="btn secondary" href="/contact">Contact Us</a>
+        </div>
+      </div>
+    </section>
+
     <Footer />
   </body>
 </html>
-
-<style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    background: var(--bg-0);
-    color: var(--text-primary);
-  }
-
-  main {
-    width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-  }
-
-  /* Compact Hero */
-  .hero-compact {
-    background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
-    padding: 3rem 0;
-    text-align: center;
-  }
-
-  .hero-compact h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.75rem;
-    background: linear-gradient(135deg, #00D4FF, #00FFA3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .hero-subtitle {
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-  }
-
-  /* Two Column Layout for Desktop */
-  .section-combined {
-    padding: 3rem 0;
-    background: var(--bg-1);
-  }
-
-  .two-column {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: start;
-    max-width: 1000px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .column h2 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .subtitle {
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
-  }
-
-  /* Compact Stats - Horizontal */
-  .stats-compact {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  .stat-compact {
-    flex: 1;
-    min-width: 120px;
-    background: var(--bg-2);
-    padding: 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-  }
-
-  .stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #00D4FF, #00FFA3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.25rem;
-  }
-
-  .stat-label {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-  }
-
-  /* Compact Steps - Vertical but tighter */
-  .steps-compact {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .step {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: var(--bg-2);
-    padding: 1rem;
-    border-radius: 0.5rem;
-  }
-
-  .step-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-  }
-
-  .step h3 {
-    font-size: 1.125rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .step p {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-  }
-
-  /* Compact CTA - Horizontal */
-  .cta-compact {
-    background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
-    padding: 2.5rem 0;
-  }
-
-  .cta-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .cta-content h2 {
-    font-size: 1.75rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .cta-content p {
-    color: var(--text-secondary);
-    font-size: 0.95rem;
-  }
-
-  .cta-buttons {
-    display: flex;
-    gap: 1rem;
-    flex-shrink: 0;
-  }
-
-  .cta-group {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 0.875rem 1.75rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .btn-primary {
-    background: linear-gradient(135deg, #00D4FF, #00FFA3);
-    color: #0A1929;
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--text-primary);
-    border: 2px solid var(--border);
-  }
-
-  .btn-secondary:hover {
-    background: var(--bg-2);
-    border-color: var(--text-primary);
-  }
-
-  /* Mobile Responsive - Stack Vertically */
-  @media (max-width: 968px) {
-    .two-column {
-      grid-template-columns: 1fr;
-      gap: 2.5rem;
-    }
-
-    .cta-content {
-      flex-direction: column;
-      text-align: center;
-    }
-
-    .cta-buttons {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .container {
-      padding: 0 1.5rem;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .hero-compact h1 {
-      font-size: 2rem;
-    }
-
-    .column h2 {
-      font-size: 1.5rem;
-    }
-
-    .stats-compact {
-      flex-direction: column;
-    }
-
-    .stat-compact {
-      width: 100%;
-    }
-
-    .btn {
-      padding: 0.75rem 1.5rem;
-      font-size: 0.95rem;
-    }
-
-    .hero-compact {
-      padding: 2rem 0;
-    }
-
-    .section-combined {
-      padding: 2rem 0;
-    }
-
-    .cta-compact {
-      padding: 2rem 0;
-    }
-  }
-</style>
