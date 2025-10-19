@@ -188,18 +188,30 @@ public class BadgesController : ControllerBase
         var color = proof.C2paPresent ? "#22c55e" : "#0ea5e9";
         
         return $"""
-        <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
+        <svg width="240" height="80" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" style="stop-color:{color};stop-opacity:1" />
                     <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
                 </linearGradient>
             </defs>
-            <rect width="200" height="60" fill="url(#grad)" rx="8"/>
-            <text x="100" y="35" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12" font-weight="bold">
+            <rect width="240" height="80" fill="url(#grad)" rx="12"/>
+            
+            <!-- Truwit Logo (Shield Icon) -->
+            <g transform="translate(15, 10)">
+                <!-- Shield shape -->
+                <path d="M10 5 L20 5 L25 10 L25 20 L20 25 L10 25 L5 20 L5 10 Z" fill="white" opacity="0.9"/>
+                <!-- Checkmark - Dark Teal, Centered -->
+                <path d="M13 15 L16.5 18.5 L21 14" stroke="#0d9488" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            
+            <!-- Status Text -->
+            <text x="120" y="35" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
                 {statusText}
             </text>
-            <text x="100" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" opacity="0.8">
+            
+            <!-- Proof ID - Double the font size -->
+            <text x="120" y="60" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold" opacity="0.95">
                 {trustmarkId}
             </text>
         </svg>
@@ -213,18 +225,30 @@ public class BadgesController : ControllerBase
         var color = "#0ea5e9";
         
         return $"""
-        <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
+        <svg width="240" height="80" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" style="stop-color:{color};stop-opacity:1" />
                     <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
                 </linearGradient>
             </defs>
-            <rect width="200" height="60" fill="url(#grad)" rx="8"/>
-            <text x="100" y="35" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12" font-weight="bold">
+            <rect width="240" height="80" fill="url(#grad)" rx="12"/>
+            
+            <!-- Truwit Logo (Shield Icon) -->
+            <g transform="translate(15, 10)">
+                <!-- Shield shape -->
+                <path d="M10 5 L20 5 L25 10 L25 20 L20 25 L10 25 L5 20 L5 10 Z" fill="white" opacity="0.9"/>
+                <!-- Checkmark - Dark Teal, Centered -->
+                <path d="M13 15 L16.5 18.5 L21 14" stroke="#0d9488" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            
+            <!-- Status Text -->
+            <text x="120" y="35" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
                 {statusText}
             </text>
-            <text x="100" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" opacity="0.8">
+            
+            <!-- Proof ID - Double the font size -->
+            <text x="120" y="60" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold" opacity="0.95">
                 {proofId}
             </text>
         </svg>
