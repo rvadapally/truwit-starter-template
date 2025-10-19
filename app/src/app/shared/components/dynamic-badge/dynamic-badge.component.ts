@@ -341,11 +341,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     if (this.proofId) {
-      // TEMPORARY: Force fallback for testing
-      console.log('🧪 Testing badge fallback for proof:', this.proofId);
-      this.hasError = true;
-      this.isLoading = false;
-      // this.loadBadge();
+      this.loadBadge();
     }
   }
 
