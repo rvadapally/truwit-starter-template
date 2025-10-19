@@ -6,6 +6,7 @@ using HumanProof.Api.Infrastructure.Services;
 using HumanProof.Api.Infrastructure.Data;
 using HumanProof.Api.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
@@ -246,11 +247,23 @@ try
 
     // app.UseHttpsRedirection(); // Disabled for local Docker testing
     
-    // Enable static file serving for proof cards and assets
-    app.UseStaticFiles();
+    // CORS must be before static files to apply headers to static content
+    app.UseCors("AllowAll");
+    
+    // Enable static file serving for proof cards and assets with CORS support
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        OnPrepareResponse = ctx =>
+        {
+            // Add CORS headers to static files
+            ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+            ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+            ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "*");
+        }
+    });
+    
     app.UseRequestId();
     app.UseGlobalExceptionHandler();
-    app.UseCors("AllowAll");
     app.UseAuthorization();
     app.MapControllers();
 
