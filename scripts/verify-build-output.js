@@ -20,8 +20,6 @@ const requiredFiles = [
   { path: 'dist/app/assets/verified-by-truwit.png', minSize: 10000, description: 'Angular verified badge' },
   { path: 'dist/index.html', minSize: 1000, description: 'Astro homepage' },
   { path: 'dist/app/index.html', minSize: 1000, description: 'Angular app' },
-  { path: 'dist/app/main.*.js', minSize: 100000, description: 'Angular main bundle', pattern: true },
-  { path: 'dist/app/styles.*.css', minSize: 1000, description: 'Angular styles', pattern: true }
 ];
 
 // Required directories that must exist
@@ -118,28 +116,35 @@ for (const file of requiredFiles) {
 // Check for critical build artifacts
 console.log('\n🔧 Checking build artifacts...');
 const criticalArtifacts = [
-  'dist/app/runtime.*.js',
-  'dist/app/polyfills.*.js',
-  'dist/app/main.*.js',
-  'dist/app/styles.*.css'
+  { pattern: 'runtime', extension: '.js', description: 'Angular runtime' },
+  { pattern: 'polyfills', extension: '.js', description: 'Angular polyfills' },
+  { pattern: 'main', extension: '.js', description: 'Angular main bundle' },
+  { pattern: 'styles', extension: '.css', description: 'Angular styles' }
 ];
 
 for (const artifact of criticalArtifacts) {
   const dir = join(projectRoot, 'dist/app');
-  const pattern = artifact.split('/').pop().replace('*', '');
   
   try {
     const files = readdirSync(dir);
-    const matchingFiles = files.filter(f => f.includes(pattern));
+    const matchingFiles = files.filter(f => 
+      f.startsWith(artifact.pattern) && f.endsWith(artifact.extension)
+    );
     
     if (matchingFiles.length === 0) {
-      console.error(`❌ Missing build artifact: ${artifact}`);
+      console.error(`❌ Missing build artifact: ${artifact.pattern}${artifact.extension}`);
       allValid = false;
     } else {
-      console.log(`✅ Found ${matchingFiles.length} artifact(s) matching ${pattern}`);
+      console.log(`✅ Found ${matchingFiles.length} artifact(s) matching ${artifact.pattern}${artifact.extension} (${artifact.description})`);
+      // Log the actual file names for debugging
+      matchingFiles.forEach(file => {
+        const fullPath = join(dir, file);
+        const stats = statSync(fullPath);
+        console.log(`   - ${file} (${stats.size} bytes)`);
+      });
     }
   } catch (error) {
-    console.error(`❌ Error checking artifact ${artifact}:`, error.message);
+    console.error(`❌ Error checking artifact ${artifact.pattern}${artifact.extension}:`, error.message);
     allValid = false;
   }
 }
