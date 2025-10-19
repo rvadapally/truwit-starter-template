@@ -1,874 +1,907 @@
-# Truwit Deployment Guide
+# TruWit Proof Card System - Deployment Guide
 
-Complete guide for deploying the Truwit Verification application to production (Railway + Cloudflare Pages).
+Complete guide for deploying the TruWit proof card generation system to production.
+
+**Last Updated:** October 19, 2025
 
 ---
 
 ## Table of Contents
-1. [Prerequisites](#prerequisites)
-2. [Repository Structure](#repository-structure)
-3. [Railway Deployment (API)](#railway-deployment-api)
-4. [Cloudflare Pages Deployment (Frontend)](#cloudflare-pages-deployment-frontend)
-5. [Environment Configuration](#environment-configuration)
-6. [Critical Deployment Issues & Fixes](#critical-deployment-issues--fixes)
-7. [Testing Production](#testing-production)
+1. [Architecture Overview](#architecture-overview)
+2. [Prerequisites](#prerequisites)
+3. [Railway API Deployment](#railway-api-deployment)
+4. [Cloudflare Pages Deployment](#cloudflare-pages-deployment)
+5. [Database Migration](#database-migration)
+6. [Post-Deployment Verification](#post-deployment-verification)
+7. [Critical Fixes Applied](#critical-fixes-applied)
 8. [Troubleshooting](#troubleshooting)
+
+---
+
+## Architecture Overview
+
+### Deployment Stack
+
+```
+┌─────────────────────────────────────────────────────┐
+│  https://truwit.ai (Cloudflare Pages)               │
+│  ├── /                 → Astro static pages          │
+│  └── /app/*            → Angular SPA                 │
+│      └── /app/t/:id    → Proof verification page    │
+└─────────────────────────────────────────────────────┘
+                    ↓ API calls
+┌─────────────────────────────────────────────────────┐
+│  Railway API (ASP.NET Core)                         │
+│  https://[project].up.railway.app                   │
+│  ├── /v1/proofs/*      → Proof management           │
+│  ├── /assets/proof/*   → Static proof card images   │
+│  └── /cards/proof/*    → Regenerate-on-miss         │
+└─────────────────────────────────────────────────────┘
+                    ↓ Database
+┌─────────────────────────────────────────────────────┐
+│  Railway PostgreSQL                                 │
+│  ├── Proofs table      → Main proof records         │
+│  └── VerificationProofs → Legacy proofs             │
+└─────────────────────────────────────────────────────┘
+```
+
+### Key Technologies
+- **Frontend**: Angular 18 + Astro (hybrid deployment)
+- **Backend**: ASP.NET Core 8.0
+- **Database**: PostgreSQL (Railway managed)
+- **Image Generation**: SkiaSharp + QRCoder
+- **Hosting**: Railway (API) + Cloudflare Pages (Frontend)
 
 ---
 
 ## Prerequisites
 
-### Accounts Needed
-- **GitHub** account with your repository
-- **Railway** account (https://railway.app)
-- **Cloudflare** account (https://cloudflare.com)
+### Required Accounts
+- ✅ GitHub account with repository access
+- ✅ Railway account (https://railway.app)
+- ✅ Cloudflare account (https://cloudflare.com)
 
-### Required Tools (Local Development)
-- Docker Desktop
-- Node.js 18+
+### Local Development Tools
+- Docker Desktop (for local testing)
 - .NET 8.0 SDK
+- Node.js 18+
 - Git
 
----
-
-## Repository Structure
-
-```
-humanproof-starter/
-├── api/                    # .NET API (→ Railway)
-│   ├── Dockerfile         # Railway builds this
-│   ├── railway.json       # Railway configuration
-│   ├── appsettings.json   # API configuration
-│   └── ...
-├── app/                    # Angular Frontend (→ Cloudflare Pages)
-│   ├── src/
-│   │   ├── _redirects    # SPA routing for Cloudflare
-│   │   └── environments/
-│   ├── angular.json       # Build configuration
-│   └── package.json
-├── package.json           # Root build script (builds Angular)
-├── start.bat             # Local development startup
-└── stop.bat              # Local development shutdown
-```
-
-**Key Points:**
-- **Mono-repo structure:** Both API and Frontend in one repository
-- **Railway:** Deploys only `api/` directory using `rootDirectory` setting
-- **Cloudflare:** Builds Angular app from root using `npm run build`
+### Repository Access
+- Clone the repository: `git clone [your-repo-url]`
+- Ensure you're on the `main` branch
 
 ---
 
-## Railway Deployment (API)
+## Railway API Deployment
 
-### Initial Setup
+### Step 1: Create PostgreSQL Database
 
-**1. Create Railway Project**
+1. Go to https://railway.app
+2. Create new project or open existing
+3. Click **"+ New"** → **"Database"** → **"PostgreSQL"**
+4. Wait for database to provision
+5. Note the connection string from **"Variables"** tab
+
+### Step 2: Configure API Service
+
+**Build Configuration:**
 ```
-https://railway.app/new
-→ Deploy from GitHub repo
-→ Select your repository
+Service Name:         truwit-api
+Root Directory:       api
+Builder:             Dockerfile
+Watch Paths:         api/**
 ```
 
-**2. Configure Service**
+**Environment Variables:**
+```bash
+# Railway provides automatically:
+DATABASE_URL=postgresql://...
+PORT=8080
 
-In Railway dashboard:
+# Add these manually:
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=http://0.0.0.0:8080
+Database__Type=postgres
+ConnectionStrings__Postgres=${DATABASE_URL}
+```
+
+**Health Check:**
+```
+Path:     /health
+Timeout:  100 seconds
+```
+
+### Step 3: Deploy
+
+1. Connect GitHub repository
+2. Select `main` branch
+3. Railway will auto-detect Dockerfile and build
+4. **Build time:** 3-5 minutes
+5. **First deploy:** May take longer due to package downloads
+
+### Step 4: Verify Deployment
+
+```bash
+# Test health endpoint
+curl https://[your-project].up.railway.app/health
+
+# Expected response:
+{"ok":true,"timestamp":"...","tools":{"yt-dlp":"...","c2patool":"unknown"}}
+```
+
+---
+
+## Cloudflare Pages Deployment
+
+### Step 1: Create Cloudflare Pages Project
+
+1. Go to https://dash.cloudflare.com
+2. Navigate to **Pages** → **Create a project**
+3. Select **"Connect to Git"**
+4. Choose your GitHub repository
+5. Select `main` branch
+
+### Step 2: Build Configuration
+
+**Framework Preset:** None (custom)
 
 **Build Settings:**
 ```
-Root Directory:    api
-Builder:          Dockerfile
+Build command:          npm run build
+Build output directory: dist
+Root directory:         / (leave empty)
+Environment:           Production
+Node version:          18 or higher
 ```
 
-**Deployment Settings:**
-```
-Health Check Path:          /health
-Health Check Timeout:       100s
-Restart Policy:             On Failure
-Max Restart Retries:        10
-```
+### Step 3: Environment Variables
 
-**3. Environment Variables**
+Cloudflare Pages uses file replacements, so no environment variables needed. The production API URL is configured in:
 
-Railway automatically provides:
-```
-PORT                      (Railway sets this)
-RAILWAY_ENVIRONMENT       production
-```
-
-Add these manually:
-```
-ASPNETCORE_ENVIRONMENT    Production
-ASPNETCORE_URLS           http://0.0.0.0:8080
-ASPNETCORE_HTTP_PORTS     8080
-```
-
-**4. Domain**
-
-Railway provides:
-```
-https://[your-project]-production.up.railway.app
-```
-
-Optional: Add custom domain in Railway settings.
-
----
-
-### railway.json Configuration
-
-File: `api/railway.json`
-
-```json
-{
-    "$schema": "https://railway.app/railway.schema.json",
-    "build": {
-        "builder": "DOCKERFILE",
-        "dockerfilePath": "Dockerfile"
-    },
-    "deploy": {
-        "healthcheckPath": "/health",
-        "healthcheckTimeout": 100,
-        "restartPolicyType": "ON_FAILURE",
-        "restartPolicyMaxRetries": 10
-    }
-}
-```
-
----
-
-### Dockerfile Explained
-
-File: `api/Dockerfile`
-
-**Key Features:**
-```dockerfile
-# Build stage - compiles .NET app
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /src
-COPY ["HumanProof.Api.csproj", "."]
-RUN dotnet restore "HumanProof.Api.csproj"
-COPY . .
-RUN dotnet publish "HumanProof.Api.csproj" -c Release -o /app/publish
-
-# Runtime stage - runs the app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
-WORKDIR /app
-
-# Install system dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    python3 \
-    ffmpeg \
-    curl \
-    ca-certificates && \
-    curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp && \
-    chmod a+rx /usr/local/bin/yt-dlp && \
-    rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /tmp/truwit_dl && chmod 777 /tmp/truwit_dl && \
-    mkdir -p /app/data && chmod 777 /app/data  # CRITICAL: For SQLite database
-
-COPY --from=build /app/publish .
-EXPOSE 8080
-ENTRYPOINT ["dotnet", "HumanProof.Api.dll"]
-```
-
-**Critical Line:**
-```dockerfile
-mkdir -p /app/data && chmod 777 /app/data
-```
-**Why:** SQLite database is stored at `/app/data/truwit.db`. Without this directory, Railway deployment fails with "unable to open database file".
-
----
-
-### Database Configuration
-
-**Connection String (appsettings.json):**
-```json
-{
-  "ConnectionStrings": {
-    "Sqlite": "Data Source=data/truwit.db"
-  }
-}
-```
-
-**Important:**
-- Database is stored in container at `/app/data/truwit.db`
-- **Ephemeral:** Data is LOST on container restart
-- For production, consider Railway's PostgreSQL add-on or persistent volumes
-- Database is created automatically on first run
-
----
-
-### Deployment Triggers
-
-Railway auto-deploys on:
-- ✅ Push to `main` branch
-- ✅ Changes in `api/` directory only (due to `rootDirectory: api`)
-- ⏱️ Build time: **5-10 minutes**
-
----
-
-## Cloudflare Pages Deployment (Frontend)
-
-### Initial Setup
-
-**1. Create Cloudflare Pages Project**
-```
-https://dash.cloudflare.com/[account]/pages
-→ Create a project
-→ Connect to Git
-→ Select your GitHub repository
-```
-
-**2. Build Settings**
-
-```
-Framework preset:      Angular
-Build command:        npm run build
-Build output directory: dist/humanproof-web/browser
-Root directory:       /
-Branch:               main
-```
-
-**Important:** Use root directory `/`, not `app/` because the build command in root `package.json` handles navigating to `app/`.
-
----
-
-### Build Configuration
-
-**Root package.json:**
-```json
-{
-  "scripts": {
-    "build": "npm run build:app && npm run build:astro && npm run integrate",
-    "build:app": "cd app && npm install && npm run build"
-  }
-}
-```
-
-**App package.json:**
-```json
-{
-  "scripts": {
-    "build": "ng build --configuration=production"
-  }
-}
-```
-
-**Angular production build** uses:
-- `app/src/environments/environment.prod.ts` (file replacement in angular.json)
-- Output: `app/dist/humanproof-web/browser/`
-
----
-
-### SPA Routing Configuration
-
-**Critical File:** `app/src/_redirects`
-
-```
-# Cloudflare Pages SPA routing
-# All routes should serve index.html for Angular routing
-
-/*    /index.html   200
-```
-
-**Why This Is Critical:**
-- Angular uses client-side routing (e.g., `/t/abc123`)
-- Without this, direct links return 404
-- This tells Cloudflare: "For ANY path, serve index.html"
-- Angular router then handles navigation
-
-**Configured in** `app/angular.json`:
-```json
-{
-  "assets": [
-    "src/favicon.ico",
-    "src/assets",
-    "src/_redirects"  // ← Copies to dist/
-  ]
-}
-```
-
----
-
-### Environment Variables
-
-**File:** `app/src/environments/environment.prod.ts`
-
-```typescript
-export const environment = {
-  production: true,
-  apiUrl: 'https://truwit-starter-template-production.up.railway.app'
-};
-```
-
-**File replacement configured in** `app/angular.json`:
-```json
-{
-  "configurations": {
-    "production": {
-      "fileReplacements": [
-        {
-          "replace": "src/environments/environment.ts",
-          "with": "src/environments/environment.prod.ts"
-        }
-      ]
-    }
-  }
-}
-```
-
----
-
-### Deployment Triggers
-
-Cloudflare auto-deploys on:
-- ✅ Push to `main` branch
-- ✅ Any changes (monitors all files)
-- ⏱️ Build time: **3-5 minutes**
-
-**Note:** Cloudflare builds faster than Railway!
-
----
-
-## Environment Configuration
-
-### Local Development
-
-**API:**
-```json
-// api/appsettings.json
-{
-  "ConnectionStrings": {
-    "Sqlite": "Data Source=data/truwit.db"
-  }
-}
-```
-
-**Frontend:**
-```typescript
-// app/src/environments/environment.ts
-export const environment = {
-  production: false,
-  apiUrl: 'http://127.0.0.1:5001'  // Local Docker API
-};
-```
-
-**Docker Compose:**
-```yaml
-# api/docker-compose.yml
-services:
-  api:
-    ports:
-      - "127.0.0.1:5001:8080"  # Local port 5001 → Container port 8080
-    volumes:
-      - ./data:/app/data  # Database persists locally
-```
-
----
-
-### Production Configuration
-
-**API (Railway):**
-- Uses same `appsettings.json`
-- Database at `/app/data/truwit.db` (ephemeral)
-- Exposed on Railway's provided URL
-
-**Frontend (Cloudflare):**
 ```typescript
 // app/src/environments/environment.prod.ts
 export const environment = {
   production: true,
-  apiUrl: 'https://truwit-starter-template-production.up.railway.app'
+  apiUrl: 'https://[your-railway-project].up.railway.app'
 };
 ```
 
-**Served on:**
-- Primary: `https://[project].pages.dev`
-- Custom: `https://www.truwit.ai` (configure in Cloudflare)
+### Step 4: Custom Domain (Optional)
+
+1. Cloudflare Pages → Your project → **Custom domains**
+2. Add `truwit.ai` and `www.truwit.ai`
+3. Cloudflare automatically configures DNS
 
 ---
 
-## Critical Deployment Issues & Fixes
+## Database Migration
 
-This section documents all the major issues we encountered and fixed.
+### **CRITICAL:** Apply PostgreSQL Migration
 
-### Issue 1: Broken Git Submodules
+After the first Railway deployment, you **MUST** run this SQL to add proof card columns:
 
-**Error:**
+**Step 1: Access Railway PostgreSQL**
+1. Railway Dashboard → PostgreSQL service
+2. Click **"Data"** tab
+3. Click **"Query"** button
+
+**Step 2: Run Migration SQL**
+```sql
+-- Add proof card URL columns to Proofs table
+ALTER TABLE "Proofs"
+ADD COLUMN IF NOT EXISTS "ProofCardSmallUrl" TEXT NULL;
+
+ALTER TABLE "Proofs"
+ADD COLUMN IF NOT EXISTS "ProofCardLargeUrl" TEXT NULL;
+
+-- Verify columns were added
+SELECT column_name 
+FROM information_schema.columns 
+WHERE table_name = 'Proofs' 
+AND column_name LIKE 'ProofCard%';
+
+-- Expected output:
+--  column_name
+-- -------------------
+--  ProofCardSmallUrl
+--  ProofCardLargeUrl
 ```
-fatal: No url found for submodule path 'cloudflare-workers/humanproof-api' in .gitmodules
-Failed: error occurred while updating repository submodules
-```
 
-**Cause:**
-- Repository had submodule entries in git index
-- No `.gitmodules` file with URLs
-- Cloudflare couldn't clone the repository
+**Why This Is Critical:**
+- Without these columns, proof card URLs cannot be stored
+- New proofs will fail to save proof card references
+- Frontend will get 404 when trying to load proof cards
 
-**Fix:**
+---
+
+## Post-Deployment Verification
+
+### 1. Test Proof Card Generation
+
+**Create a test proof:**
 ```bash
-# Remove submodule entries
-git rm --cached cloudflare-workers/humanproof-api truwit-integrated
-
-# Add to .gitignore
-echo "cloudflare-workers/" >> .gitignore
-echo "truwit-integrated/" >> .gitignore
-
-git commit -m "Remove broken submodules"
-git push
+curl -X POST https://[your-railway].up.railway.app/v1/proofs/url \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: test-$(date +%s)" \
+  -d '{"url":"https://youtu.be/dQw4w9WgXcQ"}'
 ```
 
-**Commit:** `9b8a455`
-
----
-
-### Issue 2: Railway SQLite Database Failure
-
-**Error:**
-```
-Microsoft.Data.Sqlite.SqliteException (0x80004005): 
-SQLite Error 14: 'unable to open database file'.
-```
-
-**Cause:**
-- Connection string: `Data Source=data/truwit.db`
-- Directory `/app/data` didn't exist in Railway container
-- Local Docker worked because `docker-compose.yml` creates it via volume mount
-
-**Environment Difference:**
-```yaml
-# Local: docker-compose.yml creates /app/data
-volumes:
-  - ./data:/app/data  # ← Automatically creates directory
-
-# Railway: Just runs Dockerfile
-# No volume mounts! Directory doesn't exist!
-```
-
-**Fix:**
-```dockerfile
-# api/Dockerfile
-RUN mkdir -p /app/data && chmod 777 /app/data
-```
-
-**Commit:** `a03c1f0`
-
----
-
-### Issue 3: Hash Routing Breaking Navigation
-
-**Error:**
-- URLs like `http://localhost:4200/#/t/abc123` (ugly hash)
-- `window.open()` not working with hash routing
-- Direct links failing
-
-**Cause:**
-- Angular configured with `HashLocationStrategy`
-- Not needed for modern deployments
-
-**Fix:**
-```typescript
-// app/src/app/app.module.ts
-// REMOVED:
-// import { HashLocationStrategy, LocationStrategy } from '@angular/common';
-// RouterModule.forRoot(routes, { useHash: true }),
-// providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }]
-
-// NOW:
-RouterModule.forRoot(routes),  // Clean URLs
-providers: []
-```
-
-**Added SPA routing:**
-```
-# app/src/_redirects
-/*    /index.html   200
-```
-
-**Result:**
-- Clean URLs: `http://localhost:4200/t/abc123`
-- Direct links work
-- Sharing works
-
-**Commit:** `fe8ac6a`
-
----
-
-### Issue 4: Content Hash Showing "Unknown"
-
-**Error:**
-- Verification page showed: `Content Hash: unknown`
-- Database had the hash, but API wasn't returning it
-
-**Cause:**
-```csharp
-// api/Controllers/ProofsController.cs (Line 1097)
-// WRONG:
-var asset = await _assetsRepo.GetBySha256Async(proof.AssetId);
-//                          ↑ Wrong method!
-// AssetId is a GUID, not a SHA256 hash!
-```
-
-**Fix:**
-```csharp
-// Added new method to repository:
-public async Task<Asset?> GetByIdAsync(string assetId) { ... }
-
-// Updated controller:
-var asset = await _assetsRepo.GetByIdAsync(proof.AssetId);
-```
-
-**Commit:** `16a90eb`
-
----
-
-### Issue 5: Timezone Conversion Issues
-
-**Error:**
-- API stored timestamps in Central Time
-- But marked them as UTC (with 'Z' suffix)
-- Browser displayed wrong times
-
-**Cause:**
-```csharp
-// WRONG:
-IssuedAt = proof.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ")
-// Takes 2:29 AM Central, outputs "2:29Z" (claiming it's UTC!)
-```
-
-**Fix:**
-```csharp
-// api/Controllers/ProofsController.cs
-IssuedAt = TimeZoneInfo.ConvertTimeToUtc(
-    proof.CreatedAt,
-    TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time")
-).ToString("yyyy-MM-ddTHH:mm:ssZ")
-// Now actually converts to UTC before adding 'Z'
-```
-
-**Commit:** `03361ab`
-
----
-
-### Issue 6: start.bat Starting Wrong Server
-
-**Error:**
-- Running `start.bat` started Astro (port 4321) instead of Angular (port 4200)
-
-**Cause:**
-```batch
-# BROKEN:
-cd app
-start "Truwit Angular" cmd /k "npm start"
-cd ..
-
-# New window starts in ROOT directory, not app!
-# Runs root's package.json → Astro
-```
-
-**Fix:**
-```batch
-# FIXED:
-start "Truwit Angular" cmd /k "cd app && npm start"
-# cd happens INSIDE the new window
-```
-
-**Commit:** `53ab97a`
-
----
-
-### Issue 7: Wrong API Endpoint (No Deduplication)
-
-**Error:**
-- Creating proofs for same URL multiple times generated new proofs
-- Deduplication not working
-
-**Cause:**
-```typescript
-// app/src/app/core/services/verification.service.ts
-// WRONG:
-return this.apiService.post('/v1/proofs', request)  // Legacy endpoint, no dedup
-
-// CORRECT:
-return this.apiService.post('/v1/proofs/url', request)  // New endpoint with dedup
-```
-
-**Fix:**
-- Updated frontend to call `/v1/proofs/url` endpoint
-- This endpoint checks `LinkIndex` table for existing proofs
-
-**Commit:** `1eb6791`
-
----
-
-## Testing Production
-
-### 1. Health Check
-
-**Railway API:**
-```bash
-curl https://truwit-starter-template-production.up.railway.app/health
-```
-
-**Expected Response:**
+**Expected response:**
 ```json
 {
-  "ok": true,
-  "timestamp": "2025-10-12T08:00:00Z",
-  "tools": {
-    "yt-dlp": "2025.09.26",
-    "c2patool": "unknown"
-  }
+  "proofId": "...",
+  "trustmarkId": "TW-XXXXXXXX",  // Note the TW- prefix for new proofs
+  "verifyUrl": "/t/TW-XXXXXXXX",
+  "deduped": false
 }
 ```
 
----
+### 2. Test Proof Card Image
 
-### 2. Frontend Loads
-
-Visit: `https://www.truwit.ai`
-
-**Check:**
-- ✅ Page loads without errors
-- ✅ URL is clean (no `#`)
-- ✅ Form displays correctly
-- ✅ Browser console has no errors
-
----
-
-### 3. End-to-End Verification
-
-**Step 1: Create Proof**
-```
-1. Go to https://www.truwit.ai
-2. Paste YouTube URL: https://www.youtube.com/watch?v=Av1g2yciuDU
-3. Click "Generate Proof"
-4. Wait for download (30s - 2min)
-5. See success message
-```
-
-**Step 2: View Verification**
-```
-6. Click "View Verification Details"
-7. URL should be: https://www.truwit.ai/t/[8-char-id]
-8. Check all data displays:
-   - Content Hash (64 characters, not "unknown")
-   - Timestamps (UTC + Your Time)
-   - C2PA Signature Status with explanation
-```
-
-**Step 3: Test Deduplication**
-```
-9. Go back to home
-10. Paste SAME URL again
-11. Click "Generate Proof"
-12. Should return INSTANTLY (no download)
-13. Same TrustmarkId as before
-14. Same timestamp (not updated)
-```
-
-**Step 4: Direct Link**
-```
-15. Copy the verification URL
-16. Open in new incognito window
-17. Should load verification page (not 404)
-```
-
----
-
-### 4. Database Test
-
-**Create multiple proofs:**
+**Check if proof card was generated:**
 ```bash
-# Using curl
-curl -X POST https://truwit-starter-template-production.up.railway.app/v1/proofs/url \
-  -H "Content-Type: application/json" \
-  -d '{"Url":"https://www.youtube.com/watch?v=test1"}'
-
-curl -X POST https://truwit-starter-template-production.up.railway.app/v1/proofs/url \
-  -H "Content-Type: application/json" \
-  -d '{"Url":"https://www.youtube.com/watch?v=test2"}'
+curl -I https://[your-railway].up.railway.app/assets/proof/[trustmarkId]-800.png
 ```
 
-**Get stats:**
-```bash
-curl https://truwit-starter-template-production.up.railway.app/v1/proofs/test/stats
+**Expected headers:**
 ```
+HTTP/1.1 200 OK
+Content-Type: image/png
+Access-Control-Allow-Origin: *
+Content-Length: [size in bytes]
+```
+
+### 3. Test Frontend Display
+
+1. Go to `https://truwit.ai/app/t/[trustmarkId]`
+2. **Should display:**
+   - Verification page (not landing page)
+   - Proof card image with teal background
+   - Circular "Verified by TruWit" badge
+   - TW- prefixed proof ID in white container
+   - QR code for verification
+3. **Should NOT display:**
+   - Landing page
+   - 404 error
+   - CORS errors in browser console
+
+### 4. Test CORS Headers
+
+**From browser console on https://truwit.ai:**
+```javascript
+fetch('https://[your-railway].up.railway.app/assets/proof/test-800.png', {
+  method: 'HEAD'
+})
+.then(r => console.log('CORS OK:', r.headers.get('access-control-allow-origin')))
+.catch(e => console.error('CORS FAIL:', e))
+```
+
+**Expected:** `CORS OK: *`
+
+---
+
+## Critical Fixes Applied
+
+### Fix 1: CORS for Static Files
+
+**Problem:** Static proof card images had CORS errors
+
+**Solution:**
+```csharp
+// api/Program.cs
+// IMPORTANT: UseCors BEFORE UseStaticFiles
+app.UseCors("AllowAll");
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Explicit CORS headers for static files
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "*");
+    }
+});
+```
+
+### Fix 2: Angular Routing Order
+
+**Problem:** `/app/t/:id` was showing landing page instead of verification page
+
+**Solution:**
+```typescript
+// app/src/app/app.routes.ts
+export const routes: Routes = [
+  { path: '', component: HomeComponent },
+  { path: 't/:id', component: PublicVerifyComponent },
+  // MORE SPECIFIC routes must come FIRST
+  { path: 'app/t/:id', component: PublicVerifyComponent },
+  // Then less specific routes
+  { path: 'app', redirectTo: '/', pathMatch: 'full' },
+  { path: '**', redirectTo: '/' }
+];
+```
+
+### Fix 3: Remove app.astro Interceptor
+
+**Problem:** Astro `app.astro` page was serving empty shell at `/app`
+
+**Solution:**
+- Deleted `src/pages/app.astro`
+- Angular app served directly from `/app` directory
+- No Astro interference with Angular routing
+
+### Fix 4: Proof Card Size Updates
+
+**Problem:** System was generating/requesting 640px instead of 800px
+
+**Solution:**
+```csharp
+// Updated in 5 locations:
+1. ProofService.cs: Generate(proofId, url, 800)  // was 640
+2. ProofsController.cs: Generate(id, url, 800)    // was 640
+3. ProofCardBackfillService.cs: if (size == 800)  // was 640
+4. ProofCardBackfillServiceForProofs.cs: same
+5. ProofsController.cs: BadgeUrl fallback uses 800  // was 640
+```
+
+### Fix 5: Environment Import Path
+
+**Problem:** TypeScript build error - cannot find module
+
+**Solution:**
+```typescript
+// app/src/app/features/verification/components/verification-form.component.ts
+// WRONG (3 levels up):
+import { environment } from '../../../environments/environment';
+
+// CORRECT (4 levels up):
+import { environment } from '../../../../environments/environment';
+```
+
+---
+
+## Deployment Checklist
+
+### Before Pushing to GitHub
+
+- [ ] Run `dotnet build` in `api/` directory (no errors)
+- [ ] Run `npm run build` in `app/` directory (no errors)
+- [ ] Test with local Docker: `docker-compose up --build`
+- [ ] Verify proof card generation locally
+- [ ] Check CORS headers locally (if testing cross-origin)
+
+### After Pushing to GitHub
+
+- [ ] Monitor Railway deployment status (5-10 minutes)
+- [ ] Monitor Cloudflare Pages build (3-5 minutes)
+- [ ] Both show "Active" or "Success" status
+
+### After Both Deployments Complete
+
+- [ ] Apply PostgreSQL migration (if first deploy)
+- [ ] Test health endpoint
+- [ ] Create test proof
+- [ ] Verify proof card generates
+- [ ] Test frontend displays proof card
+- [ ] Check CORS headers in browser console
+- [ ] Test in incognito mode (no cache)
 
 ---
 
 ## Troubleshooting
 
-### Railway Issues
+### Railway API Not Deploying
 
-**Problem:** Build fails with "command not found"
+**Check:**
+1. GitHub webhook is connected (Project Settings → GitHub)
+2. `api/` directory has changes (Railway watches this path)
+3. Dockerfile builds successfully locally
+4. Railway logs for build errors
 
-**Solution:**
-- Check Dockerfile has correct `RUN` commands
-- Verify `apt-get install` includes all dependencies
+**Force Deploy:**
+- Railway Dashboard → Service → Deployments → **"Redeploy"**
 
----
+### Cloudflare Pages Not Deploying
 
-**Problem:** API crashes immediately after starting
+**Check:**
+1. GitHub integration is active
+2. Build succeeds locally: `npm run build`
+3. Cloudflare build logs for errors
 
-**Solution:**
+**Force Deploy:**
+- Cloudflare Pages → Project → **"Retry deployment"**
+
+### CORS Errors in Production
+
+**Symptoms:**
+```
+Access to XMLHttpRequest at 'https://[railway].up.railway.app/assets/proof/...' 
+from origin 'https://truwit.ai' has been blocked by CORS policy
+```
+
+**Fix:**
+1. Verify `UseCors()` is called BEFORE `UseStaticFiles()` in `api/Program.cs`
+2. Check CORS policy includes your Cloudflare domain
+3. Redeploy Railway API
+
+### Proof Cards Not Displaying
+
+**Symptoms:**
+- Frontend shows 404 for proof card image
+- Console error: "Failed to load resource"
+
+**Diagnosis:**
 ```bash
-# Check Railway logs for:
-- Database connection errors
-- Missing directories
-- Environment variable issues
+# Test if proof card exists
+curl -I https://[railway].up.railway.app/assets/proof/[id]-800.png
+
+# If 404, test regeneration endpoint
+curl https://[railway].up.railway.app/cards/proof/[id]-800.png
+
+# If still 404, check database
 ```
 
----
-
-**Problem:** Health check failing
+**Common Causes:**
+1. Database migration not applied (columns missing)
+2. Proof was created before migration (no URL stored)
+3. Railway filesystem is ephemeral (files lost on redeploy)
 
 **Solution:**
-- Verify `/health` endpoint exists
-- Check `ASPNETCORE_URLS` is set to `http://0.0.0.0:8080`
-- Increase health check timeout in `railway.json`
+- For existing proofs: Use regenerate-on-miss endpoint
+- For new proofs: Ensure migration is applied
 
----
+### Routing Shows Landing Page
 
-### Cloudflare Issues
+**Symptoms:**
+- `https://truwit.ai/app/t/:id` shows home page instead of verification
 
-**Problem:** Direct links return 404
-
-**Solution:**
-- Verify `_redirects` file exists in build output
-- Check `angular.json` includes `src/_redirects` in assets
-- Check build output directory contains `_redirects` file
-
----
-
-**Problem:** API calls return CORS errors
+**Diagnosis:**
+1. Check if `src/pages/app.astro` exists (should be deleted)
+2. Check Angular routes order in `app/src/app/app.routes.ts`
+3. Verify `_redirects` file in build output
 
 **Solution:**
-```csharp
-// api/Program.cs
-app.UseCors(policy => policy
-    .WithOrigins("https://www.truwit.ai")
-    .AllowAnyMethod()
-    .AllowAnyHeader());
+- Delete any Astro pages that might intercept `/app` routes
+- Ensure more specific routes come before general routes
+- Clear Cloudflare cache
+
+### TypeScript Build Errors
+
+**Symptoms:**
 ```
-
----
-
-**Problem:** Environment variables not working
+Cannot find module '../../../environments/environment'
+```
 
 **Solution:**
-- Check `angular.json` has `fileReplacements` for production
-- Verify `environment.prod.ts` has correct Railway URL
-- Clear Cloudflare cache after deployment
+- Count directory levels carefully (usually 4 levels up from components)
+- Verify environment files exist and are committed to git
+- Run `npm run build` locally to catch errors before pushing
 
 ---
 
-### Database Issues
+## Local Testing (Before Production Deploy)
 
-**Problem:** "unable to open database file"
+### Pre-Push Testing Script
 
-**Solution:**
-```dockerfile
-# Dockerfile must create directory:
-RUN mkdir -p /app/data && chmod 777 /app/data
+**Create:** `pre-push-test.ps1`
+
+```powershell
+Write-Host "🔍 Pre-Push Testing..." -ForegroundColor Cyan
+
+# Test API build
+Write-Host "`n📦 Building API..." -ForegroundColor Yellow
+cd api
+dotnet build
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ API build failed!" -ForegroundColor Red
+    exit 1
+}
+Write-Host "✅ API build succeeded" -ForegroundColor Green
+
+# Test Angular build
+Write-Host "`n📦 Building Angular..." -ForegroundColor Yellow
+cd ../app
+npm run build
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Angular build failed!" -ForegroundColor Red
+    exit 1
+}
+Write-Host "✅ Angular build succeeded" -ForegroundColor Green
+
+# Test Docker Compose
+Write-Host "`n🐳 Testing with Docker Compose..." -ForegroundColor Yellow
+cd ..
+docker-compose up -d --build
+Start-Sleep -Seconds 15
+
+# Test API health
+Write-Host "`n🏥 Testing API health..." -ForegroundColor Yellow
+$health = Invoke-RestMethod -Uri "http://localhost:5000/health"
+if ($health.ok) {
+    Write-Host "✅ API health check passed" -ForegroundColor Green
+} else {
+    Write-Host "❌ API health check failed" -ForegroundColor Red
+    exit 1
+}
+
+# Test proof card generation
+Write-Host "`n🎨 Testing proof card generation..." -ForegroundColor Yellow
+$testResult = docker exec truwit-postgres psql -U postgres -d truwit -c "SELECT COUNT(*) FROM \"Proofs\""
+Write-Host "Database has proofs: $testResult"
+
+Write-Host "`n✅ ALL PRE-PUSH TESTS PASSED!" -ForegroundColor Green
+Write-Host "Safe to push to production." -ForegroundColor Cyan
+
+# Cleanup
+docker-compose down
+```
+
+**Usage:**
+```powershell
+.\pre-push-test.ps1
+git push origin main
 ```
 
 ---
 
-**Problem:** Database data lost after restart
+## Deployment Order
 
-**Solution:**
-- Railway containers are ephemeral
-- Use Railway PostgreSQL add-on for persistent data
-- Or configure Railway volumes (if available)
+### Recommended Deployment Sequence
+
+**1. Push to GitHub**
+```bash
+git add .
+git commit -m "feat: your changes"
+git push origin main
+```
+
+**2. Railway Deploys First (5-10 minutes)**
+- Wait for Railway build to complete
+- Verify health endpoint responds
+
+**3. Apply Database Migration (if needed)**
+- Only needed once, or when adding new columns
+- Run SQL in Railway PostgreSQL console
+
+**4. Cloudflare Pages Deploys (3-5 minutes)**
+- Usually finishes while waiting for Railway
+- But Railway must be deployed first for API availability
+
+**5. Test End-to-End**
+- Create new proof
+- Verify proof card displays
+- Check in incognito mode
 
 ---
 
-### General Debugging
+## Environment-Specific Configurations
 
-**Check Railway Logs:**
-```
-Railway Dashboard → Your Service → Logs tab
+### Local Development
+
+**API:** `api/appsettings.json`
+```json
+{
+  "Database": {
+    "Type": "postgres"
+  },
+  "ConnectionStrings": {
+    "Postgres": "Host=localhost;Database=truwit;Username=postgres;Password=password"
+  }
+}
 ```
 
-**Check Cloudflare Build Logs:**
-```
-Cloudflare Pages → Your Project → Deployments → Latest deployment
+**Frontend:** `app/src/environments/environment.ts`
+```typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:5000'
+};
 ```
 
-**Check Browser Console:**
+### Production
+
+**API:** Uses Railway environment variables
+```bash
+Database__Type=postgres
+ConnectionStrings__Postgres=${DATABASE_URL}  # Railway provides this
+```
+
+**Frontend:** `app/src/environments/environment.prod.ts`
+```typescript
+export const environment = {
+  production: true,
+  apiUrl: 'https://truwit-starter-template-production.up.railway.app'
+};
+```
+
+---
+
+## Proof Card System Specifics
+
+### How Proof Cards Are Generated
+
+**On Proof Creation:**
+```
+1. User creates proof via /v1/proofs/url
+2. API downloads and processes media
+3. API generates 2 proof card images:
+   - [trustmarkId]-800.png  (800x800px)
+   - [trustmarkId]-1024.png (1024x1024px)
+4. API saves to /app/wwwroot/assets/proof/
+5. API stores URLs in database columns:
+   - ProofCardSmallUrl
+   - ProofCardLargeUrl
+6. Frontend loads image from /assets/proof/
+```
+
+### Regenerate-on-Miss Endpoint
+
+**Railway has ephemeral storage** - files are lost on redeploy.
+
+**Solution:** Regenerate-on-miss endpoint
+```
+GET /cards/proof/{trustmarkId}-{size}.png
+
+1. Checks if proof exists in database
+2. Generates proof card on-the-fly
+3. Saves to disk
+4. Returns PNG image
+5. Caches for future requests
+```
+
+**Frontend automatically uses this:**
+```typescript
+// 1. Try static file first
+HEAD /assets/proof/{id}-800.png
+
+// 2. If 404, regenerate
+GET /cards/proof/{id}-800.png
+
+// 3. Then retry static file
+GET /assets/proof/{id}-800.png
+
+// 4. If still fails, fallback to old badge
+```
+
+### Proof Card Design
+
+**Base Template:** `api/CardTemplates/verified-circular-badge.jpg`
+
+**Composition (SkiaSharp):**
+1. Teal background (#1ABBB4)
+2. Darker teal square card (layered effect)
+3. Circular badge overlapping card top
+4. White container at bottom
+5. Dynamic elements:
+   - Proof ID with TW- prefix
+   - Verification URL (truwit.ai/t/...)
+   - QR code (150x150px fixed size)
+
+**Output:** 800x800px PNG with 95% quality
+
+---
+
+## Critical Files Reference
+
+### Must Be Committed to Git
+
+```
+✅ api/CardTemplates/verified-circular-badge.jpg  # Badge template
+✅ api/CardTemplates/proof-card.svg               # SVG template (for reference)
+✅ app/src/assets/signed_badge.png                # Reference design
+✅ app/src/environments/environment.prod.ts       # Production API URL
+✅ api/Data/Migrations/*.sql                      # Database migrations
+```
+
+### Must Be in Docker Image
+
+```
+✅ api/CardTemplates/                    # For proof card generation
+✅ api/wwwroot/assets/proof/.gitkeep     # Ensures directory exists
+```
+
+### Must Be in .dockerignore
+
+```
+✅ bin/
+✅ obj/
+✅ *.db
+✅ temp_downloads/
+✅ uploads/
+```
+
+---
+
+## Monitoring
+
+### Railway Logs
+
+**Access:** Railway Dashboard → Service → **Logs** tab
+
+**Watch for:**
+- 🔍 Startup logs: `✅ Using Postgres database`
+- ⚠️ Proof card generation errors
+- ❌ Database connection failures
+- 🔄 Health check responses
+
+### Cloudflare Pages Logs
+
+**Access:** Cloudflare Pages → Project → **Deployments**
+
+**Watch for:**
+- ✅ Build success
+- ❌ TypeScript compilation errors
+- ⚠️ Missing environment files
+- 🔍 Asset validation failures
+
+### Browser Console
+
+**Production testing:**
 ```
 F12 → Console tab
-Look for API errors, routing errors, CORS issues
+Look for:
+- ❌ CORS errors
+- ❌ 404 errors for proof cards
+- ❌ API call failures
+- ✅ Successful proof card loads
 ```
 
 ---
 
-## Quick Reference
+## Rollback Procedure
 
-### Deployment Commands
-
-```bash
-# Push to trigger both deployments
-git push origin main
-
-# Railway deploys: ~5-10 minutes
-# Cloudflare deploys: ~3-5 minutes
-```
-
-### URLs
-
-```
-Local Frontend:    http://localhost:4200
-Local API:         http://localhost:5001
-Railway API:       https://truwit-starter-template-production.up.railway.app
-Cloudflare Pages:  https://www.truwit.ai
-```
-
-### Key Files
-
-```
-api/Dockerfile              # Railway build instructions
-api/railway.json            # Railway configuration
-api/appsettings.json        # API configuration
-app/angular.json            # Angular build config
-app/src/_redirects          # SPA routing for Cloudflare
-app/src/environments/*.ts   # API URL configuration
-```
-
----
-
-## Maintenance
-
-### Updating Dependencies
-
-**Frontend:**
-```bash
-cd app
-npm update
-npm audit fix
-```
-
-**Backend:**
-```bash
-cd api
-dotnet list package --outdated
-dotnet add package [PackageName]
-```
-
-### Monitoring
+### If Deployment Fails
 
 **Railway:**
-- Check logs daily for errors
-- Monitor health check status
-- Watch resource usage
+```
+1. Railway Dashboard → Service → Deployments
+2. Click on last successful deployment
+3. Click "Redeploy"
+```
 
 **Cloudflare:**
-- Check analytics for traffic
-- Monitor build success rate
-- Review error logs
+```
+1. Cloudflare Pages → Project → Deployments
+2. Find last successful deployment
+3. Click "..." → "Rollback to this deployment"
+```
+
+**Git:**
+```bash
+# Rollback code
+git revert HEAD
+git push origin main
+
+# Or force rollback
+git reset --hard [previous-commit-hash]
+git push -f origin main  # Use with caution!
+```
 
 ---
 
-**Last Updated:** October 12, 2025
+## Best Practices
 
+### Development Workflow
+
+1. ✅ Make changes locally
+2. ✅ Run `npm run build` (catch TypeScript errors)
+3. ✅ Test with Docker Compose (catch environment issues)
+4. ✅ Commit and push
+5. ✅ Monitor both deployments
+6. ✅ Test in production
+7. ✅ If issues, fix and repeat
+
+### Testing Checklist
+
+**Before Every Push:**
+- [ ] `dotnet build` succeeds
+- [ ] `npm run build` succeeds
+- [ ] Docker Compose starts without errors
+- [ ] Health endpoint responds
+- [ ] No console errors
+
+**After Every Deploy:**
+- [ ] Both platforms show "Success"
+- [ ] Create test proof works
+- [ ] Proof card displays correctly
+- [ ] No CORS errors
+- [ ] Incognito mode works
+
+---
+
+## Quick Commands Reference
+
+### Local Development
+
+```bash
+# Start everything
+.\start.bat
+
+# Stop everything
+.\stop.bat
+
+# Rebuild Docker
+docker-compose up --build -d
+
+# View logs
+docker-compose logs -f api
+
+# Run database migration
+docker exec truwit-postgres psql -U postgres -d truwit -f /path/to/migration.sql
+
+# Backfill proof cards
+docker exec truwit-api dotnet HumanProof.Api.dll BACKFILL-PROOFS
+```
+
+### Production Testing
+
+```bash
+# Test Railway API
+curl https://[railway-url]/health
+
+# Test proof creation
+curl -X POST https://[railway-url]/v1/proofs/url \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://youtu.be/test"}'
+
+# Test proof card
+curl -I https://[railway-url]/assets/proof/[id]-800.png
+
+# Test regeneration
+curl https://[railway-url]/cards/proof/[id]-800.png
+```
+
+---
+
+## Success Criteria
+
+### Deployment is Successful When:
+
+✅ **Railway API**
+- Health endpoint returns `{"ok":true}`
+- Proof creation works
+- Database queries succeed
+- Logs show no errors
+
+✅ **Cloudflare Pages**
+- Homepage loads at `https://truwit.ai`
+- Verification page loads at `https://truwit.ai/app/t/:id`
+- No routing errors
+- No 404s for assets
+
+✅ **Proof Card System**
+- New proofs get TW- prefix
+- Proof cards generate automatically
+- Cards display in frontend
+- CORS headers present
+- Regenerate-on-miss works
+
+✅ **End-to-End**
+- User can create proof
+- View verification page
+- See branded proof card
+- Copy embed code
+- QR code works
+
+---
+
+## Support & Resources
+
+### Documentation
+- Railway Docs: https://docs.railway.app
+- Cloudflare Pages: https://developers.cloudflare.com/pages
+- ASP.NET Core: https://learn.microsoft.com/aspnet/core
+- Angular: https://angular.io/docs
+
+### Common Issues
+- See `TROUBLESHOOTING.md` for detailed fixes
+- See `LOCAL-TESTING-GUIDE.md` for local development
+- See `POSTGRESQL-MIGRATION-GUIDE.md` for database updates
+
+---
+
+**End of Deployment Guide**
+
+This guide reflects all lessons learned from the proof card system implementation. Follow these steps carefully to avoid the common pitfalls we encountered.
