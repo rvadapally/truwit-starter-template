@@ -52,14 +52,14 @@ public class BadgesController : ControllerBase
     {
         try
         {
-            var proof = await _repository.GetByProofIdAsync(id);
+            var proof = await _proofsRepo.GetByTrustmarkIdAsync(id);
             
             if (proof == null)
             {
                 return NotFound();
             }
 
-            var badgeSvg = GenerateBadgeSvg(proof);
+            var badgeSvg = GenerateBadgeSvg(proof, id);
             
             // For PNG, we'd need to convert SVG to PNG
             // For now, return SVG with PNG content type
@@ -80,7 +80,7 @@ public class BadgesController : ControllerBase
     {
         try
         {
-            var proof = await _repository.GetByProofIdAsync(id);
+            var proof = await _proofsRepo.GetByTrustmarkIdAsync(id);
             
             if (proof == null)
             {

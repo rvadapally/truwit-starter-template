@@ -1,0 +1,10 @@
+<div class="toast-container">
+  <div *ngFor="let notification of notifications" 
+       [@toastAnimation]
+       class="toast toast-{{notification.type}}"
+       (click)="removeNotification(notification.id)">
+    <span class="toast-icon">{{ getIcon(notification.type) }}</span>
+    <span class="toast-message">{{ notification.message }}</span>
+    <button class="toast-close" (click)="removeNotification(notification.id)">×</button>
+  </div>
+</div>

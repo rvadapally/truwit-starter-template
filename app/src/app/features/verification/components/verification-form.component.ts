@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import type { VerificationRequest, VerificationMetadata, CreateProofResponse } from '../../../core/models';
 import { LicenseType } from '../../../core/models';
 
@@ -23,6 +24,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   createdProof: CreateProofResponse | null = null;
   
   private destroy$ = new Subject<void>();
+  private verificationTimeout?: ReturnType<typeof setTimeout>;
   
   readonly licenseTypes = [
     { value: LicenseType.CreatorOwned, label: 'Creator Owned' },
@@ -34,7 +36,8 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private verificationService: VerificationService,
     private cdr: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.verificationForm = this.createForm();
   }
@@ -48,6 +51,9 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.verificationTimeout) {
+      clearTimeout(this.verificationTimeout);
+    }
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -146,7 +152,9 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     // Validate URL format if URL is provided
     if (formValue.url && !this.isValidUrl(formValue.url)) {
       console.log('❌ Invalid URL format');
-      this.errorMessage = 'Please enter a valid URL (e.g., https://example.com/video.mp4)';
+      const errorMsg = 'Please enter a valid URL (e.g., https://example.com/video.mp4)';
+      this.errorMessage = errorMsg;
+      this.notificationService.showError(errorMsg);
       this.cdr.detectChanges();
       return;
     }
@@ -155,6 +163,17 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
             this.errorMessage = null;
             this.successMessage = null;
             this.verificationStep = 'Preparing verification...';
+            
+            // Set timeout protection (2 minutes)
+            this.verificationTimeout = setTimeout(() => {
+              if (this.isVerifying) {
+                this.isVerifying = false;
+                const timeoutMsg = 'Verification timed out. Please try again.';
+                this.errorMessage = timeoutMsg;
+                this.notificationService.showError(timeoutMsg);
+                this.cdr.detectChanges();
+              }
+            }, 120000);
             
             console.log('🔄 Starting verification process...');
     
@@ -188,6 +207,11 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
         next: (result: CreateProofResponse) => {
           console.log('✅ API Success!', result);
           
+          // Clear timeout
+          if (this.verificationTimeout) {
+            clearTimeout(this.verificationTimeout);
+          }
+          
           // Force immediate UI update
           setTimeout(() => {
             this.verificationStep = 'Verification complete!';
@@ -211,9 +235,17 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
             message: error.message,
             error: error.error
           });
+          
+          // Clear timeout
+          if (this.verificationTimeout) {
+            clearTimeout(this.verificationTimeout);
+          }
+          
           this.isVerifying = false;
-          this.errorMessage = this.getErrorMessage(error);
-          console.log('💬 Error message shown to user:', this.errorMessage);
+          const errorMsg = this.getErrorMessage(error);
+          this.errorMessage = errorMsg;
+          this.notificationService.showError(errorMsg);
+          console.log('💬 Error message shown to user:', errorMsg);
         }
       });
   }
@@ -224,7 +256,9 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     
     // Validate URL format before making API call
     if (!this.isValidUrl(url)) {
-      this.errorMessage = 'Please enter a valid URL (e.g., https://example.com/video.mp4)';
+      const errorMsg = 'Please enter a valid URL (e.g., https://example.com/video.mp4)';
+      this.errorMessage = errorMsg;
+      this.notificationService.showError(errorMsg);
       this.cdr.markForCheck();
       return;
     }
@@ -240,7 +274,8 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
         next: (result) => {
           this.isVerifying = false;
           if (result.exists) {
-            this.successMessage = `✅ Proof exists! Created: ${new Date(result.createdAt).toLocaleString()}`;
+            const createdAt = result.createdAt ? new Date(result.createdAt).toLocaleString() : 'Unknown';
+            this.successMessage = `✅ Proof exists! Created: ${createdAt}`;
             // Optionally show link to existing proof
           } else {
             this.successMessage = 'ℹ️ No proof found. Click "Generate Proof" to create one.';
@@ -249,9 +284,11 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.isVerifying = false;
-          this.errorMessage = error.status === 404 
+          const errorMsg = error.status === 404 
             ? 'No proof found for this URL' 
             : this.getErrorMessage(error);
+          this.errorMessage = errorMsg;
+          this.notificationService.showError(errorMsg);
           this.cdr.markForCheck();
         }
       });

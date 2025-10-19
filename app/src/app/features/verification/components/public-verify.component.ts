@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, typ
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
+import { NotificationService } from '../../../core/services/notification.service';
 import type { VerifyResponse } from '../../../core/models';
 
 @Component({
@@ -21,7 +22,8 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private verificationService: VerificationService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +59,9 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (error) => {
-          this.error = error.message || 'Failed to load verification data';
+          const errorMsg = error.message || 'Failed to load verification data';
+          this.error = errorMsg;
+          this.notificationService.showError(errorMsg);
           this.isLoading = false;
           this.cdr.markForCheck();
         }
@@ -66,14 +70,18 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
-      // TODO: Show toast notification
+      this.notificationService.showSuccess('Copied to clipboard!');
+    }).catch(() => {
+      this.notificationService.showError('Failed to copy to clipboard');
     });
   }
 
   copyVerificationLink(): void {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
-      // TODO: Show toast notification
+      this.notificationService.showSuccess('Verification link copied to clipboard!');
+    }).catch(() => {
+      this.notificationService.showError('Failed to copy verification link');
     });
   }
 

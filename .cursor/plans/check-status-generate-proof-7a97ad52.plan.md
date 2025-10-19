@@ -1,442 +1,461 @@
 <!-- 7a97ad52-4536-4269-90c6-c987a7413e59 bd40857f-66b0-482e-abd6-48a6f2176454 -->
-# Separate Check Status and Generate Proof with UX Improvements
+# Fix URL Validation, File Support, and Error Visibility
+
+## Critical UX Issues to Fix
+
+1. URL validation not working in production (old build deployed)
+2. File uploads only accept videos, need to support images too
+3. Loading spinner stuck indefinitely on errors
+4. Error messages hidden in console instead of visible to users
 
 ## Backend Changes
 
-### 1. Create Read-Only Lookup Endpoint
+### 1. Add URL Validation to Backend Endpoints
 
 **File**: `api/Controllers/ProofsController.cs`
 
-Add new GET endpoint for read-only proof lookup:
+The `IsValidUrl()` helper already exists (line 389). Add validation to URL endpoints:
 
-```csharp
-[HttpGet("proofs/lookup")]
-[ProducesResponseType(typeof(ProofLookupResponse), StatusCodes.Status200OK)]
-[ProducesResponseType(StatusCodes.Status404NotFound)]
-public async Task<ActionResult<ProofLookupResponse>> LookupProof([FromQuery] string url)
-```
+- Line 94-103: `CreateProofFromUrl` - validation already added ✓
+- Line 762: `LookupProof` - validation already added ✓
 
-- Canonicalize URL
-- Query `LinkIndex` for existing proof
-- If found: return proof summary (trustmarkId, createdAt, origin status, verify/badge links)
-- If not found: return 404 with `{ exists: false }`
-- **Never download content or create DB records**
-
-**DTO**: Add `ProofLookupResponse` record at end of ProofsController.cs:
-
-```csharp
-public record ProofLookupResponse(
-    bool Exists,
-    string? TrustmarkId,
-    string? ProofId,
-    DateTime? CreatedAt,
-    string? OriginStatus,
-    bool? C2paPresent,
-    string? VerifyUrl,
-    string? BadgeUrl
-);
-```
-
-### 2. Fix Timezone Handling
+### 2. Expand File Type Support for Images
 
 **File**: `api/Controllers/ProofsController.cs`
 
-Lines 1212, 1256 - Current code:
+Line 998 - Update allowed MIME types:
 
 ```csharp
-IssuedAt = DateTime.SpecifyKind(proof.CreatedAt, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ")
+var allowedMimeTypes = new List<string> { 
+    // Video formats
+    "video/mp4", "video/avi", "video/mov", "video/webm", "video/quicktime",
+    // Image formats
+    "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp",
+    "image/bmp", "image/tiff", "image/x-icon"
+};
 ```
 
-**Keep as-is** - DB stores UTC correctly. Frontend needs fixing.
+Update error message (line 1002):
 
-### 3. YouTube Mode Indicator
-
-**Note**: YouTube mode already stored in DB via `YOUTUBE_VERIFICATION_MODE` setting (line 173). No backend changes needed - just expose in lookup response.
+```csharp
+Message = $"Unsupported file type: {file.ContentType}. Allowed: video (mp4, avi, mov, webm, quicktime) and image (jpg, png, gif, webp, bmp, tiff) files"
+```
 
 ## Frontend Changes
 
-### 4. Add Two-Button UI
+### 3. Create Global Toast Notification Service
 
-**File**: `app/src/app/features/verification/components/verification-form.component.html`
+**New File**: `app/src/app/core/services/notification.service.ts`
 
-Replace single "Verify URL" button (lines 62-68) with two buttons:
+```typescript
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
+
+export interface ToastNotification {
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  duration?: number;
+}
+
+@Injectable({ providedIn: 'root' })
+export class NotificationService {
+  private notificationSubject = new Subject<ToastNotification>();
+  notification$ = this.notificationSubject.asObservable();
+
+  showSuccess(message: string, duration = 5000): void {
+    this.notificationSubject.next({ message, type: 'success', duration });
+  }
+
+  showError(message: string, duration = 8000): void {
+    this.notificationSubject.next({ message, type: 'error', duration });
+  }
+
+  showWarning(message: string, duration = 6000): void {
+    this.notificationSubject.next({ message, type: 'warning', duration });
+  }
+
+  showInfo(message: string, duration = 5000): void {
+    this.notificationSubject.next({ message, type: 'info', duration });
+  }
+}
+```
+
+### 4. Create Toast Notification Component
+
+**New File**: `app/src/app/shared/components/toast-notification/toast-notification.component.ts`
+
+```typescript
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
+import { NotificationService, ToastNotification } from '../../../core/services/notification.service';
+import { trigger, transition, style, animate } from '@angular/animations';
+
+@Component({
+  selector: 'app-toast-notification',
+  templateUrl: './toast-notification.component.html',
+  styleUrls: ['./toast-notification.component.scss'],
+  animations: [
+    trigger('toastAnimation', [
+      transition(':enter', [
+        style({ transform: 'translateY(-100%)', opacity: 0 }),
+        animate('300ms ease-out', style({ transform: 'translateY(0)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('300ms ease-in', style({ transform: 'translateY(-100%)', opacity: 0 }))
+      ])
+    ])
+  ]
+})
+export class ToastNotificationComponent implements OnInit, OnDestroy {
+  notifications: (ToastNotification & { id: number })[] = [];
+  private destroy$ = new Subject<void>();
+  private nextId = 0;
+
+  constructor(private notificationService: NotificationService) {}
+
+  ngOnInit(): void {
+    this.notificationService.notification$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(notification => {
+        const id = this.nextId++;
+        const notificationWithId = { ...notification, id };
+        this.notifications.push(notificationWithId);
+
+        setTimeout(() => {
+          this.removeNotification(id);
+        }, notification.duration || 5000);
+      });
+  }
+
+  removeNotification(id: number): void {
+    this.notifications = this.notifications.filter(n => n.id !== id);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  getIcon(type: string): string {
+    switch (type) {
+      case 'success': return '✓';
+      case 'error': return '✕';
+      case 'warning': return '⚠';
+      case 'info': return 'ℹ';
+      default: return '';
+    }
+  }
+}
+```
+
+**New File**: `app/src/app/shared/components/toast-notification/toast-notification.component.html`
 
 ```html
-<div class="button-group">
-  <button 
-    type="button" 
-    class="btn-check-status"
-    [disabled]="!verificationForm.get('url')?.value || isVerifying"
-    (click)="onCheckStatus()">
-    Check Status
-  </button>
-  <button 
-    type="button" 
-    class="btn-generate-proof-inline"
-    [disabled]="!verificationForm.get('url')?.value || isVerifying"
-    (click)="onSubmit()">
-    Generate Proof
-  </button>
+<div class="toast-container">
+  <div *ngFor="let notification of notifications" 
+       [@toastAnimation]
+       class="toast toast-{{notification.type}}"
+       (click)="removeNotification(notification.id)">
+    <span class="toast-icon">{{ getIcon(notification.type) }}</span>
+    <span class="toast-message">{{ notification.message }}</span>
+    <button class="toast-close" (click)="removeNotification(notification.id)">×</button>
+  </div>
 </div>
 ```
 
-Update help text (line 70-72):
+**New File**: `app/src/app/shared/components/toast-notification/toast-notification.component.scss`
 
-```html
-<small>
-  <strong>Check Status:</strong> See if proof exists (read-only). 
-  <strong>Generate Proof:</strong> Create or retrieve trustmark.
-</small>
+```scss
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.toast-success {
+  background: #22c55e;
+  color: white;
+}
+
+.toast-error {
+  background: #ef4444;
+  color: white;
+}
+
+.toast-warning {
+  background: #f59e0b;
+  color: white;
+}
+
+.toast-info {
+  background: #3b82f6;
+  color: white;
+}
+
+.toast-icon {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.toast-message {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .toast-container {
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
 ```
 
-### 5. Add Check Status Method
+### 5. Add Toast Component to App Root
+
+**File**: `app/src/app/app.component.html`
+
+Add at the top of the template:
+
+```html
+<app-toast-notification></app-toast-notification>
+<router-outlet></router-outlet>
+```
+
+**File**: `app/src/app/app.component.ts` or module
+
+Import and declare ToastNotificationComponent in the appropriate module/standalone imports.
+
+### 6. Fix Verification Form Error Handling
 
 **File**: `app/src/app/features/verification/components/verification-form.component.ts`
 
-Add new method after `onSubmit()`:
+Inject NotificationService in constructor:
 
 ```typescript
-onCheckStatus(): void {
-  const url = this.verificationForm.get('url')?.value;
-  if (!url) return;
+constructor(
+  private fb: FormBuilder,
+  private verificationService: VerificationService,
+  private cdr: ChangeDetectorRef,
+  private router: Router,
+  private notificationService: NotificationService
+) {
+  this.verificationForm = this.createForm();
+}
+```
+
+Update `onSubmit()` error handler (around line 200):
+
+```typescript
+error: (error) => {
+  console.error('❌ API Error:', error);
+  this.isVerifying = false;
+  const errorMsg = this.getErrorMessage(error);
+  this.errorMessage = errorMsg;
+  this.notificationService.showError(errorMsg);
+  this.cdr.detectChanges();
+}
+```
+
+Update `onCheckStatus()` error handler:
+
+```typescript
+error: (error) => {
+  this.isVerifying = false;
+  const errorMsg = error.status === 404 
+    ? 'No proof found for this URL' 
+    : this.getErrorMessage(error);
+  this.errorMessage = errorMsg;
+  this.notificationService.showError(errorMsg);
+  this.cdr.markForCheck();
+}
+```
+
+Add validation check at start of onSubmit (after existing checks):
+
+```typescript
+// Validate URL format if URL is provided
+if (formValue.url && !this.isValidUrl(formValue.url)) {
+  const errorMsg = 'Please enter a valid URL (e.g., https://example.com/video.mp4)';
+  this.errorMessage = errorMsg;
+  this.notificationService.showError(errorMsg);
+  this.cdr.detectChanges();
+  return;
+}
+```
+
+Add the `isValidUrl` helper method:
+
+```typescript
+private isValidUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+```
+
+### 7. Update File Input to Accept Images
+
+**File**: `app/src/app/features/verification/components/verification-form.component.html`
+
+Find the file input (around line 85) and update accept attribute:
+
+```html
+<input 
+  type="file" 
+  id="fileInput"
+  accept="video/*,image/*"
+  (change)="onFileSelected($event)"
+  #fileInput
+>
+```
+
+Update helper text:
+
+```html
+<small class="file-help">
+  Supported formats: Video (MP4, AVI, MOV, WebM) and Image (JPG, PNG, GIF, WebP, BMP, TIFF)
+</small>
+```
+
+### 8. Add Loading State Timeout Protection
+
+**File**: `app/src/app/features/verification/components/verification-form.component.ts`
+
+Add timeout protection to prevent infinite spinner:
+
+```typescript
+private verificationTimeout?: ReturnType<typeof setTimeout>;
+
+onSubmit(): void {
+  // ... existing code ...
   
   this.isVerifying = true;
-  this.errorMessage = null;
-  this.successMessage = null;
-  this.verificationStep = 'Checking proof status...';
   
-  this.verificationService.lookupProof(url)
+  // Set timeout protection (2 minutes)
+  this.verificationTimeout = setTimeout(() => {
+    if (this.isVerifying) {
+      this.isVerifying = false;
+      const timeoutMsg = 'Verification timed out. Please try again.';
+      this.errorMessage = timeoutMsg;
+      this.notificationService.showError(timeoutMsg);
+      this.cdr.detectChanges();
+    }
+  }, 120000);
+
+  verification$
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (result) => {
-        this.isVerifying = false;
-        if (result.exists) {
-          this.successMessage = `✅ Proof exists! Created: ${new Date(result.createdAt).toLocaleString()}`;
-          // Optionally show link to existing proof
-        } else {
-          this.successMessage = 'ℹ️ No proof found. Click "Generate Proof" to create one.';
-        }
-        this.cdr.markForCheck();
+        clearTimeout(this.verificationTimeout);
+        // ... existing success handling ...
       },
       error: (error) => {
-        this.isVerifying = false;
-        this.errorMessage = error.status === 404 
-          ? 'No proof found for this URL' 
-          : this.getErrorMessage(error);
-        this.cdr.markForCheck();
+        clearTimeout(this.verificationTimeout);
+        // ... existing error handling ...
       }
     });
 }
 ```
 
-### 6. Add Lookup Service Method
-
-**File**: `app/src/app/core/services/verification.service.ts`
-
-Add method after `createProofFromUrl()`:
+Update ngOnDestroy:
 
 ```typescript
-lookupProof(url: string): Observable<ProofLookupResponse> {
-  return this.apiService.get<ProofLookupResponse>(`/v1/proofs/lookup?url=${encodeURIComponent(url)}`).pipe(
-    map(response => response.data || response)
-  );
-}
-```
-
-Add interface in `app/src/app/core/models/index.ts`:
-
-```typescript
-export interface ProofLookupResponse {
-  exists: boolean;
-  trustmarkId?: string;
-  proofId?: string;
-  createdAt?: string;
-  originStatus?: string;
-  c2paPresent?: boolean;
-  verifyUrl?: string;
-  badgeUrl?: string;
-}
-```
-
-### 7. Fix Idempotency Header
-
-**File**: `app/src/app/core/services/api.service.ts`
-
-Add idempotency key generation and header to POST requests:
-
-```typescript
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-
-post<T>(endpoint: string, data: any): Observable<ApiResponse<T>> {
-  const fullUrl = `${this.apiUrl}${endpoint}`;
-  
-  // Generate unique idempotency key per request
-  const idempotencyKey = this.generateIdempotencyKey();
-  const headers = new HttpHeaders().set('Idempotency-Key', idempotencyKey);
-  
-  console.log('🌐 ApiService.post called:');
-  console.log('📍 URL:', fullUrl);
-  console.log('🔑 Idempotency-Key:', idempotencyKey);
-  console.log('📤 Data:', data);
-  
-  return this.http.post<ApiResponse<T>>(fullUrl, data, { headers }).pipe(
-    catchError(this.handleError)
-  );
-}
-
-private generateIdempotencyKey(): string {
-  // Generate unique key: timestamp + random string
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-```
-
-**Why this works**:
-
-- `HttpHeaders` is immutable - `.set()` returns a new instance
-- Key is unique per request attempt (prevents double-clicks)
-- Backend caches responses by key (lines 106-118 of ProofsController.cs)
-- Subsequent requests with same key return cached response instantly
-
-### 8. Fix Timezone Display
-
-**File**: `app/src/app/features/verification/components/public-verify.component.html`
-
-Lines 68-73 - Change "Your Time" display to use browser's actual timezone:
-
-```html
-<div class="detail-row">
-  <span class="label">Issued At (UTC):</span>
-  <span class="value">{{ formatUtcTime(verifyData.issuedAt) }}</span>
-</div>
-<div class="detail-row">
-  <span class="label">Issued At (Your Time):</span>
-  <span class="value">{{ formatLocalTime(verifyData.issuedAt) }}</span>
-</div>
-```
-
-**File**: `app/src/app/features/verification/components/public-verify.component.ts`
-
-Add formatting methods:
-
-```typescript
-formatUtcTime(isoString: string): string {
-  return new Date(isoString).toLocaleString('en-US', { 
-    timeZone: 'UTC', 
-    timeZoneName: 'short' 
-  });
-}
-
-formatLocalTime(isoString: string): string {
-  return new Date(isoString).toLocaleString('en-US', { 
-    timeZoneName: 'short' 
-  });
-}
-```
-
-### 9. Improve C2PA Status Display (Remove Red)
-
-**File**: `app/src/app/features/verification/components/public-verify.component.html`
-
-Lines 76-83 - Change styling and labels:
-
-```html
-<div class="detail-row">
-  <span class="label">C2PA Signature Status:</span>
-  <span class="value c2pa-status" [ngClass]="getC2paStatusClass(verifyData.origin)">
-    {{ getC2paStatusText(verifyData.origin) }}
-  </span>
-</div>
-```
-
-**File**: `app/src/app/features/verification/components/public-verify.component.ts`
-
-Add helper methods:
-
-```typescript
-getC2paStatusText(origin: any): string {
-  if (!origin) return 'Not checked';
-  if (origin.c2pa && origin.status === 'valid') return '✓ Signed';
-  if (origin.status === 'not_applicable_thumbnail') return 'Skipped (thumbnail mode)';
-  return 'Not signed';
-}
-
-getC2paStatusClass(origin: any): string {
-  if (!origin) return 'status-neutral';
-  if (origin.c2pa && origin.status === 'valid') return 'status-success';
-  return 'status-neutral'; // No red
-}
-```
-
-**File**: `app/src/app/features/verification/components/public-verify.component.scss`
-
-Add neutral styling:
-
-```scss
-.status-neutral {
-  color: #94a3b8; // gray
-}
-.status-success {
-  color: #22c55e; // green
-}
-```
-
-### 10. Fix Badge Display
-
-**Problem**: Badge images not loading in both Astro and Angular pages because:
-
-1. BadgesController exists but queries wrong repository (legacy `IVerificationRepository` instead of `IProofsRepository`)
-2. Uses `proofId` instead of `trustmarkId`
-3. Static badge path incorrect
-
-**Solution A: Fix BadgesController to work with new schema**
-
-**File**: `api/Controllers/BadgesController.cs`
-
-Replace constructor and GetBadgeSvg (lines 14-46):
-
-```csharp
-private readonly IProofsRepository _proofsRepo;
-private readonly ILogger<BadgesController> _logger;
-
-public BadgesController(
-    IProofsRepository proofsRepo,
-    ILogger<BadgesController> logger)
-{
-    _proofsRepo = proofsRepo;
-    _logger = logger;
-}
-
-[HttpGet("badge/{trustmarkId}.svg")]
-[ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
-[ProducesResponseType(StatusCodes.Status404NotFound)]
-public async Task<IActionResult> GetBadgeSvg(string trustmarkId)
-{
-    try
-    {
-        var proof = await _proofsRepo.GetByTrustmarkIdAsync(trustmarkId);
-        
-        if (proof == null)
-        {
-            return NotFound();
-        }
-
-        var badgeSvg = GenerateBadgeSvg(proof, trustmarkId);
-        
-        Response.Headers["Cache-Control"] = "public, max-age=3600";
-        return Content(badgeSvg, "image/svg+xml");
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error generating badge for trustmark {TrustmarkId}", trustmarkId);
-        return StatusCode(StatusCodes.Status500InternalServerError);
-    }
-}
-```
-
-Update GenerateBadgeSvg signature (line 131):
-
-```csharp
-private string GenerateBadgeSvg(Proof proof, string trustmarkId)
-{
-    var statusText = proof.C2paPresent ? "✓ Signed & Verified" : "Verified by Truwit";
-    var color = proof.C2paPresent ? "#22c55e" : "#0ea5e9";
-    
-    return $"""
-    <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:{color};stop-opacity:1" />
-                <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
-            </linearGradient>
-        </defs>
-        <rect width="200" height="60" fill="url(#grad)" rx="8"/>
-        <text x="100" y="35" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12" font-weight="bold">
-            {statusText}
-        </text>
-        <text x="100" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" opacity="0.8">
-            {trustmarkId}
-        </text>
-    </svg>
-    """;
-}
-```
-
-**Solution B: Copy static badge images to Angular assets**
-
-Badges already exist in `app/src/assets/` but need to be ensured in both places:
-
-1. **Verify images exist**: `verified-by-truwit.png` and `verified-circular-badge.jpg` are already in `app/src/assets/`
-2. **No action needed** - images are already correctly placed
-
-**Solution C: Use static badges as fallback**
-
-**File**: `app/src/app/features/verification/components/public-verify.component.ts`
-
-Add method:
-
-```typescript
-getBadgeUrl(): string {
-  if (!this.verifyData) {
-    return 'assets/verified-by-truwit.png'; // fallback
+ngOnDestroy(): void {
+  if (this.verificationTimeout) {
+    clearTimeout(this.verificationTimeout);
   }
-  
-  // Try dynamic badge first, fallback to static
-  return this.verifyData.badgeUrl || 'assets/verified-by-truwit.png';
+  this.destroy$.next();
+  this.destroy$.complete();
 }
 ```
 
-**File**: `app/src/app/features/verification/components/public-verify.component.html`
+### 9. Apply Error Notifications to Other Forms
 
-Line 103:
+Apply similar notification patterns to:
 
-```html
-<img [src]="getBadgeUrl()" 
-     (error)="onBadgeError($event)" 
-     alt="Truwit TrustMark Badge" 
-     class="badge-image">
-```
+- `app/src/app/features/verification/components/public-verify.component.ts`
+- `app/src/app/features/home/home.component.ts`  
+- Any other components with form submissions or API calls
 
-Add error handler in TypeScript:
+Inject NotificationService and call `showError()` / `showSuccess()` in error/success handlers.
 
-```typescript
-onBadgeError(event: any): void {
-  // Fallback to static badge if dynamic fails
-  event.target.src = 'assets/verified-by-truwit.png';
-}
-```
+### 10. Update Shared Module
 
-## Documentation Updates
+**File**: `app/src/app/shared/shared.module.ts` (or appropriate module file)
 
-### 11. Update API Documentation
+Export ToastNotificationComponent so it can be used throughout the app.
 
-**File**: `api/API_FUNCTIONALITY.md`
+## Testing Checklist
 
-Add section:
+- [ ] Invalid URLs show immediate error toast (no API call)
+- [ ] Valid URLs that fail show error toast with proper message
+- [ ] Image files (jpg, png, gif, webp, bmp, tiff) can be uploaded
+- [ ] Video files still work as before
+- [ ] Loading spinner stops on errors (no infinite spin)
+- [ ] Error messages visible to users (not just console)
+- [ ] Toast notifications appear at top of screen
+- [ ] Toast notifications auto-dismiss after 5-8 seconds
+- [ ] Multiple toasts stack properly
+- [ ] Toast notifications work on mobile (responsive)
 
-```markdown
-### GET /v1/proofs/lookup?url={url}
-Read-only endpoint to check if a proof exists for a URL.
-- Returns 200 with proof details if exists
-- Returns 404 if not found
-- Never creates or modifies data
-```
+## To-dos
 
-### 12. Update README
-
-**File**: `README.md`
-
-Update verification flow description to mention two-button approach.
-
-## Acceptance Criteria
-
-- ✅ Two distinct buttons: "Check Status" (read-only) and "Generate Proof" (create)
-- ✅ GET /v1/proofs/lookup never downloads content or creates records
-- ✅ POST /v1/proofs/url remains the only creation path
-- ✅ Idempotency-Key header properly sent from Angular
-- ✅ Timezone displays correct local time for user
-- ✅ C2PA status shows neutral styling (no red for "not signed")
-- ✅ Badge displays using static images based on C2PA status
-- ✅ YouTube mode visible in UI (as info text)
+- [ ] Update backend file type validation to include all image formats
+- [ ] Create NotificationService for global toast notifications
+- [ ] Create ToastNotificationComponent with animations
+- [ ] Add toast component to app root template
+- [ ] Update verification-form component to use notifications
+- [ ] Add frontend URL validation to onSubmit method
+- [ ] Update file input to accept image formats
+- [ ] Add timeout protection to prevent infinite loading
+- [ ] Apply notification pattern to all forms throughout app
+- [ ] Test error visibility and toast notifications across all flows
 
 ### To-dos
 

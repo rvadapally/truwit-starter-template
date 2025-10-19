@@ -994,22 +994,21 @@ public class ProofsController : ControllerBase
                 });
             }
 
-            // MIME type validation with feature flag support
-            var allowedMimeTypes = new List<string> { "video/mp4", "video/avi", "video/mov", "video/webm" };
-
-            // In Development with DevImageTestMode enabled, also allow images
-            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&
-                _featureFlags.Value.DevImageTestMode)
-            {
-                allowedMimeTypes.AddRange(new[] { "image/jpeg", "image/png" });
-            }
+            // MIME type validation - support both video and image formats
+            var allowedMimeTypes = new List<string> { 
+                // Video formats
+                "video/mp4", "video/avi", "video/mov", "video/webm", "video/quicktime",
+                // Image formats
+                "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp",
+                "image/bmp", "image/tiff", "image/x-icon"
+            };
 
             if (!allowedMimeTypes.Contains(file.ContentType))
             {
                 return BadRequest(new ApiResponse<object>
                 {
                     Success = false,
-                    Message = $"Unsupported file type: {file.ContentType}. Allowed types: {string.Join(", ", allowedMimeTypes)}",
+                    Message = $"Unsupported file type: {file.ContentType}. Allowed: video (mp4, avi, mov, webm, quicktime) and image (jpg, png, gif, webp, bmp, tiff) files",
                     Status = StatusCodes.Status400BadRequest
                 });
             }
