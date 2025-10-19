@@ -99,6 +99,7 @@ export interface ProofLookupResponse {
 // Legacy models for backward compatibility
 export interface VerificationResult {
   proofId: string;
+  trustmarkId?: string;
   contentHash: string;
   perceptualHash: string;
   metadata: VerificationMetadata;
