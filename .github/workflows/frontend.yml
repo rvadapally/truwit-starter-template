@@ -33,6 +33,16 @@ jobs:
         cd truwit-integrated/app
         npm ci
         
+    - name: Validate Required Assets
+      run: |
+        cd truwit-integrated
+        npm run verify:assets
+        
+    - name: Validate .gitignore Configuration
+      run: |
+        cd truwit-integrated
+        npm run verify:gitignore
+        
     - name: Build Angular app
       run: |
         cd truwit-integrated/app
@@ -48,6 +58,11 @@ jobs:
         cd truwit-integrated
         npm run integrate
         
+    - name: Verify Build Output
+      run: |
+        cd truwit-integrated
+        npm run verify:build
+        
     - name: Deploy to Cloudflare Pages
       if: github.ref == 'refs/heads/main'
       uses: cloudflare/pages-action@v1
@@ -57,3 +72,15 @@ jobs:
         projectName: truwit-starter-template
         directory: truwit-integrated/dist
         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Wait for Deployment (60s)
+      if: github.ref == 'refs/heads/main'
+      run: sleep 60
+      
+    - name: Verify Deployment
+      if: github.ref == 'refs/heads/main'
+      run: |
+        cd truwit-integrated
+        npm run verify:deployment
+      env:
+        DEPLOY_URL: https://truwit.ai

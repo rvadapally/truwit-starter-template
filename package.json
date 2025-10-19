@@ -10,18 +10,26 @@
     "dev:app": "cd app && npm start",
     "dev:both": "concurrently \"npm run dev:app\" \"npm run dev\"",
     "start": "echo ❌ ERROR: Don't run npm start here! && echo ✅ Use start.bat instead! && exit 1",
+    "prebuild": "node scripts/validate-assets.js",
     "build": "npm run build:app && npm run build:astro && npm run integrate",
+    "postbuild": "node scripts/verify-build-output.js",
     "build:astro": "astro build",
     "build:app": "cd app && npm install && npm run build",
     "integrate": "node build-integration.js",
     "preview": "astro preview",
     "astro": "astro",
-    "deploy": "npm run build && npx wrangler pages deploy ./dist --project-name=truwit-starter-template"
+    "deploy": "npm run build && npx wrangler pages deploy ./dist --project-name=truwit-starter-template",
+    "postdeploy": "node scripts/verify-deployment.js",
+    "verify:assets": "node scripts/validate-assets.js",
+    "verify:build": "node scripts/verify-build-output.js",
+    "verify:deployment": "node scripts/verify-deployment.js",
+    "verify:gitignore": "node scripts/validate-gitignore.js"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
     "@astrojs/sitemap": "^3.2.1",
     "astro": "^4.16.18",
+    "node-fetch": "^3.3.2",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
