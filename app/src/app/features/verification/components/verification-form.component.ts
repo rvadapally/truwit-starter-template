@@ -286,10 +286,10 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-          if (result.exists && result.proofId) {
+          if (result.exists && result.trustmarkId) {
             // Fetch full proof details
             this.verificationStep = 'Retrieving proof details...';
-            this.verificationService.verifyProof(result.proofId)
+            this.verificationService.verifyTrustmark(result.trustmarkId)
               .pipe(takeUntil(this.destroy$))
               .subscribe({
                 next: (verifyResult) => {
@@ -325,19 +325,24 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   }
 
   private convertToVerificationResult(verifyResult: any, url: string): VerificationResult {
+    // Handle trustmark verification response structure
+    const receipt = verifyResult.receipt?.json || {};
+    const proofId = receipt.proofId || verifyResult.proofId;
+    const trustmarkId = verifyResult.trustmarkId || receipt.trustmarkId;
+    
     return {
-      proofId: verifyResult.proofId,
-      contentHash: verifyResult.contentHash,
-      perceptualHash: verifyResult.contentHash, // Use contentHash as fallback
+      proofId: proofId,
+      contentHash: verifyResult.origin?.sha256 || receipt.sha256 || '',
+      perceptualHash: verifyResult.origin?.sha256 || receipt.sha256 || '', // Use contentHash as fallback
       metadata: {
-        prompt: verifyResult.declared?.prompt || '',
-        toolName: verifyResult.declared?.generator || '',
+        prompt: receipt.prompt || '',
+        toolName: receipt.toolName || '',
         toolVersion: '',
-        license: verifyResult.declared?.license || 'public'
+        license: receipt.license || 'public'
       },
-      timestamp: verifyResult.issuedAt,
-      verificationUrl: `https://truwit.ai/app/t/${verifyResult.proofId}`,
-      badgeUrl: verifyResult.badgeUrl || `https://api.truwit.ai/v1/badge/${verifyResult.proofId}.svg`
+      timestamp: verifyResult.createdAt || receipt.timestamp,
+      verificationUrl: `https://truwit.ai/app/t/${trustmarkId}`,
+      badgeUrl: `https://api.truwit.ai/v1/badge/${trustmarkId}.svg`
     };
   }
 

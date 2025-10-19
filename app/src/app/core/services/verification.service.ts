@@ -44,6 +44,12 @@ export class VerificationService {
     );
   }
 
+  verifyTrustmark(trustmarkId: string): Observable<VerifyResponse> {
+    return this.apiService.get<VerifyResponse>(`/v1/verify-trustmark/${trustmarkId}`).pipe(
+      map(response => response.data || response)
+    );
+  }
+
   // Legacy methods for backward compatibility
   verifyContent(request: VerificationRequest): Observable<VerificationResult> {
     if (request.file) {
