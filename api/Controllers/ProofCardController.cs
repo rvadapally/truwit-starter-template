@@ -58,8 +58,8 @@ public class ProofCardController : ControllerBase
                 return await GenerateCardForVerificationProof(verificationProof, size);
             }
 
-            // If not found in VerificationProofs, try Proofs table
-            var proof = await _proofsRepository.GetByIdAsync(proofId);
+            // If not found in VerificationProofs, try Proofs table by TrustmarkId
+            var proof = await _proofsRepository.GetByTrustmarkIdAsync(proofId);
             if (proof != null)
             {
                 return await GenerateCardForProof(proof, size);
