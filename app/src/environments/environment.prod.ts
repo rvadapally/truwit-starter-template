@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://api.truwit.ai'  // Production API URL
+  apiUrl: 'http://127.0.0.1:5000'  // Temporary: Use local API for testing
 };
