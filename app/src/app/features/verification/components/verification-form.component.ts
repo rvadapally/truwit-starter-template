@@ -342,7 +342,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
       },
       timestamp: verifyResult.createdAt || receipt.timestamp,
       verificationUrl: `https://truwit.ai/app/t/${trustmarkId}`,
-      badgeUrl: `https://api.truwit.ai/v1/badge/${trustmarkId}.svg`
+      badgeUrl: `http://127.0.0.1:5000/v1/badge/${trustmarkId}.svg`
     };
   }
 
