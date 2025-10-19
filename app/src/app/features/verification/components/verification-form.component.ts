@@ -12,8 +12,7 @@ import { VerificationResultComponent } from './verification-result.component';
   selector: 'app-verification-form',
   templateUrl: './verification-form.component.html',
   styleUrls: ['./verification-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [VerificationResultComponent]
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class VerificationFormComponent implements OnInit, OnDestroy {
   verificationForm: FormGroup;
