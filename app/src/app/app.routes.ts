@@ -8,11 +8,6 @@ export const routes: Routes = [
     path: '',
     component: HomeComponent
   },
-  // Support deployment under "/app" prefix (e.g., https://truwit.ai/app/t/:id)
-  {
-    path: 'app',
-    component: HomeComponent
-  },
   {
     path: 'verify',
     component: VerifyPageComponent
@@ -21,9 +16,16 @@ export const routes: Routes = [
     path: 't/:id',
     component: PublicVerifyComponent
   },
+  // Support deployment under "/app" prefix (e.g., https://truwit.ai/app/t/:id)
+  // Must come AFTER more specific routes
   {
     path: 'app/t/:id',
     component: PublicVerifyComponent
+  },
+  {
+    path: 'app',
+    redirectTo: '/',
+    pathMatch: 'full'
   },
   {
     path: '**',
