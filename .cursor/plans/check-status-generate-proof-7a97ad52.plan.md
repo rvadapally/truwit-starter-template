@@ -459,11 +459,13 @@ Export ToastNotificationComponent so it can be used throughout the app.
 
 ### To-dos
 
-- [ ] Create GET /v1/proofs/lookup endpoint with canonicalization and read-only repository lookup
-- [ ] Replace single 'Verify URL' button with 'Check Status' and 'Generate Proof' buttons in verification form
-- [ ] Implement onCheckStatus() method and add lookupProof() service call
-- [ ] Verify and fix Idempotency-Key header implementation in api.service.ts
-- [ ] Add formatUtcTime() and formatLocalTime() methods to properly display user's local timezone
-- [ ] Remove red styling from C2PA status and add neutral 'Not signed' / 'Skipped' labels
-- [ ] Create static badge images and implement conditional badge display based on C2PA status
-- [ ] Update API_FUNCTIONALITY.md and README.md with new lookup endpoint and two-button flow
+- [x] Update backend file type validation to include all image formats
+- [x] Create NotificationService for global toast notifications
+- [x] Create ToastNotificationComponent with animations and styling
+- [x] Add toast component to app root template and module
+- [x] Update verification-form component to use notifications and validation
+- [x] Add frontend URL validation to onSubmit and onCheckStatus methods
+- [x] Update file input accept attribute to include image formats
+- [x] Add timeout protection to prevent infinite loading spinner
+- [x] Apply notification pattern to all forms throughout app (public-verify, home, etc)
+- [x] Test error visibility and toast notifications across all user flows
