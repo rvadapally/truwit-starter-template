@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import type { VerificationRequest, VerificationResult, ProofDetails, CreateProofRequest, CreateProofResponse, VerifyResponse } from '../models';
+import type { VerificationRequest, VerificationResult, ProofDetails, CreateProofRequest, CreateProofResponse, VerifyResponse, ProofLookupResponse } from '../models';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -18,6 +18,12 @@ export class VerificationService {
     const request = { Url: url };  // New endpoint only needs URL
     
     return this.apiService.post<CreateProofResponse>('/v1/proofs/url', request).pipe(
+      map(response => response.data || response)
+    );
+  }
+
+  lookupProof(url: string): Observable<ProofLookupResponse> {
+    return this.apiService.get<ProofLookupResponse>(`/v1/proofs/lookup?url=${encodeURIComponent(url)}`).pipe(
       map(response => response.data || response)
     );
   }

@@ -66,19 +66,16 @@
         <h3>Verification Details</h3>
         <div class="detail-row">
           <span class="label">Issued At (UTC):</span>
-          <span class="value">{{ verifyData.issuedAt | date:'medium':'UTC' }}</span>
+          <span class="value">{{ formatUtcTime(verifyData.issuedAt) }}</span>
         </div>
         <div class="detail-row">
           <span class="label">Issued At (Your Time):</span>
-          <span class="value">{{ verifyData.issuedAt | date:'medium' }}</span>
+          <span class="value">{{ formatLocalTime(verifyData.issuedAt) }}</span>
         </div>
         <div class="detail-row">
           <span class="label">C2PA Signature Status:</span>
-          <span class="value" [class]="verifyData.signatureStatus">
-            {{ verifyData.signatureStatus }}
-            <span class="status-explanation" *ngIf="verifyData.signatureStatus === 'invalid'">
-              (No C2PA data found - video not signed)
-            </span>
+          <span class="value c2pa-status" [ngClass]="getC2paStatusClass(verifyData.origin)">
+            {{ getC2paStatusText(verifyData.origin) }}
           </span>
         </div>
       </div>
@@ -100,7 +97,10 @@
     <!-- Badge Preview -->
     <div class="badge-preview">
       <h3>TrustMark Badge</h3>
-      <img [src]="verifyData.badgeUrl" alt="Truwit TrustMark Badge" class="badge-image">
+      <img [src]="getBadgeUrl()" 
+           (error)="onBadgeError($event)" 
+           alt="Truwit TrustMark Badge" 
+           class="badge-image">
       <p class="badge-description">
         Add this badge to your content description to show it's verified by Truwit.
       </p>

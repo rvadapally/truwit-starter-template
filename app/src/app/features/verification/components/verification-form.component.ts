@@ -143,6 +143,14 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
       return;
     }
     
+    // Validate URL format if URL is provided
+    if (formValue.url && !this.isValidUrl(formValue.url)) {
+      console.log('❌ Invalid URL format');
+      this.errorMessage = 'Please enter a valid URL (e.g., https://example.com/video.mp4)';
+      this.cdr.detectChanges();
+      return;
+    }
+    
             this.isVerifying = true;
             this.errorMessage = null;
             this.successMessage = null;
@@ -210,6 +218,45 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
       });
   }
 
+  onCheckStatus(): void {
+    const url = this.verificationForm.get('url')?.value;
+    if (!url) return;
+    
+    // Validate URL format before making API call
+    if (!this.isValidUrl(url)) {
+      this.errorMessage = 'Please enter a valid URL (e.g., https://example.com/video.mp4)';
+      this.cdr.markForCheck();
+      return;
+    }
+    
+    this.isVerifying = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+    this.verificationStep = 'Checking proof status...';
+    
+    this.verificationService.lookupProof(url)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (result) => {
+          this.isVerifying = false;
+          if (result.exists) {
+            this.successMessage = `✅ Proof exists! Created: ${new Date(result.createdAt).toLocaleString()}`;
+            // Optionally show link to existing proof
+          } else {
+            this.successMessage = 'ℹ️ No proof found. Click "Generate Proof" to create one.';
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.isVerifying = false;
+          this.errorMessage = error.status === 404 
+            ? 'No proof found for this URL' 
+            : this.getErrorMessage(error);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
   private getErrorMessage(error: any): string {
     // Check for specific API error message first
     if (error.error?.message) {
@@ -267,5 +314,15 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  private isValidUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      // Check if it has a valid protocol (http or https)
+      return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 }

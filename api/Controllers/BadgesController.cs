@@ -8,39 +8,39 @@ namespace HumanProof.Api.Controllers;
 [Route("v1")]
 public class BadgesController : ControllerBase
 {
-    private readonly IVerificationRepository _repository;
+    private readonly IProofsRepository _proofsRepo;
     private readonly ILogger<BadgesController> _logger;
 
     public BadgesController(
-        IVerificationRepository repository,
+        IProofsRepository proofsRepo,
         ILogger<BadgesController> logger)
     {
-        _repository = repository;
+        _proofsRepo = proofsRepo;
         _logger = logger;
     }
 
-    [HttpGet("badge/{id}.svg")]
+    [HttpGet("badge/{trustmarkId}.svg")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetBadgeSvg(string id)
+    public async Task<IActionResult> GetBadgeSvg(string trustmarkId)
     {
         try
         {
-            var proof = await _repository.GetByProofIdAsync(id);
+            var proof = await _proofsRepo.GetByTrustmarkIdAsync(trustmarkId);
             
             if (proof == null)
             {
                 return NotFound();
             }
 
-            var badgeSvg = GenerateBadgeSvg(proof);
+            var badgeSvg = GenerateBadgeSvg(proof, trustmarkId);
             
             Response.Headers["Cache-Control"] = "public, max-age=3600"; // Cache for 1 hour
             return Content(badgeSvg, "image/svg+xml");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating badge for proof {ProofId}", id);
+            _logger.LogError(ex, "Error generating badge for trustmark {TrustmarkId}", trustmarkId);
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
@@ -128,24 +128,25 @@ public class BadgesController : ControllerBase
         }
     }
 
-    private string GenerateBadgeSvg(Domain.Entities.VerificationProof proof)
+    private string GenerateBadgeSvg(Domain.Entities.Proof proof, string trustmarkId)
     {
-        var text = "Verified by Truwit";
+        var statusText = proof.C2paPresent ? "✓ Signed & Verified" : "Verified by Truwit";
+        var color = proof.C2paPresent ? "#22c55e" : "#0ea5e9";
         
         return $"""
         <svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#22c55e;stop-opacity:1" />
+                    <stop offset="0%" style="stop-color:{color};stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
                 </linearGradient>
             </defs>
             <rect width="200" height="60" fill="url(#grad)" rx="8"/>
             <text x="100" y="35" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12" font-weight="bold">
-                {text}
+                {statusText}
             </text>
             <text x="100" y="50" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="8" opacity="0.8">
-                {proof.ProofId}
+                {trustmarkId}
             </text>
         </svg>
         """;

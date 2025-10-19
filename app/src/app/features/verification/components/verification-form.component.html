@@ -59,16 +59,28 @@
           class="url-input"
           [disabled]="isVerifying"
           (input)="onUrlChange()">
-        <button 
-          type="button" 
-          class="btn-url-verify"
-          [disabled]="!verificationForm.get('url')?.value || isVerifying"
-          (click)="onSubmit()">
-          Verify URL
-        </button>
+        <div class="button-group">
+          <button 
+            type="button" 
+            class="btn-check-status"
+            [disabled]="!verificationForm.get('url')?.value || isVerifying"
+            (click)="onCheckStatus()">
+            Check Status
+          </button>
+          <button 
+            type="button" 
+            class="btn-generate-proof-inline"
+            [disabled]="!verificationForm.get('url')?.value || isVerifying"
+            (click)="onSubmit()">
+            Generate Proof
+          </button>
+        </div>
       </div>
       <div class="url-help-text">
-        <small>Click "Verify URL" to check if the URL is valid, or scroll down to "Generate Proof" to create a verification proof</small>
+        <small>
+          <strong>Check Status:</strong> See if proof exists (read-only). 
+          <strong>Generate Proof:</strong> Create or retrieve trustmark.
+        </small>
       </div>
     </div>
 

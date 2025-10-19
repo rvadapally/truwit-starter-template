@@ -267,6 +267,13 @@
   100% { transform: rotate(360deg); }
 }
 
+.status-neutral {
+  color: #94a3b8; // gray
+}
+.status-success {
+  color: #22c55e; // green
+}
+
 @media (max-width: 768px) {
   .public-verify-container {
     padding: 1rem;

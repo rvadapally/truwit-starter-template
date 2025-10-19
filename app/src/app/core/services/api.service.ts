@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -24,11 +24,17 @@ export class ApiService {
 
   post<T>(endpoint: string, data: any): Observable<ApiResponse<T>> {
     const fullUrl = `${this.apiUrl}${endpoint}`;
+    
+    // Generate unique idempotency key per request
+    const idempotencyKey = this.generateIdempotencyKey();
+    const headers = new HttpHeaders().set('Idempotency-Key', idempotencyKey);
+    
     console.log('🌐 ApiService.post called:');
     console.log('📍 URL:', fullUrl);
+    console.log('🔑 Idempotency-Key:', idempotencyKey);
     console.log('📤 Data:', data);
     
-    return this.http.post<ApiResponse<T>>(fullUrl, data).pipe(
+    return this.http.post<ApiResponse<T>>(fullUrl, data, { headers }).pipe(
       catchError(this.handleError)
     );
   }
@@ -77,5 +83,10 @@ export class ApiService {
 
     console.error('API Error:', errorMessage);
     return throwError(() => new Error(errorMessage));
+  }
+
+  private generateIdempotencyKey(): string {
+    // Generate unique key: timestamp + random string
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   }
 }

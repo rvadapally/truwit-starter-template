@@ -114,6 +114,14 @@ Controller: `Controllers/ProofsController.cs`
   - Returns `VerifyResponseDto` with a simplified, public-friendly view: `verdict` (mocked green), content hash, MIME/duration/resolution (when known), declared data, issued at, signature status, badge URL, and origin info parsed from C2PA JSON when present.
   - Falls back to legacy `IVerificationService.GetProofDetailsAsync` shape when record not found in the new tables.
 
+- `GET /v1/proofs/lookup?url={url}`
+  - Read-only endpoint to check if a proof exists for a URL.
+  - Canonicalizes URL using `IUrlCanonicalizer` and queries `LinkIndex` for existing proof.
+  - Returns 200 with `ProofLookupResponse` containing proof details if found.
+  - Returns 404 with `ProofLookupResponse` containing `Exists: false` if not found.
+  - **Never downloads content or creates DB records** - purely read-only lookup.
+  - Response includes: `Exists`, `TrustmarkId`, `ProofId`, `CreatedAt`, `OriginStatus`, `C2paPresent`, `VerifyUrl`, `BadgeUrl`.
+
 - Test/utilities:
   - `GET /v1/proofs/test/stats`: returns counts and IDs for quick DB sanity.
   - `GET /v1/proofs/test/requests`: returns last 10 `VerificationRequests` for inspection.

@@ -102,6 +102,18 @@ public class ProofsController : ControllerBase
                 });
             }
 
+            // Validate URL format
+            if (!IsValidUrl(request.Url))
+            {
+                _logger.LogWarning("❌ Invalid URL format: {Url}", request.Url);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Invalid URL format. Please provide a valid HTTP or HTTPS URL.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
             // Check idempotency key
             var idempotencyKey = Request.Headers["Idempotency-Key"].FirstOrDefault();
             _logger.LogInformation("🔑 Idempotency key: {IdempotencyKey}", idempotencyKey ?? "none");
@@ -372,6 +384,12 @@ public class ProofsController : ControllerBase
         // Generate a short, URL-safe ID using Guid (8 characters)
         // Using Guid ensures uniqueness
         return Guid.NewGuid().ToString("N").Substring(0, 8);
+    }
+
+    private static bool IsValidUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out var uriResult) 
+               && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
     }
 
     [HttpPost("proofs/file-upload")]
@@ -731,6 +749,100 @@ public class ProofsController : ControllerBase
         catch
         {
             return Array.Empty<object>();
+        }
+    }
+
+    [HttpGet("proofs/lookup")]
+    [ProducesResponseType(typeof(ProofLookupResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ProofLookupResponse>> LookupProof([FromQuery] string url)
+    {
+        try
+        {
+            _logger.LogInformation("🔍 LookupProof called with URL: {Url}", url);
+
+            if (string.IsNullOrEmpty(url))
+            {
+                _logger.LogWarning("❌ URL is null or empty");
+                return NotFound(new ProofLookupResponse(
+                    Exists: false,
+                    TrustmarkId: null,
+                    ProofId: null,
+                    CreatedAt: null,
+                    OriginStatus: null,
+                    C2paPresent: null,
+                    VerifyUrl: null,
+                    BadgeUrl: null
+                ));
+            }
+
+            // Validate URL format
+            if (!IsValidUrl(url))
+            {
+                _logger.LogWarning("❌ Invalid URL format: {Url}", url);
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "Invalid URL format. Please provide a valid HTTP or HTTPS URL.",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            // Canonicalize URL and check for existing proof
+            _logger.LogInformation("🔍 Canonicalizing URL: {Url}", url);
+            var (platform, canonicalId) = _canonicalizer.Canonicalize(url);
+            _logger.LogInformation("📍 Canonicalized to platform: {Platform}, ID: {CanonicalId}", platform, canonicalId);
+
+            var existingProofIdFromIndex = await _linkIndexRepo.TryGetProofIdAsync(platform.ToString(), canonicalId);
+
+            if (!string.IsNullOrEmpty(existingProofIdFromIndex))
+            {
+                var existingProof = await _proofsRepo.GetByIdAsync(existingProofIdFromIndex);
+                if (existingProof != null)
+                {
+                    _logger.LogInformation("✅ Found existing proof for URL: {Url}, ProofId: {ProofId}", url, existingProofIdFromIndex);
+
+                    var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                    var response = new ProofLookupResponse(
+                        Exists: true,
+                        TrustmarkId: existingProof.TrustmarkId,
+                        ProofId: existingProof.Id,
+                        CreatedAt: existingProof.CreatedAt,
+                        OriginStatus: existingProof.OriginStatus,
+                        C2paPresent: existingProof.C2paPresent,
+                        VerifyUrl: $"/t/{existingProof.TrustmarkId}",
+                        BadgeUrl: $"{baseUrl}/v1/badge/{existingProof.TrustmarkId}.svg"
+                    );
+
+                    return Ok(response);
+                }
+            }
+
+            _logger.LogInformation("ℹ️ No proof found for URL: {Url}", url);
+            return NotFound(new ProofLookupResponse(
+                Exists: false,
+                TrustmarkId: null,
+                ProofId: null,
+                CreatedAt: null,
+                OriginStatus: null,
+                C2paPresent: null,
+                VerifyUrl: null,
+                BadgeUrl: null
+            ));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Error looking up proof for URL: {Url}", url);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ProofLookupResponse(
+                Exists: false,
+                TrustmarkId: null,
+                ProofId: null,
+                CreatedAt: null,
+                OriginStatus: null,
+                C2paPresent: null,
+                VerifyUrl: null,
+                BadgeUrl: null
+            ));
         }
     }
 
@@ -1334,3 +1446,14 @@ public class VerifyResponseDto
     public string BadgeUrl { get; set; } = string.Empty;
     public OriginInfo? Origin { get; set; }
 }
+
+public record ProofLookupResponse(
+    bool Exists,
+    string? TrustmarkId,
+    string? ProofId,
+    DateTime? CreatedAt,
+    string? OriginStatus,
+    bool? C2paPresent,
+    string? VerifyUrl,
+    string? BadgeUrl
+);

@@ -85,6 +85,17 @@ export interface VerifyResponse {
   badgeUrl: string;
 }
 
+export interface ProofLookupResponse {
+  exists: boolean;
+  trustmarkId?: string;
+  proofId?: string;
+  createdAt?: string;
+  originStatus?: string;
+  c2paPresent?: boolean;
+  verifyUrl?: string;
+  badgeUrl?: string;
+}
+
 // Legacy models for backward compatibility
 export interface VerificationResult {
   proofId: string;

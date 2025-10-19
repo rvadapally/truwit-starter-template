@@ -52,6 +52,14 @@ Angular 17 + Auth0 (Google sign‑in) + .NET 8 Minimal APIs
    # http://localhost:4200
    ```
 
+## Verification Flow
+The verification interface now provides two distinct actions:
+
+- **Check Status**: Read-only lookup to see if a proof already exists for a URL (no downloads or processing)
+- **Generate Proof**: Creates a new verification proof by downloading content, calculating hashes, and running C2PA verification
+
+This separation prevents accidental duplicate proof creation and provides clear user intent.
+
 ## Configure
 - API: `api/appsettings.Development.json` → Domain, Audience
 - Web: `web/src/app/auth.config.ts` → domain, clientId, audience, api base

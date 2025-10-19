@@ -108,4 +108,44 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
       default: return 'Unknown';
     }
   }
+
+  formatUtcTime(isoString: string): string {
+    return new Date(isoString).toLocaleString('en-US', { 
+      timeZone: 'UTC', 
+      timeZoneName: 'short' 
+    });
+  }
+
+  formatLocalTime(isoString: string): string {
+    return new Date(isoString).toLocaleString('en-US', { 
+      timeZoneName: 'short' 
+    });
+  }
+
+  getC2paStatusText(origin: any): string {
+    if (!origin) return 'Not checked';
+    if (origin.c2pa && origin.status === 'valid') return '✓ Signed';
+    if (origin.status === 'not_applicable_thumbnail') return 'Skipped (thumbnail mode)';
+    return 'Not signed';
+  }
+
+  getC2paStatusClass(origin: any): string {
+    if (!origin) return 'status-neutral';
+    if (origin.c2pa && origin.status === 'valid') return 'status-success';
+    return 'status-neutral'; // No red
+  }
+
+  getBadgeUrl(): string {
+    if (!this.verifyData) {
+      return 'assets/verified-by-truwit.png'; // fallback
+    }
+    
+    // Try dynamic badge first, fallback to static
+    return this.verifyData.badgeUrl || 'assets/verified-by-truwit.png';
+  }
+
+  onBadgeError(event: any): void {
+    // Fallback to static badge if dynamic fails
+    event.target.src = 'assets/verified-by-truwit.png';
+  }
 }
