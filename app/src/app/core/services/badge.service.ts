@@ -26,19 +26,19 @@ export class BadgeService {
   constructor(private http: HttpClient) {}
 
   /**
-   * Get dynamic badge SVG for a proof ID
+   * Get dynamic proof card PNG for a proof ID
    */
-  getBadgeSvg(proofId: string): Observable<string> {
-    return this.http.get(`${this.apiUrl}/v1/badge/${proofId}.svg`, {
-      responseType: 'text'
+  getProofCard(proofId: string, size: number = 800): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/assets/proof/${proofId}-${size}.png`, {
+      responseType: 'blob'
     });
   }
 
   /**
-   * Get dynamic badge PNG for a proof ID
+   * Get dynamic badge SVG for a proof ID (legacy fallback)
    */
-  getBadgePng(proofId: string): Observable<string> {
-    return this.http.get(`${this.apiUrl}/v1/badge/${proofId}.png`, {
+  getBadgeSvg(proofId: string): Observable<string> {
+    return this.http.get(`${this.apiUrl}/v1/badge/${proofId}.svg`, {
       responseType: 'text'
     });
   }
@@ -51,10 +51,10 @@ export class BadgeService {
   }
 
   /**
-   * Generate badge URL for a proof ID
+   * Generate proof card URL for a proof ID
    */
-  getBadgeUrl(proofId: string): string {
-    return `${this.apiUrl}/v1/badge/${proofId}.svg`;
+  getBadgeUrl(proofId: string, size: number = 800): string {
+    return `${this.apiUrl}/assets/proof/${proofId}-${size}.png`;
   }
 
   /**
@@ -67,8 +67,8 @@ export class BadgeService {
   /**
    * Generate embed HTML for a proof ID
    */
-  generateEmbedHtml(proofId: string): string {
-    const badgeUrl = this.getBadgeUrl(proofId);
+  generateEmbedHtml(proofId: string, size: number = 800): string {
+    const badgeUrl = this.getBadgeUrl(proofId, size);
     const verificationUrl = this.getVerificationUrl(proofId);
     
     return `<a href="${verificationUrl}" target="_blank">
@@ -79,8 +79,8 @@ export class BadgeService {
   /**
    * Generate markdown code for a proof ID
    */
-  generateMarkdownCode(proofId: string): string {
-    const badgeUrl = this.getBadgeUrl(proofId);
+  generateMarkdownCode(proofId: string, size: number = 800): string {
+    const badgeUrl = this.getBadgeUrl(proofId, size);
     const verificationUrl = this.getVerificationUrl(proofId);
     
     return `[![Verified by Truwit](${badgeUrl})](${verificationUrl})`;

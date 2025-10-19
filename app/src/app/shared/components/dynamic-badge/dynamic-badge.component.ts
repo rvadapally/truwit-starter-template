@@ -20,7 +20,7 @@ import { environment } from '../../../../environments/environment';
       <div class="badge-fallback" *ngIf="hasError">
         <div class="circular-badge-wrapper">
           <img 
-            src="assets/verified-by-truwit.png" 
+            src="assets/signed_badge.png" 
             alt="Verified by Truwit"
             class="circular-badge-image">
         </div>
@@ -69,7 +69,7 @@ import { environment } from '../../../../environments/environment';
       <!-- Fallback Static Badge -->
       <div class="static-badge-fallback" *ngIf="!isLoading && !hasError && !badgeUrl && useFallback">
         <img 
-          src="assets/verified-circular-badge.jpg" 
+          src="assets/signed_badge.png" 
           alt="Verified by Truwit"
           class="badge-image">
         <div class="fallback-text">Static Badge</div>

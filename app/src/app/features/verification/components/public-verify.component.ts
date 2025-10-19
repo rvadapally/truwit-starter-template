@@ -145,15 +145,15 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
 
   getBadgeUrl(): string {
     if (!this.verifyData) {
-      return '/assets/verified-by-truwit.png'; // fallback with leading slash
+      return '/assets/signed_badge.png'; // fallback with leading slash
     }
     
     // Try dynamic badge first, fallback to static
-    return this.verifyData.badgeUrl || '/assets/verified-by-truwit.png';
+    return this.verifyData.badgeUrl || '/assets/signed_badge.png';
   }
 
   onBadgeError(event: any): void {
     // Fallback to static badge if dynamic fails
-    event.target.src = '/assets/verified-by-truwit.png';
+    event.target.src = '/assets/signed_badge.png';
   }
 }

@@ -34,7 +34,7 @@ import { Component, type OnInit } from '@angular/core';
           </div>
           <div class="feature">
             <div class="feature-icon">
-              <img src="assets/verified-circular-badge.jpg" alt="Verified by TruWit" style="width: 48px; height: 48px; object-fit: contain;">
+              <img src="assets/signed_badge.png" alt="Verified by TruWit" style="width: 48px; height: 48px; object-fit: contain;">
             </div>
             <h3>Show Trust</h3>
             <p>Use "Verified by TruWit" badges on posts, thumbnails, and sites</p>
@@ -163,7 +163,7 @@ export class HomeComponent implements OnInit {
     const img = new Image();
     img.onload = () => console.log('✅ Badge image loaded successfully:', img.src);
     img.onerror = () => console.log('❌ Badge image failed to load:', img.src);
-    img.src = '/assets/verified-by-truwit.png';
+    img.src = '/assets/signed_badge.png';
     
     console.log('🖼️ Badge image src:', img.src);
   }
