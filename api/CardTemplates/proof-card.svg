@@ -1,0 +1,54 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- Shadow filter for depth -->
+    <filter id="cardShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="15"/>
+      <feOffset dx="0" dy="10" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- Gradient for square card -->
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#B8E8E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A0DCD8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Teal background -->
+  <rect width="800" height="800" fill="#1ABBB4"/>
+  
+  <!-- Square card with rounded corners and shadow (layered effect) -->
+  <rect x="160" y="280" width="480" height="440" rx="24" ry="24" 
+        fill="url(#cardGradient)" filter="url(#cardShadow)"/>
+  
+  <!-- Circular badge positioned to overlap top of square card -->
+  <image href="verified-circular-badge.jpg" x="250" y="140" width="300" height="300" 
+         clip-path="circle(150px at 150px 150px)"/>
+  
+  <!-- Proof ID text (centered, below circular badge, on the square card) -->
+  <text x="400" y="500" font-family="Arial, Helvetica, sans-serif" font-size="48" 
+        font-weight="bold" fill="#2D2D2D" text-anchor="middle">
+    Proof ID: {PROOF_ID}
+  </text>
+  
+  <!-- White rounded container at bottom of square card -->
+  <rect x="190" y="570" width="420" height="120" rx="16" ry="16" fill="#FFFFFF"/>
+  
+  <!-- URL text in white container (left side) -->
+  <text x="220" y="615" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#2D2D2D">
+    truwit.ai/t/
+  </text>
+  <text x="220" y="655" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#2D2D2D">
+    {PROOF_ID}
+  </text>
+  
+  <!-- QR Code placeholder (right side of white container) -->
+  <!-- The actual QR code will be drawn by SkiaSharp after SVG rendering -->
+  <rect x="470" y="585" width="120" height="120" fill="#F5F5F5" rx="8" ry="8"/>
+</svg>

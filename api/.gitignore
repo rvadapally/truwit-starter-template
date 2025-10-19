@@ -1,0 +1,66 @@
+# .NET build outputs
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options directory
+.vs/
+
+# Generated proof cards (excluded from repo)
+wwwroot/assets/proof/*.png
+
+# But keep directory structure
+!wwwroot/assets/proof/.gitkeep
+!wwwroot/assets/badges/.gitkeep
+
+# Temporary downloads
+temp_downloads/
+uploads/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Log files
+*.log
+
+# Environment files with secrets
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+
+# Cookie files
+*.txt
+!README.txt
+

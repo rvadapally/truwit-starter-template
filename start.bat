@@ -103,9 +103,7 @@ echo.
 echo Press any key to run automated tests...
 pause >nul
 
-echo.
-echo Running comprehensive automated tests...
-powershell -ExecutionPolicy Bypass -File test-all-features.ps1 -Environment local
+
 echo.
 
 pause

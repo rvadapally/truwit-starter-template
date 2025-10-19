@@ -312,6 +312,26 @@ public class ProofsController : ControllerBase
 
             await _proofsRepo.InsertAsync(proof);
 
+            // Generate proof cards
+            try
+            {
+                var cardGenerator = HttpContext.RequestServices.GetRequiredService<IProofCardGenerator>();
+                var proofUrl = $"https://www.truwit.ai/t/{proof.TrustmarkId}";
+                var (_, smallUrl) = cardGenerator.Generate(proof.TrustmarkId, proofUrl, 800);
+                var (_, largeUrl) = cardGenerator.Generate(proof.TrustmarkId, proofUrl, 1024);
+                
+                proof.ProofCardSmallUrl = smallUrl;
+                proof.ProofCardLargeUrl = largeUrl;
+                await _proofsRepo.InsertAsync(proof); // Update with proof card URLs
+                
+                _logger.LogInformation("✅ Generated proof cards for {TrustmarkId}", proof.TrustmarkId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Failed to generate proof cards for {TrustmarkId}", proof.TrustmarkId);
+                // Don't fail the proof creation if card generation fails
+            }
+
             // Create receipt
             var receiptData = new
             {
@@ -381,9 +401,10 @@ public class ProofsController : ControllerBase
 
     private string GenerateShortId()
     {
-        // Generate a short, URL-safe ID using Guid (8 characters)
-        // Using Guid ensures uniqueness
-        return Guid.NewGuid().ToString("N").Substring(0, 8);
+        // Generate a short, URL-safe ID with TW- prefix for branding (11 characters)
+        // Format: TW-XXXXXXXX (uppercase hex)
+        var random = Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
+        return $"TW-{random}";  // e.g., TW-7F39C1AB
     }
 
     private static bool IsValidUrl(string url)
@@ -473,6 +494,26 @@ public class ProofsController : ControllerBase
                 };
 
                 await _proofsRepo.InsertAsync(proof);
+
+                // Generate proof cards
+                try
+                {
+                    var cardGenerator = HttpContext.RequestServices.GetRequiredService<IProofCardGenerator>();
+                    var proofUrl = $"https://www.truwit.ai/t/{proof.TrustmarkId}";
+                    var (_, smallUrl) = cardGenerator.Generate(proof.TrustmarkId, proofUrl, 640);
+                    var (_, largeUrl) = cardGenerator.Generate(proof.TrustmarkId, proofUrl, 1024);
+                    
+                    proof.ProofCardSmallUrl = smallUrl;
+                    proof.ProofCardLargeUrl = largeUrl;
+                    await _proofsRepo.InsertAsync(proof); // Update with proof card URLs
+                    
+                    _logger.LogInformation("✅ Generated proof cards for {TrustmarkId}", proof.TrustmarkId);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Failed to generate proof cards for {TrustmarkId}", proof.TrustmarkId);
+                    // Don't fail the proof creation if card generation fails
+                }
 
                 // Create receipt
                 var receiptData = new
@@ -1318,7 +1359,7 @@ public class ProofsController : ControllerBase
                     // CreatedAt is stored in UTC in the database, just specify the kind and format
                     IssuedAt = DateTime.SpecifyKind(proof.CreatedAt, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
                     SignatureStatus = proof.C2paPresent ? "valid" : "invalid",
-                    BadgeUrl = $"{baseUrl}/v1/badge/{proof.TrustmarkId}.svg",
+                    BadgeUrl = proof.ProofCardSmallUrl ?? $"{baseUrl}/assets/proof/{proof.TrustmarkId}-640.png",
                     Origin = new OriginInfo(
                         C2pa: proof.C2paPresent,
                         Status: proof.OriginStatus,

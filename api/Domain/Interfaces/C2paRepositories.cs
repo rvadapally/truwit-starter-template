@@ -29,6 +29,8 @@ public interface IProofsRepository
     Task<string> InsertAsync(Proof proof);
     Task<Proof?> GetByIdAsync(string id);
     Task<Proof?> GetByTrustmarkIdAsync(string trustmarkId);
+    Task<IEnumerable<Proof>> GetAllAsync();
+    Task UpdateAsync(Proof proof);
 }
 
 /// <summary>

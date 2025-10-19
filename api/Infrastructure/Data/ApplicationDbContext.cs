@@ -34,6 +34,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.ContentHash).IsRequired().HasMaxLength(64);
             entity.Property(e => e.PerceptualHash).IsRequired().HasMaxLength(64);
             entity.Property(e => e.Signature).IsRequired().HasMaxLength(512);
+            entity.Property(e => e.ProofCardSmallUrl).HasMaxLength(500);
+            entity.Property(e => e.ProofCardLargeUrl).HasMaxLength(500);
             
             entity.HasIndex(e => e.ProofId).IsUnique();
             entity.HasIndex(e => e.ContentHash);
@@ -88,6 +90,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.TrustmarkId).HasMaxLength(50).IsRequired();
             entity.Property(e => e.AssetId).HasMaxLength(50);
             entity.Property(e => e.ReceiptId).HasMaxLength(50);
+            entity.Property(e => e.ProofCardSmallUrl).HasMaxLength(500);
+            entity.Property(e => e.ProofCardLargeUrl).HasMaxLength(500);
             entity.HasIndex(e => e.TrustmarkId).IsUnique();
             entity.HasIndex(e => e.AssetId);
         });

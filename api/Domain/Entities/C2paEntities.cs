@@ -45,6 +45,10 @@ public class Proof
     public string? ReceiptId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTimeProvider.Now;
     public DateTime UpdatedAt { get; set; } = DateTimeProvider.Now;
+    
+    // Proof card URLs
+    public string? ProofCardSmallUrl { get; set; }  // 640x640 card
+    public string? ProofCardLargeUrl { get; set; }  // 1024x1024 card
 }
 
 /// <summary>

@@ -108,4 +108,54 @@ public class ProofsRepository : IProofsRepository
         
         return result;
     }
+
+    public async Task<IEnumerable<Proof>> GetAllAsync()
+    {
+        var connection = _context.Database.GetDbConnection();
+
+        var sql = _isPostgres
+            ? @"SELECT ""Id"", ""TrustmarkId"", ""AssetId"", ""C2paPresent"", ""C2paJson"", ""OriginStatus"", ""PolicyResult"", ""PolicyJson"", ""MetadataId"", ""ReceiptId"", ""CreatedAt"", ""UpdatedAt"", ""ProofCardSmallUrl"", ""ProofCardLargeUrl""
+                FROM ""Proofs"" ORDER BY ""CreatedAt"" DESC"
+            : @"SELECT Id, TrustmarkId, AssetId, C2paPresent, C2paJson, OriginStatus, PolicyResult, PolicyJson, MetadataId, ReceiptId, CreatedAt, UpdatedAt, ProofCardSmallUrl, ProofCardLargeUrl
+                FROM Proofs ORDER BY CreatedAt DESC";
+
+        return await connection.QueryAsync<Proof>(sql);
+    }
+
+    public async Task UpdateAsync(Proof proof)
+    {
+        var connection = _context.Database.GetDbConnection();
+
+        var sql = _isPostgres
+            ? @"UPDATE ""Proofs"" SET 
+                ""TrustmarkId"" = @TrustmarkId,
+                ""AssetId"" = @AssetId,
+                ""C2paPresent"" = @C2paPresent,
+                ""C2paJson"" = @C2paJson,
+                ""OriginStatus"" = @OriginStatus,
+                ""PolicyResult"" = @PolicyResult,
+                ""PolicyJson"" = @PolicyJson,
+                ""MetadataId"" = @MetadataId,
+                ""ReceiptId"" = @ReceiptId,
+                ""UpdatedAt"" = @UpdatedAt,
+                ""ProofCardSmallUrl"" = @ProofCardSmallUrl,
+                ""ProofCardLargeUrl"" = @ProofCardLargeUrl
+                WHERE ""Id"" = @Id"
+            : @"UPDATE Proofs SET 
+                TrustmarkId = @TrustmarkId,
+                AssetId = @AssetId,
+                C2paPresent = @C2paPresent,
+                C2paJson = @C2paJson,
+                OriginStatus = @OriginStatus,
+                PolicyResult = @PolicyResult,
+                PolicyJson = @PolicyJson,
+                MetadataId = @MetadataId,
+                ReceiptId = @ReceiptId,
+                UpdatedAt = @UpdatedAt,
+                ProofCardSmallUrl = @ProofCardSmallUrl,
+                ProofCardLargeUrl = @ProofCardLargeUrl
+                WHERE Id = @Id";
+
+        await connection.ExecuteAsync(sql, proof);
+    }
 }

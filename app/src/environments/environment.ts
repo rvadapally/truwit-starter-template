@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: ''  // Use proxy configuration for local development
+  apiUrl: 'http://localhost:5000'  // Use HTTP directly for local development
 };

@@ -63,6 +63,21 @@ try
     // Register Memory Cache (required by SettingsService)
     builder.Services.AddMemoryCache();
 
+    // Register Proof Card Generation services FIRST (needed by ProofService)
+    builder.Services.AddScoped<IProofCardGenerator>(sp =>
+    {
+        var env = sp.GetRequiredService<IWebHostEnvironment>();
+        var logger = sp.GetRequiredService<ILogger<ProofCardSvgGenerator>>();
+        return new ProofCardSvgGenerator(
+            templatePath: Path.Combine(env.ContentRootPath, "CardTemplates", "proof-card.svg"),
+            outputDir: Path.Combine(env.ContentRootPath, "wwwroot", "assets", "proof"),
+            publicBase: "/assets/proof",
+            logger: logger
+        );
+    });
+        builder.Services.AddScoped<ProofCardBackfillService>();
+        builder.Services.AddScoped<ProofCardBackfillServiceForProofs>();
+
     // Register application services
     builder.Services.AddScoped<IVerificationService, VerificationService>();
     builder.Services.AddScoped<IProofService, ProofService>();
@@ -149,6 +164,49 @@ try
     }
 
     var app = builder.Build();
+    
+    // CLI command handling (before regular startup)
+        if (args.Length > 0)
+        {
+            var command = args[0].ToUpperInvariant();
+            
+            if (command == "BACKFILL" || command == "TRUNCATE")
+            {
+                using var scope = app.Services.CreateScope();
+                var backfillService = scope.ServiceProvider.GetRequiredService<ProofCardBackfillService>();
+                
+                if (command == "BACKFILL")
+                {
+                    Console.WriteLine("🔄 Running proof card backfill for VerificationProof entities...");
+                    await backfillService.BackfillAllAsync();
+                }
+                else if (command == "TRUNCATE")
+                {
+                    Console.WriteLine("🗑️  Running proof card truncation for VerificationProof entities...");
+                    await backfillService.TruncateAllAsync();
+                }
+                
+                return; // Exit after command
+            }
+            else if (command == "BACKFILL-PROOFS" || command == "TRUNCATE-PROOFS")
+            {
+                using var scope = app.Services.CreateScope();
+                var backfillService = scope.ServiceProvider.GetRequiredService<ProofCardBackfillServiceForProofs>();
+                
+                if (command == "BACKFILL-PROOFS")
+                {
+                    Console.WriteLine("🔄 Running proof card backfill for Proof entities...");
+                    await backfillService.BackfillAllAsync();
+                }
+                else if (command == "TRUNCATE-PROOFS")
+                {
+                    Console.WriteLine("🗑️  Running proof card truncation for Proof entities...");
+                    await backfillService.TruncateAllAsync();
+                }
+                
+                return; // Exit after command
+            }
+        }
 
     // Ensure database is created and migrated (if using database)
     if (databaseType.ToLower() != "memory")
@@ -186,7 +244,10 @@ try
         c.RoutePrefix = "swagger";
     });
 
-    app.UseHttpsRedirection();
+    // app.UseHttpsRedirection(); // Disabled for local Docker testing
+    
+    // Enable static file serving for proof cards and assets
+    app.UseStaticFiles();
     app.UseRequestId();
     app.UseGlobalExceptionHandler();
     app.UseCors("AllowAll");

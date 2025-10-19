@@ -1,5 +1,6 @@
 using HumanProof.Api.Domain.Interfaces;
 using HumanProof.Api.Domain.Entities;
+using HumanProof.Api.Application.Services;
 
 namespace HumanProof.Api.Infrastructure.Services;
 
@@ -7,11 +8,16 @@ public class ProofService : IProofService
 {
     private readonly IVerificationRepository _repository;
     private readonly ILogger<ProofService> _logger;
+    private readonly IProofCardGenerator? _cardGenerator;
 
-    public ProofService(IVerificationRepository repository, ILogger<ProofService> logger)
+    public ProofService(
+        IVerificationRepository repository, 
+        ILogger<ProofService> logger,
+        IProofCardGenerator? cardGenerator = null)
     {
         _repository = repository;
         _logger = logger;
+        _cardGenerator = cardGenerator;
     }
 
     public async Task<string> GenerateProofIdAsync()
@@ -45,7 +51,37 @@ public class ProofService : IProofService
             IsDeleted = false
         };
         
-        return await _repository.CreateAsync(proof);
+        var createdProof = await _repository.CreateAsync(proof);
+        
+        // Generate proof cards (if generator is available)
+        _logger.LogInformation("🔍 Card generator status: {Status}", _cardGenerator != null ? "Available" : "NULL");
+        if (_cardGenerator != null)
+        {
+            try
+            {
+                var proofUrl = $"https://www.truwit.ai/t/{createdProof.ProofId}";
+                _logger.LogInformation("🎨 Starting proof card generation for {ProofId}", createdProof.ProofId);
+                var (_, smallUrl) = _cardGenerator.Generate(createdProof.ProofId, proofUrl, 800);
+                var (_, largeUrl) = _cardGenerator.Generate(createdProof.ProofId, proofUrl, 1024);
+                
+                createdProof.ProofCardSmallUrl = smallUrl;
+                createdProof.ProofCardLargeUrl = largeUrl;
+                await _repository.UpdateAsync(createdProof);
+                
+                _logger.LogInformation("✅ Generated proof cards for {ProofId}", createdProof.ProofId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Failed to generate proof cards for {ProofId}", createdProof.ProofId);
+                // Don't fail the proof creation if card generation fails
+            }
+        }
+        else
+        {
+            _logger.LogWarning("⚠️ Proof card generator is NULL - cards will not be generated");
+        }
+        
+        return createdProof;
     }
 
     public async Task<VerificationProof?> GetProofAsync(string proofId)

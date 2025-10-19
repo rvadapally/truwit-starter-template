@@ -359,6 +359,47 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
     this.imageLoaded = false;
 
     const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
+    
+    // Try to load proof card first (800px size)
+    const proofCardUrl = `${apiUrl}/assets/proof/${badgeId}-800.png`;
+    
+    // Check if proof card exists by making a HEAD request
+    this.http.head(proofCardUrl)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          // Proof card exists, use it
+          this.badgeUrl = proofCardUrl;
+          this.isLoading = false;
+        },
+        error: (error: any) => {
+          if (error.status === 404) {
+            // Proof card doesn't exist, try to regenerate it
+            console.log(`Proof card not found, attempting regeneration for ${badgeId}`);
+            this.http.get(`${apiUrl}/cards/proof/${badgeId}-800.png`)
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: () => {
+                  // Regeneration successful, use the proof card
+                  this.badgeUrl = proofCardUrl;
+                  this.isLoading = false;
+                },
+                error: (regenError: any) => {
+                  console.error('Failed to regenerate proof card:', regenError);
+                  this.fallbackToOldBadge(badgeId);
+                }
+              });
+          } else {
+            console.error('Error checking proof card:', error);
+            this.fallbackToOldBadge(badgeId);
+          }
+        }
+      });
+  }
+
+  private fallbackToOldBadge(badgeId: string): void {
+    // Fallback to old SVG badge system
+    const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
     this.http.get(`${apiUrl}/v1/badge/${badgeId}.svg`, { responseType: 'text' })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -370,7 +411,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
           this.isLoading = false;
         },
         error: (error: any) => {
-          console.error('Error loading badge:', error);
+          console.error('Error loading fallback badge:', error);
           this.hasError = true;
           this.isLoading = false;
         }
@@ -395,7 +436,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
   copyEmbedCode(): void {
     const badgeId = this.trustmarkId || this.proofId;
     const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
-    const badgeUrl = `${apiUrl}/v1/badge/${badgeId}.svg`;
+    const badgeUrl = this.badgeUrl || `${apiUrl}/assets/proof/${badgeId}-800.png`;
     const verificationUrl = `https://truwit.ai/app/t/${badgeId}`;
     const embedCode = `<a href="${verificationUrl}" target="_blank">
       <img src="${badgeUrl}" alt="Verified by Truwit" style="max-width: 200px; height: auto;" />
@@ -411,7 +452,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
       const badgeId = this.trustmarkId || this.proofId;
       const link = document.createElement('a');
       link.href = this.badgeUrl;
-      link.download = `truwit-badge-${badgeId}.svg`;
+      link.download = `truwit-proof-card-${badgeId}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

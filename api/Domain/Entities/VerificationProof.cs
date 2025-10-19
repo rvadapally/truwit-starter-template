@@ -14,6 +14,10 @@ public class VerificationProof
     public DateTime UpdatedAt { get; set; }
     public bool IsDeleted { get; set; }
     
+    // Proof card URLs
+    public string? ProofCardSmallUrl { get; set; }  // 640x640 card
+    public string? ProofCardLargeUrl { get; set; }  // 1024x1024 card
+    
     // Navigation properties
     public VerificationMetadata Metadata { get; set; } = null!;
     public Guid MetadataId { get; set; }
