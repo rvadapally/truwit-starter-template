@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://127.0.0.1:5000'  // Temporary: Use local API for testing
+  apiUrl: 'https://truwit-starter-template-production.up.railway.app'
 };
