@@ -1,25 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
 
 import { VerificationFormComponent } from './components/verification-form.component';
-import { VerificationResultComponent } from './components/verification-result.component';
 import { PublicVerifyComponent } from './components/public-verify.component';
+import { VerificationResultComponent } from './components/verification-result.component';
 
 @NgModule({
   declarations: [
     VerificationFormComponent,
-    VerificationResultComponent,
     PublicVerifyComponent
   ],
   imports: [
     CommonModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule,
+    VerificationResultComponent
   ],
   exports: [
     VerificationFormComponent,
-    VerificationResultComponent,
-    PublicVerifyComponent
+    PublicVerifyComponent,
+    VerificationResultComponent
   ]
 })
 export class VerificationModule { }

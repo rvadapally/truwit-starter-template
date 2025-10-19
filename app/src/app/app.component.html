@@ -6,7 +6,7 @@
     <nav class="nav">
       <div class="nav-brand">
         <img src="assets/logo.svg" alt="Truwit Logo" class="nav-logo" />
-        <h1 class="brand-name" routerLink="/">Truwit</h1>
+        <h1 class="brand-name" (click)="goToLandingPage()">Truwit</h1>
       </div>
       <div class="nav-links">
         <a routerLink="/" class="nav-link" [class.active]="currentRoute === '/'">Home</a>

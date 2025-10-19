@@ -1,11 +1,15 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import type { VerificationResult } from '../../../core/models';
+import { DynamicBadgeComponent } from '../../../shared/components/dynamic-badge/dynamic-badge.component';
 
 @Component({
   selector: 'app-verification-result',
   templateUrl: './verification-result.component.html',
   styleUrls: ['./verification-result.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [CommonModule, DynamicBadgeComponent]
 })
 export class VerificationResultComponent {
   @Input({ required: true }) result!: VerificationResult;

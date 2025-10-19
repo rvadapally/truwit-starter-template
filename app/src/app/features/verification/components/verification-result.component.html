@@ -36,18 +36,15 @@
       </div>
     </div>
 
-    <!-- Badge -->
+    <!-- Dynamic Badge -->
     <div class="result-section">
       <h3 class="section-title">Verification Badge</h3>
-      <div class="badge-container">
-        <img [src]="result.badgeUrl" alt="Truwit Verification Badge" class="verification-badge">
-        <button 
-          class="download-btn"
-          (click)="downloadBadge()"
-          title="Download Badge">
-          📥 Download Badge
-        </button>
-      </div>
+      <app-dynamic-badge 
+        [proofId]="result.proofId"
+        [showActions]="true"
+        [showProofId]="true"
+        [useFallback]="true">
+      </app-dynamic-badge>
     </div>
 
     <!-- QR Code (if available) -->

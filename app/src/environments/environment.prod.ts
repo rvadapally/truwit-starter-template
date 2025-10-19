@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://truwit-starter-template-production.up.railway.app'  // Railway deployed .NET API
+  apiUrl: 'https://api.truwit.ai'  // Production API URL
 };

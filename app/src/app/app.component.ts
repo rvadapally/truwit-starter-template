@@ -37,4 +37,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  goToLandingPage(): void {
+    // Navigate to the main truwit.ai landing page
+    window.location.href = 'https://truwit.ai';
+  }
 }

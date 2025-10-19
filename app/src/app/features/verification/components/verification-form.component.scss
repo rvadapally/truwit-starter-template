@@ -214,12 +214,6 @@
 .url-input-container {
   display: flex;
   gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.url-input-container {
-  display: flex;
-  gap: 0.75rem;
   flex-wrap: nowrap;
   align-items: stretch;
 }
@@ -365,6 +359,7 @@
   min-height: 80px;
 }
 
+// Themed Button Styles
 .btn-primary, .btn-secondary {
   padding: 0.875rem 1.75rem;
   border: none;
@@ -374,20 +369,43 @@
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.url-input-container .btn-primary {
+// Primary Button (Check Status)
+.btn-check-status {
+  background: linear-gradient(135deg, #0ea5e9, #22c55e);
+  color: white;
   flex-shrink: 0;
   width: 120px;
   min-width: 120px;
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn-check-status:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 8px 20px rgba(14, 165, 233, 0.4);
   background: linear-gradient(135deg, #0284c7, #16a34a);
 }
 
+// Secondary Button (Generate Proof Inline)
+.btn-generate-proof-inline {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  color: white;
+  flex-shrink: 0;
+  width: 120px;
+  min-width: 120px;
+}
+
+.btn-generate-proof-inline:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+}
+
+// Secondary Button (General)
 .btn-secondary {
   background: rgba(14, 165, 233, 0.2);
   color: #0ea5e9;
@@ -396,12 +414,16 @@
 
 .btn-secondary:hover:not(:disabled) {
   background: rgba(14, 165, 233, 0.3);
+  transform: translateY(-1px);
 }
 
-.btn-primary:disabled, .btn-secondary:disabled {
+// Disabled State
+.btn-primary:disabled, .btn-secondary:disabled, 
+.btn-check-status:disabled, .btn-generate-proof-inline:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .form-actions {
@@ -503,10 +525,21 @@
   
   .url-input-container {
     flex-direction: column;
+    gap: 0.75rem;
   }
   
-  .url-input, .text-input, .textarea-input, .select-input {
-    min-width: 80%;
+  .url-input {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .btn-check-status, .btn-generate-proof-inline {
+    width: 100%;
+    min-width: auto;
+  }
+  
+  .text-input, .textarea-input, .select-input {
+    min-width: 100%;
   }
   
   .metadata-grid {
@@ -523,6 +556,7 @@
   
   .action-buttons {
     flex-direction: column;
+    gap: 0.75rem;
   }
   
   .action-buttons button {
