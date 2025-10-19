@@ -45,7 +45,14 @@
     </div>
   </div>
 
-  <div class="form-section" *ngIf="!createdProof">
+  <!-- Existing Proof Display -->
+  <app-verification-result 
+    *ngIf="existingProof" 
+    [result]="existingProof" 
+    [isExistingProof]="true">
+  </app-verification-result>
+
+  <div class="form-section" *ngIf="!createdProof && !existingProof">
     <h3 class="section-title">Video Content Verification</h3>
     
     <!-- URL Input -->
@@ -105,7 +112,7 @@
   </div>
 
   <!-- Metadata Section -->
-  <div class="form-section" *ngIf="!createdProof">
+  <div class="form-section" *ngIf="!createdProof && !existingProof">
     <h3 class="section-title">Metadata (Optional)</h3>
     
     <div class="metadata-grid">
@@ -152,7 +159,7 @@
   </div>
 
   <!-- Action Buttons -->
-  <div class="form-actions" *ngIf="!createdProof">
+  <div class="form-actions" *ngIf="!createdProof && !existingProof">
     <div class="action-section">
       <h4 class="action-title">Ready to Create Proof?</h4>
       <p class="action-description">Generate a cryptographic proof for your content</p>

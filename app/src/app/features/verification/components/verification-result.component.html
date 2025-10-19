@@ -1,8 +1,10 @@
 <div class="verification-result" *ngIf="result">
   <div class="success-header">
     <div class="success-icon">✅</div>
-    <h2 class="success-title">Verification Complete!</h2>
-    <p class="success-subtitle">Your content has been verified and proof generated</p>
+    <h2 class="success-title">{{ isExistingProof ? 'Proof Retrieved Successfully!' : 'Verification Complete!' }}</h2>
+    <p class="success-subtitle">
+      {{ isExistingProof ? 'Previously signed verification information retrieved' : 'Your content has been verified and proof generated' }}
+    </p>
   </div>
 
   <div class="result-content">
@@ -83,7 +85,7 @@
         </div>
         <div class="metadata-item">
           <span class="metadata-label">Verified:</span>
-          <span class="metadata-value">{{ result.timestamp | date:'medium' }}</span>
+          <span class="metadata-value">{{ formattedTimestamp }}</span>
         </div>
       </div>
     </div>

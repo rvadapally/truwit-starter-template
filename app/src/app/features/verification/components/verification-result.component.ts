@@ -13,6 +13,13 @@ import { DynamicBadgeComponent } from '../../../shared/components/dynamic-badge/
 })
 export class VerificationResultComponent {
   @Input({ required: true }) result!: VerificationResult;
+  @Input() isExistingProof: boolean = false;
+
+  get formattedTimestamp(): string {
+    if (!this.result?.timestamp) return 'Unknown';
+    const date = new Date(this.result.timestamp);
+    return date.toLocaleString(); // This will use the user's local timezone
+  }
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {

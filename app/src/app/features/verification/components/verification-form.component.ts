@@ -4,14 +4,16 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import type { VerificationRequest, VerificationMetadata, CreateProofResponse } from '../../../core/models';
+import type { VerificationRequest, VerificationMetadata, CreateProofResponse, VerificationResult } from '../../../core/models';
 import { LicenseType } from '../../../core/models';
+import { VerificationResultComponent } from './verification-result.component';
 
 @Component({
   selector: 'app-verification-form',
   templateUrl: './verification-form.component.html',
   styleUrls: ['./verification-form.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [VerificationResultComponent]
 })
 export class VerificationFormComponent implements OnInit, OnDestroy {
   verificationForm: FormGroup;
@@ -22,6 +24,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   successMessage: string | null = null;
   verificationStep: string = '';
   createdProof: CreateProofResponse | null = null;
+  existingProof: VerificationResult | null = null;
   
   private destroy$ = new Subject<void>();
   private verificationTimeout?: ReturnType<typeof setTimeout>;
@@ -130,6 +133,17 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     if (this.verificationForm.get('url')?.value) {
       this.selectedFile = null;
     }
+    // Clear any existing error messages and proof when user changes URL
+    if (this.errorMessage) {
+      this.errorMessage = null;
+    }
+    if (this.existingProof) {
+      this.existingProof = null;
+    }
+    if (this.successMessage) {
+      this.successMessage = null;
+    }
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
@@ -266,21 +280,38 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     this.isVerifying = true;
     this.errorMessage = null;
     this.successMessage = null;
+    this.existingProof = null;
     this.verificationStep = 'Checking proof status...';
     
     this.verificationService.lookupProof(url)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {
-          this.isVerifying = false;
-          if (result.exists) {
-            const createdAt = result.createdAt ? new Date(result.createdAt).toLocaleString() : 'Unknown';
-            this.successMessage = `✅ Proof exists! Created: ${createdAt}`;
-            // Optionally show link to existing proof
+          if (result.exists && result.proofId) {
+            // Fetch full proof details
+            this.verificationStep = 'Retrieving proof details...';
+            this.verificationService.verifyProof(result.proofId)
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: (verifyResult) => {
+                  this.isVerifying = false;
+                  // Convert VerifyResponse to VerificationResult
+                  this.existingProof = this.convertToVerificationResult(verifyResult, url);
+                  this.cdr.markForCheck();
+                },
+                error: (error) => {
+                  this.isVerifying = false;
+                  const errorMsg = 'Failed to retrieve proof details';
+                  this.errorMessage = errorMsg;
+                  this.notificationService.showError(errorMsg);
+                  this.cdr.markForCheck();
+                }
+              });
           } else {
+            this.isVerifying = false;
             this.successMessage = 'ℹ️ No proof found. Click "Generate Proof" to create one.';
+            this.cdr.markForCheck();
           }
-          this.cdr.markForCheck();
         },
         error: (error) => {
           this.isVerifying = false;
@@ -292,6 +323,23 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }
       });
+  }
+
+  private convertToVerificationResult(verifyResult: any, url: string): VerificationResult {
+    return {
+      proofId: verifyResult.proofId,
+      contentHash: verifyResult.contentHash,
+      perceptualHash: verifyResult.contentHash, // Use contentHash as fallback
+      metadata: {
+        prompt: verifyResult.declared?.prompt || '',
+        toolName: verifyResult.declared?.generator || '',
+        toolVersion: '',
+        license: verifyResult.declared?.license || 'public'
+      },
+      timestamp: verifyResult.issuedAt,
+      verificationUrl: `https://truwit.ai/app/t/${verifyResult.proofId}`,
+      badgeUrl: verifyResult.badgeUrl || `https://api.truwit.ai/v1/badge/${verifyResult.proofId}.svg`
+    };
   }
 
   private getErrorMessage(error: any): string {
@@ -335,6 +383,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
             this.successMessage = null;
             this.verificationStep = '';
             this.createdProof = null;
+            this.existingProof = null;
             this.verificationService.clearVerificationResult();
           }
 
