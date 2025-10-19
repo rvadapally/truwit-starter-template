@@ -53,7 +53,7 @@ public class ProofCardBackfillService
                     try
                     {
                         var (_, publicUrl) = _cardGenerator.Generate(proof.ProofId, proofUrl, size);
-                        if (size == 640) smallUrl = publicUrl;
+                        if (size == 800) smallUrl = publicUrl;
                         if (size == 1024) largeUrl = publicUrl;
                     }
                     catch (Exception ex)

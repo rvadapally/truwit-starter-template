@@ -1359,7 +1359,7 @@ public class ProofsController : ControllerBase
                     // CreatedAt is stored in UTC in the database, just specify the kind and format
                     IssuedAt = DateTime.SpecifyKind(proof.CreatedAt, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
                     SignatureStatus = proof.C2paPresent ? "valid" : "invalid",
-                    BadgeUrl = proof.ProofCardSmallUrl ?? $"{baseUrl}/assets/proof/{proof.TrustmarkId}-640.png",
+                    BadgeUrl = proof.ProofCardSmallUrl ?? $"{baseUrl}/assets/proof/{proof.TrustmarkId}-800.png",
                     Origin = new OriginInfo(
                         C2pa: proof.C2paPresent,
                         Status: proof.OriginStatus,

@@ -51,7 +51,7 @@ public class ProofCardBackfillServiceForProofs
                     try
                     {
                         var (_, publicUrl) = _cardGenerator.Generate(proof.TrustmarkId, proofUrl, size);
-                        if (size == 640) smallUrl = publicUrl;
+                        if (size == 800) smallUrl = publicUrl;
                         if (size == 1024) largeUrl = publicUrl;
                     }
                     catch (Exception ex)
@@ -60,6 +60,10 @@ public class ProofCardBackfillServiceForProofs
                     }
                 }
 
+                // Always update to ensure database is in sync with generated files
+                _logger.LogInformation("📝 Comparing DB vs Generated - DB Small={DbSmall}, Generated Small={GenSmall}, DB Large={DbLarge}, Generated Large={GenLarge}", 
+                    proof.ProofCardSmallUrl ?? "NULL", smallUrl ?? "NULL", proof.ProofCardLargeUrl ?? "NULL", largeUrl ?? "NULL");
+                
                 if (proof.ProofCardSmallUrl != smallUrl || proof.ProofCardLargeUrl != largeUrl)
                 {
                     proof.ProofCardSmallUrl = smallUrl;

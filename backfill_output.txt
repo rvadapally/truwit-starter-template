@@ -1,0 +1,87 @@
+﻿dbug: HumanProof.Api.Program[0]
+      init main
+Γ£à Using Postgres database
+≡ƒöä Running proof card backfill for Proof entities...
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      ≡ƒöä Starting proof card backfill for Proof entities...
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Found 13 Proof entities to process
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/TW-36CD6ADA-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/TW-36CD6ADA-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity TW-36CD6ADA
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/TW-4962F941-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/TW-4962F941-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity TW-4962F941
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/3edcd747-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/3edcd747-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity 3edcd747
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/3640fad7-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/3640fad7-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity 3640fad7
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/a7649876-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/a7649876-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity a7649876
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/95daa847-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/95daa847-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity 95daa847
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/ed57ec1e-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/ed57ec1e-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity ed57ec1e
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/dc9c14dd-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/dc9c14dd-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity dc9c14dd
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/84169e4e-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/84169e4e-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity 84169e4e
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/0be41a0f-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/0be41a0f-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity 0be41a0f
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/b657e107-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/b657e107-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity b657e107
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/85b1fb85-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/85b1fb85-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity 85b1fb85
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/7d3d17c6-800.png
+info: HumanProof.Api.Application.Services.ProofCardSvgGenerator[0]
+      Proof card already exists: /app/wwwroot/assets/proof/7d3d17c6-1024.png
+info: HumanProof.Api.Application.Services.ProofCardBackfillServiceForProofs[0]
+      Γä╣∩╕Å  No DB update needed for Proof entity 7d3d17c6
+Γ£à Proof card backfill for Proof entities completed.
