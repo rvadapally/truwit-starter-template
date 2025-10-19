@@ -6,7 +6,7 @@ import { VerificationService } from '../../../core/services/verification.service
 import { NotificationService } from '../../../core/services/notification.service';
 import type { VerificationRequest, VerificationMetadata, CreateProofResponse, VerificationResult } from '../../../core/models';
 import { LicenseType } from '../../../core/models';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-verification-form',
