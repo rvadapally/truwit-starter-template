@@ -282,6 +282,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class DynamicBadgeComponent implements OnInit, OnDestroy {
   @Input() proofId!: string;
+  @Input() trustmarkId?: string;
   @Input() showActions: boolean = true;
   @Input() showProofId: boolean = true;
   @Input() useFallback: boolean = true;
@@ -308,14 +309,15 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
   }
 
   loadBadge(): void {
-    if (!this.proofId) return;
+    const badgeId = this.trustmarkId || this.proofId;
+    if (!badgeId) return;
 
     this.isLoading = true;
     this.hasError = false;
     this.imageLoaded = false;
 
     const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
-    this.http.get(`${apiUrl}/v1/badge/${this.proofId}.svg`, { responseType: 'text' })
+    this.http.get(`${apiUrl}/v1/badge/${badgeId}.svg`, { responseType: 'text' })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (svgContent: string) => {
@@ -343,14 +345,16 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
   }
 
   viewVerification(): void {
-    const verificationUrl = `https://truwit.ai/app/t/${this.proofId}`;
+    const badgeId = this.trustmarkId || this.proofId;
+    const verificationUrl = `https://truwit.ai/app/t/${badgeId}`;
     window.open(verificationUrl, '_blank');
   }
 
   copyEmbedCode(): void {
+    const badgeId = this.trustmarkId || this.proofId;
     const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
-    const badgeUrl = `${apiUrl}/v1/badge/${this.proofId}.svg`;
-    const verificationUrl = `https://truwit.ai/app/t/${this.proofId}`;
+    const badgeUrl = `${apiUrl}/v1/badge/${badgeId}.svg`;
+    const verificationUrl = `https://truwit.ai/app/t/${badgeId}`;
     const embedCode = `<a href="${verificationUrl}" target="_blank">
       <img src="${badgeUrl}" alt="Verified by Truwit" style="max-width: 200px; height: auto;" />
     </a>`;
@@ -362,9 +366,10 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
 
   downloadBadge(): void {
     if (this.badgeUrl) {
+      const badgeId = this.trustmarkId || this.proofId;
       const link = document.createElement('a');
       link.href = this.badgeUrl;
-      link.download = `truwit-badge-${this.proofId}.svg`;
+      link.download = `truwit-badge-${badgeId}.svg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

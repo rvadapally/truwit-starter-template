@@ -332,6 +332,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
     
     return {
       proofId: proofId,
+      trustmarkId: trustmarkId,
       contentHash: verifyResult.origin?.sha256 || receipt.sha256 || '',
       perceptualHash: verifyResult.origin?.sha256 || receipt.sha256 || '', // Use contentHash as fallback
       metadata: {
