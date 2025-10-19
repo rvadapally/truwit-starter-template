@@ -38,9 +38,15 @@ try
     {
         options.AddPolicy("AllowAll", policy =>
         {
-            policy.AllowAnyOrigin()
+            policy.WithOrigins(
+                    "http://localhost:4200",
+                    "https://truwit.ai",
+                    "https://www.truwit.ai",
+                    "https://truwit-starter-template-production.up.railway.app"
+                  )
                   .AllowAnyMethod()
-                  .AllowAnyHeader();
+                  .AllowAnyHeader()
+                  .WithExposedHeaders("*");
         });
     });
 

@@ -16,11 +16,21 @@ import { environment } from '../../../../environments/environment';
         <span class="loading-text">Loading badge...</span>
       </div>
 
-      <!-- Error State -->
-      <div class="badge-error" *ngIf="hasError">
-        <div class="error-icon">⚠️</div>
-        <span class="error-text">Badge unavailable</span>
-        <button class="retry-button" (click)="loadBadge()">Retry</button>
+      <!-- Error/Fallback State with Circular Badge -->
+      <div class="badge-fallback" *ngIf="hasError">
+        <div class="circular-badge-wrapper">
+          <img 
+            src="assets/verified-by-truwit.png" 
+            alt="Verified by Truwit"
+            class="circular-badge-image">
+        </div>
+        <div class="proof-id-display">
+          <div class="proof-id-label">VERIFICATION ID</div>
+          <div class="proof-id-large">{{ trustmarkId || proofId }}</div>
+        </div>
+        <button class="action-button primary" (click)="viewVerification()" *ngIf="showActions">
+          View Full Verification
+        </button>
       </div>
 
       <!-- Badge Display -->
@@ -102,36 +112,59 @@ import { environment } from '../../../../environments/environment';
       opacity: 0.8;
     }
 
-    .badge-error {
+    .badge-fallback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 2rem 1rem;
+      width: 100%;
+    }
+
+    .circular-badge-wrapper {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.3);
+      border: 3px solid #0ea5e9;
+    }
+
+    .circular-badge-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .proof-id-display {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 0.5rem;
-      color: #ef4444;
-      text-align: center;
+      padding: 1rem 1.5rem;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.15), rgba(34, 197, 94, 0.15));
+      border: 2px solid rgba(14, 165, 233, 0.4);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 300px;
     }
 
-    .error-icon {
+    .proof-id-label {
+      color: #9fb3d9;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .proof-id-large {
+      color: #e6eefc;
       font-size: 1.5rem;
-    }
-
-    .error-text {
-      font-size: 0.9rem;
-    }
-
-    .retry-button {
-      background: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .retry-button:hover {
-      background: rgba(239, 68, 68, 0.3);
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 2px;
+      text-align: center;
+      word-break: break-all;
     }
 
     .badge-display {
@@ -275,6 +308,15 @@ import { environment } from '../../../../environments/environment';
       .action-button {
         padding: 0.875rem 1rem;
         font-size: 1rem;
+      }
+
+      .circular-badge-wrapper {
+        width: 140px;
+        height: 140px;
+      }
+      
+      .proof-id-large {
+        font-size: 1.2rem;
       }
     }
   `],

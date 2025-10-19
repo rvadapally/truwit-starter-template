@@ -754,7 +754,7 @@ public class ProofsController : ControllerBase
 
     [HttpGet("proofs/lookup")]
     [ProducesResponseType(typeof(ProofLookupResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProofLookupResponse>> LookupProof([FromQuery] string url)
     {
         try
@@ -764,16 +764,12 @@ public class ProofsController : ControllerBase
             if (string.IsNullOrEmpty(url))
             {
                 _logger.LogWarning("❌ URL is null or empty");
-                return NotFound(new ProofLookupResponse(
-                    Exists: false,
-                    TrustmarkId: null,
-                    ProofId: null,
-                    CreatedAt: null,
-                    OriginStatus: null,
-                    C2paPresent: null,
-                    VerifyUrl: null,
-                    BadgeUrl: null
-                ));
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "URL parameter is required",
+                    Status = StatusCodes.Status400BadRequest
+                });
             }
 
             // Validate URL format
@@ -819,7 +815,7 @@ public class ProofsController : ControllerBase
             }
 
             _logger.LogInformation("ℹ️ No proof found for URL: {Url}", url);
-            return NotFound(new ProofLookupResponse(
+            return Ok(new ProofLookupResponse(
                 Exists: false,
                 TrustmarkId: null,
                 ProofId: null,

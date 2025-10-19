@@ -307,8 +307,10 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
                 }
               });
           } else {
+            // Proof not found - show friendly message
             this.isVerifying = false;
-            this.successMessage = 'ℹ️ No proof found. Click "Generate Proof" to create one.';
+            this.successMessage = 'ℹ️ No verification found for this URL. This content has not been signed previously. Click "Generate Proof" to create one.';
+            this.verificationStep = '';
             this.cdr.markForCheck();
           }
         },
