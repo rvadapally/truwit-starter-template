@@ -34,6 +34,16 @@ app/.nx/
 *.swo
 *~
 
+# Visual Studio
+.vs/
+*.vsidx
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -117,6 +127,9 @@ api/bin/
 api/obj/
 api/temp_downloads/
 api/uploads/
+tools/*/bin/
+tools/*/obj/
+tools/*/.vs/
 *.dll
 *.exe
 *.pdb

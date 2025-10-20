@@ -1,0 +1,4 @@
+Test deployment trigger - Badge loading fix
+Timestamp: 2025-01-19 22:30:00
+Changes: Fixed DynamicBadgeComponent to use correct badge URL (/v1/badge/{id}.svg instead of /assets/proof/{id}-800.png)
+Status: Ready for deployment

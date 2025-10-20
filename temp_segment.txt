@@ -1,0 +1,38 @@
+copyEmbedCodeFromVerification(): void {
+    if (!this.embedCode) return;
+    navigator.clipboard.writeText(this.embedCode).then(() => {
+      this.notificationService.showSuccess('Embed code copied!');
+    }).catch(() => {
+      this.notificationService.showError('Failed to copy embed code');
+    });
+  }
+
+  copyToClipboard(text: string): void {
+    navigator.clipboard.writeText(text).then(() => {
+      this.notificationService.showSuccess('Copied to clipboard!');
+    }).catch(() => {
+      this.notificationService.showError('Failed to copy to clipboard');
+    });
+  }
+
+  copyVerificationLink(): void {
+    const currentUrl = window.location.href;
+    navigator.clipboard.writeText(currentUrl).then(() => {
+      this.notificationService.showSuccess('Verification link copied to clipboard!');
+    }).catch(() => {
+      this.notificationService.showError('Failed to copy verification link');
+    });
+  }
+
+  copyImageUrl(): void {
+    const url = this.getBadgeUrl();
+    navigator.clipboard.writeText(url).then(() => {
+      this.notificationService.showSuccess('Image URL copied!');
+    }).catch(() => {
+      this.notificationService.showError('Failed to copy image URL');
+    });
+  }
+
+  shareToX(): void {\n    if (!this.verifyData) return;\n    \n    const text = Verified by Truwit: ;\n    const url = window.location.href;\n    const twitterUrl = https://twitter.com/intent/tweet?text=&url=;\n    \n    window.open(twitterUrl, '_blank');\n  }
+
+  

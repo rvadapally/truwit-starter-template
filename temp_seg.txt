@@ -1,0 +1,5 @@
+try {
+    const stats = statSync(filePath);
+    if (stats.size < minSize) {
+      console.error(`❌ CRITICAL: ${description} too small: ${stats.size} bytes (minimum ${minSize})`);
+      process.exit(

@@ -950,8 +950,8 @@ public class ProofsController : ControllerBase
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
-                VerifyUrl = $"/t/{result.TrustmarkId}",
-                BadgeUrl = $"{baseUrl}/v1/badge/{result.TrustmarkId}.svg"
+                VerifyUrl = $"/t/{result.ProofId}",
+                BadgeUrl = $"{baseUrl}/v1/badge/{result.ProofId}.svg"
             };
 
             _logger.LogInformation("Basic verification completed for URL: {Url}", request.Input.Url);
@@ -1089,8 +1089,8 @@ public class ProofsController : ControllerBase
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
-                VerifyUrl = $"/t/{result.TrustmarkId}",
-                BadgeUrl = $"{baseUrl}/v1/badge/{result.TrustmarkId}.svg",
+                VerifyUrl = $"/t/{result.ProofId}",
+                BadgeUrl = $"{baseUrl}/v1/badge/{result.ProofId}.svg",
                 DevTestMode = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&
                              _featureFlags.Value.DevImageTestMode
             };

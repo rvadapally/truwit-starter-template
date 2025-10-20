@@ -134,7 +134,7 @@ public class VerificationService : IVerificationService
                 },
                 Timestamp = proof.CreatedAt,
                 VerificationUrl = $"/verify/{proof.ProofId}",
-                BadgeUrl = $"/v1/badge/{proof.TrustmarkId}.svg",
+                BadgeUrl = $"/v1/badge/{proof.ProofId}.svg",
                 QrCodeUrl = $"/qr/{proof.ProofId}",
                 Duration = mediaMetadata?.Duration,
                 Resolution = mediaMetadata?.Resolution,
