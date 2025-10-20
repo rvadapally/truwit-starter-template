@@ -1,0 +1,327 @@
+{
+  "baseUrl": "http://127.0.0.1:4321",
+  "visited": [
+    {
+      "path": "/",
+      "url": "http://127.0.0.1:4321/",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/about",
+      "url": "http://127.0.0.1:4321/about",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/app",
+      "url": "http://127.0.0.1:4321/app",
+      "status": 404,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/app",
+          "status": "404",
+          "type": "response"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/contact",
+      "url": "http://127.0.0.1:4321/contact",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/generate",
+      "url": "http://127.0.0.1:4321/generate",
+      "status": 404,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/generate",
+          "status": "404",
+          "type": "response"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/how-it-works",
+      "url": "http://127.0.0.1:4321/how-it-works",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/investors",
+      "url": "http://127.0.0.1:4321/investors",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/pricing",
+      "url": "http://127.0.0.1:4321/pricing",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/technology",
+      "url": "http://127.0.0.1:4321/technology",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/use-cases",
+      "url": "http://127.0.0.1:4321/use-cases",
+      "status": 200,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connecting..."
+        },
+        {
+          "type": "debug",
+          "text": "[vite] connected."
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "status": "404",
+          "type": "response"
+        },
+        {
+          "url": "http://127.0.0.1:4321/fonts/Inter-Var.woff2",
+          "method": "GET",
+          "type": "requestfailed",
+          "failure": "net::ERR_ABORTED"
+        }
+      ],
+      "pendingUIStates": []
+    },
+    {
+      "path": "/verify",
+      "url": "http://127.0.0.1:4321/verify",
+      "status": 404,
+      "console": [
+        {
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+        }
+      ],
+      "networkFailures": [
+        {
+          "url": "http://127.0.0.1:4321/verify",
+          "status": "404",
+          "type": "response"
+        }
+      ],
+      "pendingUIStates": []
+    }
+  ],
+  "failureDetected": true
+}
