@@ -378,7 +378,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
           if (error.status === 404) {
             // Proof card doesn't exist, try to regenerate it
             console.log(`Proof card not found, attempting regeneration for ${badgeId}`);
-            this.http.get(`${apiUrl}/cards/proof/${badgeId}-800.png`)
+            this.http.get(`${apiUrl}/cards/proof/${badgeId}-800.png`, { responseType: 'blob', observe: 'response' })
               .pipe(takeUntil(this.destroy$))
               .subscribe({
                 next: () => {

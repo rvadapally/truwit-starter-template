@@ -163,7 +163,8 @@ export class HomeComponent implements OnInit {
     const img = new Image();
     img.onload = () => console.log('✅ Badge image loaded successfully:', img.src);
     img.onerror = () => console.log('❌ Badge image failed to load:', img.src);
-    img.src = '/assets/signed_badge.png';
+    // Use path relative to base href (/app/) so it works on Pages
+    img.src = 'assets/signed_badge.png';
     
     console.log('🖼️ Badge image src:', img.src);
   }
