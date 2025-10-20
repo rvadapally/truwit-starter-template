@@ -35,13 +35,15 @@ import { environment } from '../../../../environments/environment';
 
       <!-- Badge Display -->
       <div class="badge-display" *ngIf="!isLoading && !hasError && badgeUrl">
-        <img 
-          [src]="badgeUrl" 
-          [alt]="altText"
-          class="badge-image"
-          (load)="onImageLoad()"
-          (error)="onImageError()"
-          [class.loaded]="imageLoaded">
+        <a (click)="viewVerification()" class="badge-link" title="View verification">
+          <img 
+            [src]="badgeUrl" 
+            [alt]="altText"
+            class="badge-image"
+            (load)="onImageLoad()"
+            (error)="onImageError()"
+            [class.loaded]="imageLoaded">
+        </a>
         
         <!-- Badge Actions -->
         <div class="badge-actions" *ngIf="showActions">
