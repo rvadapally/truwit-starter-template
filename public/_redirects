@@ -1,1 +1,1 @@
-/app/*    /app/   200
+# Use Pages Functions for SPA routing. Keep redirects file minimal to avoid loops.
