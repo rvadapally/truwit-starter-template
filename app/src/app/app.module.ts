@@ -22,7 +22,7 @@ import { routes } from './app.routes';
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    RouterModule.forRoot(routes),
+    RouterModule.forRoot(routes, { useHash: true, scrollPositionRestoration: 'enabled' }),
     VerificationModule
   ],
   providers: [],

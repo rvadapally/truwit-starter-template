@@ -382,9 +382,16 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
               .pipe(takeUntil(this.destroy$))
               .subscribe({
                 next: () => {
-                  // Regeneration successful, use the proof card
-                  this.badgeUrl = proofCardUrl;
-                  this.isLoading = false;
+                  // Regeneration kicked off OK; poll until the asset is available
+                  this.pollUntilAvailable(proofCardUrl, 6, 300)
+                    .then(() => {
+                      this.badgeUrl = proofCardUrl;
+                      this.isLoading = false;
+                    })
+                    .catch(() => {
+                      console.warn('Proof card not available after retries, falling back');
+                      this.fallbackToOldBadge(badgeId);
+                    });
                 },
                 error: (regenError: any) => {
                   console.error('Failed to regenerate proof card:', regenError);
@@ -397,6 +404,34 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
           }
         }
       });
+  }
+
+  private pollUntilAvailable(url: string, retries: number, delayMs: number): Promise<void> {
+    const attempt = (n: number): Promise<void> => {
+      return new Promise<void>((resolve, reject) => {
+        this.http.head(url, { observe: 'response' })
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (resp) => {
+              if (resp.status >= 200 && resp.status < 300) {
+                resolve();
+              } else if (n <= 0) {
+                reject();
+              } else {
+                setTimeout(() => attempt(n - 1).then(resolve).catch(reject), delayMs);
+              }
+            },
+            error: () => {
+              if (n <= 0) {
+                reject();
+              } else {
+                setTimeout(() => attempt(n - 1).then(resolve).catch(reject), delayMs);
+              }
+            }
+          });
+      });
+    };
+    return attempt(retries);
   }
 
   private fallbackToOldBadge(badgeId: string): void {
@@ -431,7 +466,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
 
   viewVerification(): void {
     const badgeId = this.trustmarkId || this.proofId;
-    const verificationUrl = `https://truwit.ai/app/t/${badgeId}`;
+    const verificationUrl = `https://truwit.ai/app/#/t/${badgeId}`;
     window.open(verificationUrl, '_blank');
   }
 
@@ -439,7 +474,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
     const badgeId = this.trustmarkId || this.proofId;
     const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
     const badgeUrl = this.badgeUrl || `${apiUrl}/assets/proof/${badgeId}-800.png`;
-    const verificationUrl = `https://truwit.ai/app/t/${badgeId}`;
+    const verificationUrl = `https://truwit.ai/app/#/t/${badgeId}`;
     const embedCode = `<a href="${verificationUrl}" target="_blank">
       <img src="${badgeUrl}" alt="Verified by Truwit" style="max-width: 200px; height: auto;" />
     </a>`;

@@ -109,7 +109,7 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
       return;
     }
     const id = this.verifyData.proofId;
-    const verificationUrl = `https://truwit.ai/app/t/${id}`;
+    const verificationUrl = `https://truwit.ai/app/#/t/${id}`;
     // Prefer provided badgeUrl, else fall back to API proof card (800px)
     let imageUrl = this.verifyData.badgeUrl;
     if (!imageUrl) {
