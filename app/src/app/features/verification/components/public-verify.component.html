@@ -89,7 +89,8 @@
       <button class="btn-secondary" (click)="shareToXWithImage()" title="Copy image to clipboard and open X">
         Share on X (copies image)
       </button>
-      <a [href]="verifyData.badgeUrl" target="_blank" class="btn-outline">
+      <button class="btn-secondary" (click)="copyImageUrl()" title="Copy direct image URL">Copy Image URL</button>
+      <a [href]="getBadgeUrl()" target="_blank" class="btn-outline">
         View Badge
       </a>
     </div>
@@ -117,3 +118,4 @@
     </div>
   </div>
 </div>
+

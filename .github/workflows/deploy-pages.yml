@@ -1,0 +1,63 @@
+name: Build, Deploy, Verify (Cloudflare Pages)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+jobs:
+  build-deploy-verify:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: '18'
+      CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+      CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      CF_PAGES_PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
+      PROD_API_URL: ${{ secrets.PROD_API_URL }}
+      PROD_TEST_IDS: ${{ secrets.PROD_TEST_IDS }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install root deps
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Build Angular app
+        run: |
+          cd app
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Build Astro site + integrate
+        run: |
+          npm run build:astro
+          npm run integrate
+
+      - name: Verify build output
+        run: |
+          node scripts/verify-build-output.js
+
+      - name: Deploy to Cloudflare Pages (with Functions)
+        run: |
+          npx wrangler pages deploy ./dist \
+            --project-name="$CF_PAGES_PROJECT" \
+            --functions=functions
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+
+      - name: Post-deploy verification (static assets + routes)
+        run: node scripts/verify-deployment.js
+        env:
+          BASE_URL: https://truwit.ai
+
+      - name: Proof card regeneration smoke (production API)
+        shell: pwsh
+        run: |
+          $ids = if ([string]::IsNullOrEmpty("${{ env.PROD_TEST_IDS }}")) { 'TW-TEST-1234,TW-DEMO-0001' } else { '${{ env.PROD_TEST_IDS }}' }
+          pwsh -File scripts/test-proof-card-regeneration.ps1 -ApiUrl "${{ env.PROD_API_URL }}" -Ids $ids -Size 800 -PollRetries 10 -PollDelayMs 400

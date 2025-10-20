@@ -54,7 +54,9 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     this.error = null;
     this.cdr.markForCheck();
     
-    this.verificationService.verifyProof(this.proofId)
+    // Use trustmark ID for verification since the URL uses trustmark ID
+    const trustmarkId = this.getTrustmarkIdFromUrl();
+    this.verificationService.verifyProof(trustmarkId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data) => {
@@ -79,9 +81,13 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     const proofId = this.verifyData.proofId;
     const pageUrl = window.location.href;
 
-    // Prefer provided badgeUrl; ensure it is absolute for OG
+    // Use the same logic as getBadgeUrl() for consistency
     let imageUrl = this.verifyData.badgeUrl;
-    if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+    if (!imageUrl) {
+      // Use the correct API endpoint for badges with HTTPS
+      const trustmarkId = this.getTrustmarkIdFromUrl();
+      imageUrl = `https://api.truwit.ai/assets/proof/${trustmarkId}-800.png`;
+    } else if (!/^https?:\/\//i.test(imageUrl)) {
       // If relative, prefix with current origin
       imageUrl = new URL(imageUrl, window.location.origin).toString();
     }
@@ -108,14 +114,16 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
       this.embedCode = '';
       return;
     }
-    const id = this.verifyData.proofId;
-    const verificationUrl = `https://truwit.ai/app/#/t/${id}`;
-    // Prefer provided badgeUrl, else fall back to API proof card (800px)
+    
+    // Use trustmarkId for URL consistency (matches the actual verification URL)
+    const trustmarkId = this.getTrustmarkIdFromUrl();
+    const verificationUrl = `https://truwit.ai/app/t/`;
+    
+    // Use the correct badge URL format
     let imageUrl = this.verifyData.badgeUrl;
     if (!imageUrl) {
-      const origin = window?.location?.origin || '';
-      // Fallback to same-origin API guess; replace with production API if needed
-      imageUrl = `${origin.replace(/\/$/, '')}/assets/proof/${id}-800.png`;
+      // Use the correct API endpoint for badges
+      imageUrl = `https://api.truwit.ai/assets/proof/${trustmarkId}-800.png`;
     } else if (!/^https?:\/\//i.test(imageUrl)) {
       imageUrl = new URL(imageUrl, window.location.origin).toString();
     }
@@ -125,48 +133,59 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
 </a>`;
   }
 
-  copyEmbedCodeFromVerification(): void {
+    copyEmbedCodeFromVerification(): void {
     if (!this.embedCode) return;
     navigator.clipboard.writeText(this.embedCode).then(() => {
-      this.notificationService.showSuccess('Embed code copied!');
+      this.notificationService.showSuccess("Embed code copied!");
     }).catch(() => {
-      this.notificationService.showError('Failed to copy embed code');
+      this.notificationService.showError("Failed to copy embed code");
     });
   }
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(() => {
-      this.notificationService.showSuccess('Copied to clipboard!');
+      this.notificationService.showSuccess("Copied to clipboard!");
     }).catch(() => {
-      this.notificationService.showError('Failed to copy to clipboard');
+      this.notificationService.showError("Failed to copy to clipboard");
     });
   }
 
   copyVerificationLink(): void {
     const currentUrl = window.location.href;
     navigator.clipboard.writeText(currentUrl).then(() => {
-      this.notificationService.showSuccess('Verification link copied to clipboard!');
+      this.notificationService.showSuccess("Verification link copied to clipboard!");
     }).catch(() => {
-      this.notificationService.showError('Failed to copy verification link');
+      this.notificationService.showError("Failed to copy verification link");
+    });
+  }
+
+  copyImageUrl(): void {
+    const url = this.getBadgeUrl();
+    navigator.clipboard.writeText(url).then(() => {
+      this.notificationService.showSuccess("Image URL copied!");
+    }).catch(() => {
+      this.notificationService.showError("Failed to copy image URL");
     });
   }
 
   shareToX(): void {
     if (!this.verifyData) return;
-    
     const text = `Verified by Truwit: ${this.verifyData.proofId}`;
     const url = window.location.href;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-    
-    window.open(twitterUrl, '_blank');
+    window.open(twitterUrl, "_blank");
   }
 
   async shareToXWithImage(): Promise<void> {
     if (!this.verifyData) return;
 
-    // Build absolute image URL
+    // Build absolute image URL with HTTPS
     let imgUrl = this.verifyData.badgeUrl || '';
-    if (imgUrl && !/^https?:\/\//i.test(imgUrl)) {
+    if (!imgUrl) {
+      // Use the correct API endpoint for badges with HTTPS
+      const trustmarkId = this.getTrustmarkIdFromUrl();
+      imgUrl = `https://api.truwit.ai/assets/proof/${trustmarkId}-800.png`;
+    } else if (!/^https?:\/\//i.test(imgUrl)) {
       imgUrl = new URL(imgUrl, window.location.origin).toString();
     }
 
@@ -188,7 +207,7 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
 
     // Open X share intent with page URL; OG tags ensure preview
     const text = `Verified by Truwit: ${this.verifyData.proofId}`;
-    const url = window.location.href;
+    const url = imgUrl;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, '_blank');
 
@@ -252,11 +271,44 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     }
     
     // Try dynamic badge first, fallback to static
-    return this.verifyData.badgeUrl || '/assets/signed_badge.png';
+    let badgeUrl = this.verifyData.badgeUrl;
+    if (!badgeUrl) {
+      // Use the correct API endpoint for badges with HTTPS
+      const trustmarkId = this.getTrustmarkIdFromUrl();
+      badgeUrl = `https://api.truwit.ai/assets/proof/${trustmarkId}-800.png`;
+    } else if (!/^https?:\/\//i.test(badgeUrl)) {
+      // Convert relative URLs to absolute HTTPS URLs
+      badgeUrl = new URL(badgeUrl, window.location.origin).toString();
+    }
+    
+    return badgeUrl;
   }
 
   onBadgeError(event: any): void {
     // Fallback to static badge if dynamic fails
     event.target.src = '/assets/signed_badge.png';
   }
+
+  private getTrustmarkIdFromUrl(): string {
+    // Extract trustmark ID from current URL path
+    const currentUrl = window.location.href;
+    const match = currentUrl.match(/\/t\/([^\/\?#]+)/);
+    return match ? match[1] : this.proofId || '';
+  }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

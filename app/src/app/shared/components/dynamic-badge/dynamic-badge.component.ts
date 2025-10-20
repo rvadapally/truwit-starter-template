@@ -360,48 +360,27 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
     this.hasError = false;
     this.imageLoaded = false;
 
-    const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
+    // Force HTTPS and strip trailing slash
+    let apiUrl = (environment.apiUrl || 'https://api.truwit.ai').trim();
+    if (apiUrl.startsWith('http://')) apiUrl = 'https://' + apiUrl.substring('http://'.length);
+    apiUrl = apiUrl.replace(/\/$/, '');
     
-    // Try to load proof card first (800px size)
-    const proofCardUrl = `${apiUrl}/assets/proof/${badgeId}-800.png`;
+    // Try to load badge from correct endpoint first (FIXED: Use correct API path)
+    const badgeUrl = `${apiUrl}/v1/badge/${badgeId}.svg`;
     
-    // Check if proof card exists by making a HEAD request
-    this.http.head(proofCardUrl)
+    // Check if badge exists by making a HEAD request
+    this.http.head(badgeUrl, { observe: 'response' })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          // Proof card exists, use it
-          this.badgeUrl = proofCardUrl;
+        next: (resp) => {
+          // Badge exists, use it
+          this.badgeUrl = badgeUrl;
           this.isLoading = false;
         },
         error: (error: any) => {
-          if (error.status === 404) {
-            // Proof card doesn't exist, try to regenerate it
-            console.log(`Proof card not found, attempting regeneration for ${badgeId}`);
-            this.http.get(`${apiUrl}/cards/proof/${badgeId}-800.png`, { responseType: 'blob', observe: 'response' })
-              .pipe(takeUntil(this.destroy$))
-              .subscribe({
-                next: () => {
-                  // Regeneration kicked off OK; poll until the asset is available
-                  this.pollUntilAvailable(proofCardUrl, 6, 300)
-                    .then(() => {
-                      this.badgeUrl = proofCardUrl;
-                      this.isLoading = false;
-                    })
-                    .catch(() => {
-                      console.warn('Proof card not available after retries, falling back');
-                      this.fallbackToOldBadge(badgeId);
-                    });
-                },
-                error: (regenError: any) => {
-                  console.error('Failed to regenerate proof card:', regenError);
-                  this.fallbackToOldBadge(badgeId);
-                }
-              });
-          } else {
-            console.error('Error checking proof card:', error);
-            this.fallbackToOldBadge(badgeId);
-          }
+          console.error('Error loading badge:', error);
+          this.hasError = true;
+          this.isLoading = false;
         }
       });
   }
@@ -409,7 +388,9 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
   private pollUntilAvailable(url: string, retries: number, delayMs: number): Promise<void> {
     const attempt = (n: number): Promise<void> => {
       return new Promise<void>((resolve, reject) => {
-        this.http.head(url, { observe: 'response' })
+        // Add cache-busting to avoid CDN stale responses during polling
+        const bustUrl = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        this.http.head(bustUrl, { observe: 'response' })
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (resp) => {
@@ -419,6 +400,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
                 reject();
               } else {
                 setTimeout(() => attempt(n - 1).then(resolve).catch(reject), delayMs);
+                delayMs = Math.min(delayMs * 2, 2000);
               }
             },
             error: () => {
@@ -426,6 +408,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
                 reject();
               } else {
                 setTimeout(() => attempt(n - 1).then(resolve).catch(reject), delayMs);
+                delayMs = Math.min(delayMs * 2, 2000);
               }
             }
           });

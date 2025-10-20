@@ -1,7 +1,7 @@
-# Cursor Rules for Angular + .NET Application
+# Cursor Rules for Angular + .NET + Railway + Cloudflare Projects
 
 ## Project Overview
-This is a full-stack application with Angular frontend and .NET backend services. Follow these rules to maintain consistency, quality, and best practices across the codebase.
+This is a full-stack application with Angular frontend, ASP.NET Core backend, Railway hosting, and Cloudflare Pages deployment. Follow these rules to maintain consistency, quality, and best practices across the codebase.
 
 ---
 
@@ -30,29 +30,30 @@ This is a full-stack application with Angular frontend and .NET backend services
 
 ### Project Structure
 ```
-src/
-├── app/
-│   ├── core/                 # Singleton services, guards, interceptors
-│   │   ├── services/
-│   │   ├── guards/
-│   │   ├── interceptors/
-│   │   └── models/
-│   ├── shared/               # Shared components, directives, pipes
-│   │   ├── components/
-│   │   ├── directives/
-│   │   ├── pipes/
-│   │   └── utils/
-│   ├── features/             # Feature modules (lazy-loaded)
-│   │   └── feature-name/
-│   │       ├── components/
-│   │       ├── services/
-│   │       ├── models/
-│   │       └── feature-name.module.ts
-│   ├── layout/               # Layout components (header, footer, sidebar)
-│   └── app.config.ts
-├── assets/
-├── environments/
-└── styles/
+app/
+├── src/
+│   ├── app/
+│   │   ├── core/                 # Singleton services, guards, interceptors
+│   │   │   ├── services/
+│   │   │   ├── guards/
+│   │   │   ├── interceptors/
+│   │   │   └── models/
+│   │   ├── shared/               # Shared components, directives, pipes
+│   │   │   ├── components/
+│   │   │   ├── directives/
+│   │   │   ├── pipes/
+│   │   │   └── utils/
+│   │   ├── features/             # Feature modules (lazy-loaded)
+│   │   │   └── feature-name/
+│   │   │       ├── components/
+│   │   │       ├── services/
+│   │   │       ├── models/
+│   │   │       └── feature-name.module.ts
+│   │   ├── layout/               # Layout components (header, footer, sidebar)
+│   │   └── app.config.ts
+│   ├── assets/
+│   ├── environments/
+│   └── styles/
 ```
 
 ### Module Organization
@@ -250,31 +251,26 @@ export type ApiResponse<T> = {
 
 ### Project Structure
 ```
-Solution/
-├── src/
-│   ├── API/                          # Presentation layer
-│   │   ├── Controllers/
-│   │   ├── Filters/
-│   │   ├── Middleware/
-│   │   └── Program.cs
-│   ├── Application/                   # Business logic layer
-│   │   ├── Services/
-│   │   ├── Interfaces/
-│   │   ├── DTOs/
-│   │   ├── Validators/
-│   │   └── Mappings/
-│   ├── Domain/                        # Domain models
-│   │   ├── Entities/
-│   │   ├── ValueObjects/
-│   │   ├── Enums/
-│   │   └── Interfaces/
-│   ├── Infrastructure/                # Data access & external services
-│   │   ├── Data/
-│   │   ├── Repositories/
-│   │   └── ExternalServices/
-├── tests/
-│   ├── UnitTests/
-│   └── IntegrationTests/
+api/
+├── Controllers/                  # API endpoints
+├── Application/                  # Business logic layer
+│   ├── Services/
+│   ├── Interfaces/
+│   ├── DTOs/
+│   ├── Validators/
+│   └── Mappings/
+├── Domain/                       # Domain models
+│   ├── Entities/
+│   ├── ValueObjects/
+│   ├── Enums/
+│   └── Interfaces/
+├── Infrastructure/               # Data access & external services
+│   ├── Data/
+│   ├── Repositories/
+│   └── ExternalServices/
+├── CardTemplates/               # Image templates
+├── wwwroot/                     # Static files
+└── Dockerfile                   # Container configuration
 ```
 
 ### Architecture Patterns
@@ -527,6 +523,64 @@ public class UserServiceTests
 
 ---
 
+## Railway Deployment Rules
+
+### Configuration
+- Use railway.json for build configuration
+- Set proper health check endpoints
+- Configure environment variables correctly
+- Use Docker for consistent deployments
+
+```json
+{
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "api/Dockerfile"
+  },
+  "deploy": {
+    "startCommand": "dotnet YourApp.dll",
+    "healthcheckPath": "/health",
+    "healthcheckTimeout": 100
+  }
+}
+```
+
+### Environment Variables
+- Use Railway's built-in DATABASE_URL
+- Set ASPNETCORE_ENVIRONMENT=Production
+- Configure connection strings properly
+- Use secrets for sensitive data
+
+### Database Management
+- Use PostgreSQL for production
+- Implement proper migrations
+- Use connection pooling
+- Monitor database performance
+
+---
+
+## Cloudflare Pages Rules
+
+### Build Configuration
+- Use GitHub Actions for deployment
+- Configure proper build commands
+- Set correct output directory
+- Use environment variables for API URLs
+
+### Performance
+- Enable Cloudflare caching
+- Use CDN for static assets
+- Implement proper cache headers
+- Monitor Core Web Vitals
+
+### Security
+- Enable Cloudflare security features
+- Use HTTPS only
+- Implement proper CORS policies
+- Monitor for security threats
+
+---
+
 ## Cross-Cutting Concerns
 
 ### Security
@@ -592,6 +646,13 @@ Before submitting code for review, ensure:
 - Don't use Select N+1 queries
 - Don't forget to dispose of disposable resources
 
+### Deployment
+- Don't forget to apply database migrations
+- Don't configure CORS after static files middleware
+- Don't commit secrets to version control
+- Don't ignore build errors
+- Don't skip testing before deployment
+
 ---
 
 ## When to Ask for Help
@@ -600,3 +661,29 @@ Before submitting code for review, ensure:
 - When performance optimization is needed
 - When dealing with complex business logic
 - When external integrations are required
+
+---
+
+## Tools and Extensions
+
+### Recommended VS Code Extensions
+- Angular Language Service
+- C# Dev Kit
+- Docker
+- GitLens
+- Prettier
+- ESLint
+- Thunder Client (API testing)
+
+### Recommended Tools
+- Railway CLI
+- Cloudflare CLI
+- Angular CLI
+- .NET CLI
+- Docker Desktop
+- Postman (API testing)
+- Playwright (E2E testing)
+
+---
+
+**These rules are based on successful production deployments and should be followed to maintain code quality and avoid common pitfalls.**

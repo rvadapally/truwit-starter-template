@@ -950,8 +950,8 @@ public class ProofsController : ControllerBase
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
-                VerifyUrl = $"/t/{result.ProofId}",
-                BadgeUrl = $"{baseUrl}/v1/badge/{result.ProofId}.svg"
+                VerifyUrl = $"/t/{result.TrustmarkId}",
+                BadgeUrl = $"{baseUrl}/v1/badge/{result.TrustmarkId}.svg"
             };
 
             _logger.LogInformation("Basic verification completed for URL: {Url}", request.Input.Url);
@@ -1089,8 +1089,8 @@ public class ProofsController : ControllerBase
             var response = new CreateProofResponseDto
             {
                 ProofId = result.ProofId,
-                VerifyUrl = $"/t/{result.ProofId}",
-                BadgeUrl = $"{baseUrl}/v1/badge/{result.ProofId}.svg",
+                VerifyUrl = $"/t/{result.TrustmarkId}",
+                BadgeUrl = $"{baseUrl}/v1/badge/{result.TrustmarkId}.svg",
                 DevTestMode = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" &&
                              _featureFlags.Value.DevImageTestMode
             };
@@ -1359,7 +1359,7 @@ public class ProofsController : ControllerBase
                     // CreatedAt is stored in UTC in the database, just specify the kind and format
                     IssuedAt = DateTime.SpecifyKind(proof.CreatedAt, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
                     SignatureStatus = proof.C2paPresent ? "valid" : "invalid",
-                    BadgeUrl = proof.ProofCardSmallUrl ?? $"{baseUrl}/assets/proof/{proof.TrustmarkId}-800.png",
+                    BadgeUrl = proof.ProofCardSmallUrl ?? $"{baseUrl}/v1/badge/{proof.TrustmarkId}.svg",
                     Origin = new OriginInfo(
                         C2pa: proof.C2paPresent,
                         Status: proof.OriginStatus,

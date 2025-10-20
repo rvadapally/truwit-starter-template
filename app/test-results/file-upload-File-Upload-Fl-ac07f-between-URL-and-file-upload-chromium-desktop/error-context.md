@@ -9,46 +9,34 @@
         - heading "Truwit" [level=1] [ref=e8]
       - generic [ref=e9]:
         - link "Home" [ref=e10] [cursor=pointer]:
-          - /url: /
+          - /url: "#/"
         - link "Verify" [ref=e11] [cursor=pointer]:
-          - /url: /verify
-  - generic [ref=e16]:
-    - generic [ref=e17]:
-      - heading "Video Content Verification" [level=3] [ref=e18]
-      - generic [ref=e19]:
-        - generic [ref=e20]: Paste URL
-        - generic [ref=e21]:
-          - textbox "https://example.com/video.mp4" [active] [ref=e22]: https://test.com/video
-          - button "Verify URL" [ref=e23] [cursor=pointer]
-        - generic [ref=e24]: Click "Verify URL" to check if the URL is valid, or scroll down to "Generate Proof" to create a verification proof
-      - generic [ref=e25]: or
-      - generic [ref=e26]:
-        - generic [ref=e27]: Upload video file
-        - button "Choose File" [ref=e28] [cursor=pointer]
-    - generic [ref=e29]:
-      - heading "Metadata (Optional)" [level=3] [ref=e30]
-      - generic [ref=e31]:
-        - generic [ref=e32]:
-          - generic [ref=e33]: Prompt Used
-          - textbox "Describe the prompt used to generate this content..." [ref=e34]
-        - generic [ref=e35]:
-          - generic [ref=e36]: Tool Name
-          - textbox "e.g., Sora, Midjourney, DALL-E" [ref=e37]
-        - generic [ref=e38]:
-          - generic [ref=e39]: Tool Version
-          - textbox "e.g., v2, 5.2" [ref=e40]
-        - generic [ref=e41]:
-          - generic [ref=e42]: License Type
-          - combobox [ref=e43]:
-            - option "Creator Owned" [selected]
-            - option "Brand Owned"
-            - option "Public"
-    - generic [ref=e45]:
-      - heading "Ready to Create Proof?" [level=4] [ref=e46]
-      - paragraph [ref=e47]: Generate a cryptographic proof for your content
-      - generic [ref=e48]:
-        - button "🚀 Generate Proof" [ref=e49] [cursor=pointer]
-        - button "Reset Form" [ref=e50] [cursor=pointer]
-  - contentinfo [ref=e51]:
-    - paragraph [ref=e52]: © 2025 Truwit. All rights reserved.
+          - /url: "#/verify"
+  - generic [ref=e13]:
+    - paragraph [ref=e14]: Where Provenance Meets Proof
+    - generic [ref=e15]:
+      - heading "Verify origin. Prove consent. Publish with confidence." [level=2] [ref=e16]
+      - paragraph [ref=e17]: Truwit attaches cryptographic provenance, consent, and authenticity to digital media. Verify the origin and prove consent for AI-generated content.
+      - generic [ref=e18]:
+        - generic [ref=e19]:
+          - generic [ref=e20]: 🔒
+          - heading "Cryptographic Proof" [level=3] [ref=e21]
+          - paragraph [ref=e22]: Immutable verification using blockchain technology
+        - generic [ref=e23]:
+          - generic [ref=e24]: ✅
+          - heading "Consent Tracking" [level=3] [ref=e25]
+          - paragraph [ref=e26]: Track and verify consent for likeness usage
+        - generic [ref=e27]:
+          - generic [ref=e28]: 🎯
+          - heading "AI Detection" [level=3] [ref=e29]
+          - paragraph [ref=e30]: Identify and verify AI-generated content
+        - generic [ref=e31]:
+          - img "Verified by TruWit" [ref=e33]
+          - heading "Show Trust" [level=3] [ref=e34]
+          - paragraph [ref=e35]: Use "Verified by TruWit" badges on posts, thumbnails, and sites
+      - generic [ref=e36]:
+        - button "Start Verification" [ref=e37] [cursor=pointer]
+        - paragraph [ref=e38]: Upload your content to begin
+  - contentinfo [ref=e39]:
+    - paragraph [ref=e40]: © 2025 Truwit. All rights reserved.
 ```
