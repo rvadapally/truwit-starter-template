@@ -365,15 +365,18 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
     if (apiUrl.startsWith('http://')) apiUrl = 'https://' + apiUrl.substring('http://'.length);
     apiUrl = apiUrl.replace(/\/$/, '');
     
-    // Try to load badge from correct endpoint first (FIXED: Use correct API path)
-    const badgeUrl = `${apiUrl}/v1/badge/${badgeId}.svg`;
+    // Try to load proof card from correct endpoint (beautiful cards with QR codes)
+    const badgeUrl = `${apiUrl}/cards/proof/${badgeId}-800.png`;
     
-    // Check if badge exists by making a HEAD request
-    this.http.head(badgeUrl, { observe: 'response' })
+    // Use GET request to load the beautiful proof card PNG
+    this.http.get(badgeUrl, { 
+      observe: 'response',
+      responseType: 'blob' // Expect PNG content
+    })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
-          // Badge exists, use it
+          // Badge exists and loaded successfully
           this.badgeUrl = badgeUrl;
           this.isLoading = false;
         },
@@ -390,7 +393,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
       return new Promise<void>((resolve, reject) => {
         // Add cache-busting to avoid CDN stale responses during polling
         const bustUrl = url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now();
-        this.http.head(bustUrl, { observe: 'response' })
+        this.http.get(bustUrl, { observe: 'response', responseType: 'blob' })
           .pipe(takeUntil(this.destroy$))
           .subscribe({
             next: (resp) => {
