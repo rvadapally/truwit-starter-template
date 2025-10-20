@@ -127,3 +127,15 @@ validateFileSize(badgeDest, 10000, 'Badge destination file');
 
 // Final validation of dist/ structure
 validateDistStructure();
+
+// Ensure root-level redirects file is present in dist/
+try {
+  const redirectsSrc = join(__dirname, 'public', '_redirects');
+  const redirectsDest = join(__dirname, 'dist', '_redirects');
+  validateFileExists(redirectsSrc, 'Root _redirects source');
+  copyFileSync(redirectsSrc, redirectsDest);
+  console.log('✅ Copied _redirects to dist/');
+} catch (err) {
+  console.error('❌ Failed to copy _redirects to dist/:', err.message);
+  process.exit(1);
+}
