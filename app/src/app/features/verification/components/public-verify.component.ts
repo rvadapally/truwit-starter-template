@@ -161,6 +161,43 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     window.open(twitterUrl, '_blank');
   }
 
+  async shareToXWithImage(): Promise<void> {
+    if (!this.verifyData) return;
+
+    // Build absolute image URL
+    let imgUrl = this.verifyData.badgeUrl || '';
+    if (imgUrl && !/^https?:\/\//i.test(imgUrl)) {
+      imgUrl = new URL(imgUrl, window.location.origin).toString();
+    }
+
+    // Attempt to copy image to clipboard (best-effort)
+    let copied = false;
+    try {
+      if (imgUrl && navigator.clipboard && (window as any).ClipboardItem) {
+        const resp = await fetch(imgUrl, { cache: 'no-cache' });
+        const blob = await resp.blob();
+        const item = new (window as any).ClipboardItem({ [blob.type]: blob });
+        await (navigator.clipboard as any).write([item]);
+        copied = true;
+        this.notificationService.showSuccess('Badge image copied. Paste it in X composer.');
+      }
+    } catch {
+      // Ignore; we will still open the share URL
+      this.notificationService.showError('Could not copy image automatically. You can attach it manually.');
+    }
+
+    // Open X share intent with page URL; OG tags ensure preview
+    const text = `Verified by Truwit: ${this.verifyData.proofId}`;
+    const url = window.location.href;
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+    window.open(twitterUrl, '_blank');
+
+    if (!copied && imgUrl) {
+      // Fallback: open image in a new tab so user can save/attach quickly
+      window.open(imgUrl, '_blank');
+    }
+  }
+
   getVerdictColor(): string {
     if (!this.verifyData) return 'gray';
     
