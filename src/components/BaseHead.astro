@@ -34,6 +34,23 @@ const siteUrl = 'https://truwit.ai';
   })();
 </script>
 
+<!-- Client-side rescue for /app/t/* deep links: redirect to hash routing -->
+<script is:inline>
+  (function() {
+    try {
+      var p = location.pathname;
+      if (p.startsWith('/app/t/')) {
+        var rest = p.substring(4); // '/t/...' including leading slash after /app
+        var target = '/app/#' + rest + location.search + location.hash;
+        location.replace(target);
+      } else if (p === '/app' || p === '/app/') {
+        // Ensure Angular boot even if cached HTML was served
+        // No-op; Angular index will load under /app/
+      }
+    } catch (e) { /* ignore */ }
+  })();
+  </script>
+
 <!-- Font preloads -->
 <link rel="preload" href="/fonts/Inter-Var.woff2" as="font" type="font/woff2" crossorigin />
 
