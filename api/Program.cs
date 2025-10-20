@@ -43,7 +43,9 @@ try
                     "http://localhost:4200",
                     "https://truwit.ai",
                     "https://www.truwit.ai",
-                    "https://truwit-starter-template-production.up.railway.app"
+                    "https://truwit-starter-template-production.up.railway.app",
+                    "https://6b7eb0da.truwit-starter-template.pages.dev",
+                    "https://*.truwit-starter-template.pages.dev"
                   )
                   .AllowAnyMethod()
                   .AllowAnyHeader()
