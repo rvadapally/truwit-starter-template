@@ -51,18 +51,31 @@ public class ProofCardController : ControllerBase
                 return BadRequest(new { error = "Size must be 640, 800, or 1024" });
             }
 
-            // Try to find proof in VerificationProofs table first
-            var verificationProof = await _verificationRepository.GetByProofIdAsync(proofId);
+            // Normalize incoming id variants
+            var originalId = proofId;
+            var cleanId = proofId.StartsWith("TW-", StringComparison.OrdinalIgnoreCase)
+                ? proofId.Substring(3)
+                : proofId;
+            var prefixedId = proofId.StartsWith("TW-", StringComparison.OrdinalIgnoreCase)
+                ? proofId
+                : $"TW-{proofId}";
+
+            // Try to find proof in VerificationProofs table first (by both forms)
+            var verificationProof = await _verificationRepository.GetByProofIdAsync(originalId)
+                ?? await _verificationRepository.GetByProofIdAsync(prefixedId)
+                ?? await _verificationRepository.GetByProofIdAsync(cleanId);
             if (verificationProof != null)
             {
                 return await GenerateCardForVerificationProof(verificationProof, size);
             }
 
-            // If not found in VerificationProofs, try Proofs table by TrustmarkId
-            var proof = await _proofsRepository.GetByTrustmarkIdAsync(proofId);
+            // If not found in VerificationProofs, try Proofs table by TrustmarkId (accept with/without TW-)
+            var proof = await _proofsRepository.GetByTrustmarkIdAsync(originalId)
+                ?? await _proofsRepository.GetByTrustmarkIdAsync(cleanId)
+                ?? await _proofsRepository.GetByTrustmarkIdAsync(cleanId.ToUpperInvariant());
             if (proof != null)
             {
-                return await GenerateCardForProof(proof, size);
+                return await GenerateCardForProof(proof, size, displayId: prefixedId);
             }
 
             _logger.LogWarning("Proof not found in either table: {ProofId}", proofId);
@@ -99,14 +112,17 @@ public class ProofCardController : ControllerBase
         return await ReturnImageFile(diskPath, publicUrl);
     }
 
-    private async Task<IActionResult> GenerateCardForProof(Proof proof, int size)
+    private async Task<IActionResult> GenerateCardForProof(Proof proof, int size, string? displayId = null)
     {
-        // Compute proof URL
-        var proofUrl = $"https://www.truwit.ai/t/{proof.TrustmarkId}";
+        // Compute display id (use requested id with TW- prefix for filename/QR)
+        var idForDisplay = displayId ?? (proof.TrustmarkId.StartsWith("TW-", StringComparison.OrdinalIgnoreCase)
+            ? proof.TrustmarkId
+            : $"TW-{proof.TrustmarkId}");
+        var proofUrl = $"https://www.truwit.ai/t/{idForDisplay}";
 
         // Generate card
-        _logger.LogInformation("Regenerating proof card for Proof {TrustmarkId} at size {Size}", proof.TrustmarkId, size);
-        var (diskPath, publicUrl) = _generator.Generate(proof.TrustmarkId, proofUrl, size);
+        _logger.LogInformation("Regenerating proof card for Proof {TrustmarkId} at size {Size} (display {DisplayId})", proof.TrustmarkId, size, idForDisplay);
+        var (diskPath, publicUrl) = _generator.Generate(idForDisplay, proofUrl, size);
 
         // Update database with URL
         if (size == 640 && proof.ProofCardSmallUrl != publicUrl)
