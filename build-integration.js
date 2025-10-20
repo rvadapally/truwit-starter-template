@@ -95,6 +95,18 @@ try {
   process.exit(1);
 }
 
+// Ensure SPA fallback inside /app: create 200.html next to index.html
+try {
+  const idx = join(appDistDest, 'index.html');
+  const spa = join(appDistDest, '200.html');
+  validateFileExists(idx, 'Angular index.html');
+  copyFileSync(idx, spa);
+  console.log('✅ Created /app/200.html SPA fallback');
+} catch (err) {
+  console.error('❌ Error creating /app/200.html fallback:', err.message);
+  process.exit(1);
+}
+
 // Copy shared badge image to Angular assets directory
 console.log('📦 Copying shared badge to Angular assets...');
 const badgeDest = join(__dirname, 'dist', 'app', 'assets', 'verified-circular-badge.jpg');
