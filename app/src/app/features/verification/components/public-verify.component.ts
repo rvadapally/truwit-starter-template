@@ -17,6 +17,7 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
   verifyData: VerifyResponse | null = null;
   isLoading = true;
   error: string | null = null;
+  embedCode: string = '';
   
   private destroy$ = new Subject<void>();
 
@@ -60,6 +61,7 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
           this.verifyData = data;
           this.isLoading = false;
           this.updateMetaTags();
+          this.updateEmbedCode();
           this.cdr.markForCheck();
         },
         error: (error) => {
@@ -99,6 +101,37 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     this.meta.updateTag({ name: 'twitter:title', content: `Verified by TruWit: ${proofId}` });
     this.meta.updateTag({ name: 'twitter:description', content: `View verification and provenance for ${proofId}` });
     if (imageUrl) this.meta.updateTag({ name: 'twitter:image', content: imageUrl });
+  }
+
+  private updateEmbedCode(): void {
+    if (!this.verifyData) {
+      this.embedCode = '';
+      return;
+    }
+    const id = this.verifyData.proofId;
+    const verificationUrl = `https://truwit.ai/app/t/${id}`;
+    // Prefer provided badgeUrl, else fall back to API proof card (800px)
+    let imageUrl = this.verifyData.badgeUrl;
+    if (!imageUrl) {
+      const origin = window?.location?.origin || '';
+      // Fallback to same-origin API guess; replace with production API if needed
+      imageUrl = `${origin.replace(/\/$/, '')}/assets/proof/${id}-800.png`;
+    } else if (!/^https?:\/\//i.test(imageUrl)) {
+      imageUrl = new URL(imageUrl, window.location.origin).toString();
+    }
+
+    this.embedCode = `<a href="${verificationUrl}" target="_blank" rel="noopener">
+  <img src="${imageUrl}" alt="Verified by TruWit" />
+</a>`;
+  }
+
+  copyEmbedCodeFromVerification(): void {
+    if (!this.embedCode) return;
+    navigator.clipboard.writeText(this.embedCode).then(() => {
+      this.notificationService.showSuccess('Embed code copied!');
+    }).catch(() => {
+      this.notificationService.showError('Failed to copy embed code');
+    });
   }
 
   copyToClipboard(text: string): void {

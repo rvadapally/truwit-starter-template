@@ -105,5 +105,15 @@
         Add this badge to your content description to show it's verified by Truwit.
       </p>
     </div>
+
+    <!-- Use This Badge (Copy/Paste Snippet) -->
+    <div class="embed-snippet">
+      <h3>Use This Badge</h3>
+      <p>Copy and paste this HTML snippet into your post or site:</p>
+      <textarea class="embed-textarea" readonly [value]="embedCode"></textarea>
+      <div>
+        <button class="btn-secondary" (click)="copyEmbedCodeFromVerification()">Copy Embed Code</button>
+      </div>
+    </div>
   </div>
 </div>
