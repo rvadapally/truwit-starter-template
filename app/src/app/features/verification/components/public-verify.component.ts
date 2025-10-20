@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
+import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
@@ -23,7 +24,9 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private verificationService: VerificationService,
     private cdr: ChangeDetectorRef,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private title: Title,
+    private meta: Meta
   ) {}
 
   ngOnInit(): void {
@@ -56,6 +59,7 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
         next: (data) => {
           this.verifyData = data;
           this.isLoading = false;
+          this.updateMetaTags();
           this.cdr.markForCheck();
         },
         error: (error) => {
@@ -66,6 +70,35 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }
       });
+  }
+
+  private updateMetaTags(): void {
+    if (!this.verifyData) return;
+    const proofId = this.verifyData.proofId;
+    const pageUrl = window.location.href;
+
+    // Prefer provided badgeUrl; ensure it is absolute for OG
+    let imageUrl = this.verifyData.badgeUrl;
+    if (imageUrl && !/^https?:\/\//i.test(imageUrl)) {
+      // If relative, prefix with current origin
+      imageUrl = new URL(imageUrl, window.location.origin).toString();
+    }
+
+    this.title.setTitle(`Verified by TruWit: ${proofId}`);
+    this.meta.updateTag({ name: 'description', content: `Verification details for ${proofId}` });
+
+    // Open Graph
+    this.meta.updateTag({ property: 'og:type', content: 'website' });
+    this.meta.updateTag({ property: 'og:title', content: `Verified by TruWit: ${proofId}` });
+    this.meta.updateTag({ property: 'og:description', content: `View verification and provenance for ${proofId}` });
+    if (imageUrl) this.meta.updateTag({ property: 'og:image', content: imageUrl });
+    this.meta.updateTag({ property: 'og:url', content: pageUrl });
+
+    // Twitter
+    this.meta.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+    this.meta.updateTag({ name: 'twitter:title', content: `Verified by TruWit: ${proofId}` });
+    this.meta.updateTag({ name: 'twitter:description', content: `View verification and provenance for ${proofId}` });
+    if (imageUrl) this.meta.updateTag({ name: 'twitter:image', content: imageUrl });
   }
 
   copyToClipboard(text: string): void {

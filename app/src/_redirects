@@ -1,5 +1,5 @@
 # Cloudflare Pages SPA routing
 # All routes should serve index.html for Angular routing
 
-/*    /index.html   200
+/app/*    /app/index.html   200
 
