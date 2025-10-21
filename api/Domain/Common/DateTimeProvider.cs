@@ -1,16 +1,17 @@
 namespace HumanProof.Api.Domain.Common;
 
 /// <summary>
-/// Provides DateTime values in Central Time Zone (Dallas, Texas)
+/// Provides DateTime values - ALWAYS uses UTC for database storage
 /// </summary>
 public static class DateTimeProvider
 {
     private static readonly TimeZoneInfo CentralTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
 
     /// <summary>
-    /// Gets the current DateTime in Central Time Zone (CST/CDT for Dallas, Texas)
+    /// Gets the current DateTime in UTC (for database storage)
+    /// This should ALWAYS be used for CreatedAt/UpdatedAt fields
     /// </summary>
-    public static DateTime Now => TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, CentralTimeZone);
+    public static DateTime Now => DateTime.UtcNow;  // CHANGED: Was converting to Central Time
 
     /// <summary>
     /// Gets the current UTC DateTime
