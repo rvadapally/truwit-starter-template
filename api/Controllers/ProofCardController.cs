@@ -150,8 +150,8 @@ public class ProofCardController : ControllerBase
 
         var imageBytes = await System.IO.File.ReadAllBytesAsync(diskPath);
 
-        // Set cache headers
-        Response.Headers.Append("Cache-Control", "public, max-age=31536000, immutable");
+        // Set cache headers - DISABLED FOR TESTING
+        Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
         Response.Headers.Append("X-Generated-On-Demand", "true");
 
         _logger.LogInformation("✅ Regenerated proof card: {PublicUrl}", publicUrl);

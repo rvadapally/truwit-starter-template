@@ -36,7 +36,7 @@ public class BadgesController : ControllerBase
             {
                 var badgeSvg = GenerateBadgeSvg(proof, trustmarkId);
                 
-                Response.Headers["Cache-Control"] = "public, max-age=3600"; // Cache for 1 hour
+                Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate"; // Disable caching for testing
                 return Content(badgeSvg, "image/svg+xml");
             }
 
@@ -47,7 +47,7 @@ public class BadgesController : ControllerBase
             {
                 var badgeSvg = GenerateLegacyBadgeSvg(legacyProof, trustmarkId);
                 
-                Response.Headers["Cache-Control"] = "public, max-age=3600"; // Cache for 1 hour
+                Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate"; // Disable caching for testing
                 return Content(badgeSvg, "image/svg+xml");
             }
 
@@ -168,7 +168,7 @@ public class BadgesController : ControllerBase
                 if (System.IO.File.Exists(badgePath))
                 {
                     var fileBytes = System.IO.File.ReadAllBytes(badgePath);
-                    Response.Headers["Cache-Control"] = "public, max-age=3600"; // Cache for 1 hour
+                    Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate"; // Disable caching for testing
                     return File(fileBytes, "image/png");
                 }
             }

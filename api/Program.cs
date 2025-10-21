@@ -240,7 +240,7 @@ try
     // CORS must be before static files to apply headers to static content
     app.UseCors("AllowAll");
     
-    // Enable static file serving for proof cards and assets with CORS support
+    // Enable static file serving for proof cards and assets with CORS support - CACHING DISABLED FOR TESTING
     app.UseStaticFiles(new StaticFileOptions
     {
         OnPrepareResponse = ctx =>
@@ -249,6 +249,8 @@ try
             ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
             ctx.Context.Response.Headers.Append("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
             ctx.Context.Response.Headers.Append("Access-Control-Allow-Headers", "*");
+            // DISABLE CACHING FOR TESTING
+            ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
         }
     });
     
