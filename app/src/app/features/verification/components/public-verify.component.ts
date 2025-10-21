@@ -5,6 +5,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import type { VerifyResponse } from '../../../core/models';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-public-verify',
@@ -273,9 +274,10 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     // Try dynamic badge first, fallback to static
     let badgeUrl = this.verifyData.badgeUrl;
     if (!badgeUrl) {
-      // Use the correct API endpoint for badges with HTTPS
+      // Use the NEW proof card endpoint for beautiful cards with QR codes
       const trustmarkId = this.getTrustmarkIdFromUrl();
-      badgeUrl = `https://api.truwit.ai/assets/proof/${trustmarkId}-800.png`;
+      const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
+      badgeUrl = `${apiUrl}/cards/proof/${trustmarkId}-800.png`;
     } else if (!/^https?:\/\//i.test(badgeUrl)) {
       // Convert relative URLs to absolute HTTPS URLs
       badgeUrl = new URL(badgeUrl, window.location.origin).toString();
