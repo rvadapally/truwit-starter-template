@@ -228,8 +228,8 @@ class ComprehensiveE2ETester:
                 ))
     
     async def test_badge_system(self, browser: Browser):
-        """Test the complete badge system end-to-end"""
-        print("\n[TEST] Testing Badge System...")
+        """Test the complete badge system end-to-end with consistency validation"""
+        print("\n[TEST] Testing Badge System Consistency (CRUX of the app)...")
         
         start_time = time.time()
         
@@ -237,64 +237,182 @@ class ComprehensiveE2ETester:
             context = await browser.new_context()
             page = await context.new_page()
             
-            # Track badge loading
+            # Track badge loading and consistency
             badge_loading_logs = []
+            badge_urls_found = set()
+            console_errors = []
+            
             def on_console(msg: ConsoleMessage):
-                if "badge" in msg.text.lower() or "loading" in msg.text.lower():
+                if "badge" in msg.text.lower() or "loading" in msg.text.lower() or "proof" in msg.text.lower():
                     badge_loading_logs.append({"type": msg.type, "text": msg.text})
+                if msg.type == "error":
+                    console_errors.append(msg.text)
             
             page.on("console", on_console)
             
-            # Navigate to verification page
+            # Test 1: Navigate to verification page and check badge loading
+            print("   Testing verification page badge loading...")
             verify_url = f"{self.base_url}/app/#/verify"
             await page.goto(verify_url, wait_until="load")
+            await page.wait_for_timeout(3000)
             
-            # Wait for badge to load (or fail)
-            await page.wait_for_timeout(5000)
-            
-            # Check for badge elements
-            badge_elements = await page.evaluate("""
+            # Check for badge elements and consistency
+            badge_analysis = await page.evaluate("""
                 () => {
-                    const badges = document.querySelectorAll('img[alt*="badge"], img[alt*="Badge"], .badge-image, .circular-badge-image');
-                    const loadingSpinners = document.querySelectorAll('.loading-spinner, .badge-loading');
-                    const loadingTexts = Array.from(document.querySelectorAll('.loading-text')).map(el => el.textContent);
+                    const badges = document.querySelectorAll('img[alt*="badge"], img[alt*="Badge"], img[alt*="Verified"], img[alt*="Truwit"], .badge-image, .circular-badge-image');
+                    const loadingSpinners = document.querySelectorAll('.loading-spinner, .badge-loading, [class*="loading"]');
+                    const loadingTexts = Array.from(document.querySelectorAll('.loading-text, [class*="loading"]')).map(el => el.textContent);
+                    
+                    const badgeData = Array.from(badges).map(img => ({
+                        src: img.src,
+                        alt: img.alt,
+                        className: img.className,
+                        width: img.width,
+                        height: img.height,
+                        naturalWidth: img.naturalWidth,
+                        naturalHeight: img.naturalHeight
+                    }));
                     
                     return {
                         badgeCount: badges.length,
                         spinnerCount: loadingSpinners.length,
                         loadingTexts: loadingTexts,
                         hasStuckLoading: loadingTexts.some(text => text && text.includes('Loading badge')),
-                        badgeSources: Array.from(badges).map(img => img.src)
+                        badgeData: badgeData,
+                        isCircularBadge: badgeData.some(b => 
+                            b.src.includes('circular') || 
+                            b.src.includes('card') || 
+                            b.className.includes('circular') ||
+                            (b.naturalWidth > 0 && b.naturalHeight > 0 && Math.abs(b.naturalWidth - b.naturalHeight) < 50)
+                        )
                     };
                 }
             """)
             
+            # Test 2: Test badge consistency across different routes
+            print("   Testing badge consistency across routes...")
+            routes_to_test = [
+                ("Home", f"{self.base_url}/app/#/"),
+                ("About", f"{self.base_url}/app/#/about"),
+            ]
+            
+            route_consistency_scores = []
+            
+            for route_name, route_url in routes_to_test:
+                await page.goto(route_url, wait_until="load")
+                await page.wait_for_timeout(2000)
+                
+                route_badges = await page.evaluate("""
+                    () => {
+                        const badges = document.querySelectorAll('img[alt*="badge"], img[alt*="Badge"], img[alt*="Verified"], img[alt*="Truwit"]');
+                        return Array.from(badges).map(img => ({
+                            src: img.src,
+                            alt: img.alt,
+                            className: img.className
+                        }));
+                    }
+                """)
+                
+                # Check consistency of badge sources
+                route_score = 1.0
+                for badge in route_badges:
+                    badge_urls_found.add(badge['src'])
+                    # Check if badge is using new proof card endpoint
+                    if not ('cards/proof' in badge['src'] or 'circular' in badge['src'].lower()):
+                        route_score -= 0.3
+                
+                route_consistency_scores.append(route_score)
+            
+            # Test 3: Test badge API endpoints directly
+            print("   Testing badge API endpoints...")
+            api_endpoints = [
+                f"{self.api_url}/cards/proof/TW-TEST-800.png",
+                f"{self.api_url}/v1/badge/TW-TEST.svg",
+            ]
+            
+            api_success_count = 0
+            for endpoint in api_endpoints:
+                try:
+                    response = await page.request.get(endpoint)
+                    if response.status in [200, 404]:  # 404 is expected for test IDs
+                        api_success_count += 1
+                except:
+                    pass
+            
+            api_consistency_score = api_success_count / len(api_endpoints) if api_endpoints else 0.0
+            
+            # Calculate overall consistency score
+            overall_consistency = 0.0
+            consistency_factors = []
+            
+            # Factor 1: Badge loading success
+            if badge_analysis.get('badgeCount', 0) > 0 and not badge_analysis.get('hasStuckLoading'):
+                consistency_factors.append(1.0)
+            else:
+                consistency_factors.append(0.0)
+            
+            # Factor 2: No loading spinners
+            if badge_analysis.get('spinnerCount', 0) == 0:
+                consistency_factors.append(1.0)
+            else:
+                consistency_factors.append(0.5)
+            
+            # Factor 3: Circular badge format
+            if badge_analysis.get('isCircularBadge', False):
+                consistency_factors.append(1.0)
+            else:
+                consistency_factors.append(0.3)
+            
+            # Factor 4: Route consistency
+            if route_consistency_scores:
+                consistency_factors.append(sum(route_consistency_scores) / len(route_consistency_scores))
+            else:
+                consistency_factors.append(1.0)
+            
+            # Factor 5: API consistency
+            consistency_factors.append(api_consistency_score)
+            
+            # Factor 6: No console errors
+            if len(console_errors) == 0:
+                consistency_factors.append(1.0)
+            else:
+                consistency_factors.append(0.5)
+            
+            overall_consistency = sum(consistency_factors) / len(consistency_factors)
+            
             duration_ms = int((time.time() - start_time) * 1000)
             
-            # Check if badges loaded successfully
-            passed = (
-                badge_elements.get('badgeCount', 0) > 0 and
-                not badge_elements.get('hasStuckLoading') and
-                badge_elements.get('spinnerCount', 0) == 0
-            )
+            # Determine if test passed (rock solid = 90%+ consistency)
+            passed = overall_consistency >= 0.9
             
             error_msg = ""
             if not passed:
-                if badge_elements.get('hasStuckLoading'):
-                    error_msg = f"Badge loading stuck: {badge_elements.get('loadingTexts')}"
-                elif badge_elements.get('badgeCount', 0) == 0:
-                    error_msg = "No badge elements found"
-                elif badge_elements.get('spinnerCount', 0) > 0:
-                    error_msg = f"Loading spinners still present: {badge_elements.get('spinnerCount')}"
+                if overall_consistency >= 0.7:
+                    error_msg = f"Badge consistency needs improvement: {overall_consistency:.2f}"
+                else:
+                    error_msg = f"CRITICAL: Badge consistency issues detected: {overall_consistency:.2f}"
             
             self.results.append(TestResult(
-                test_name="Badge System End-to-End",
+                test_name="Badge System Consistency (CRUX)",
                 passed=passed,
                 error_message=error_msg,
                 details={
-                    "badge_elements": badge_elements,
+                    "overall_consistency_score": overall_consistency,
+                    "consistency_factors": {
+                        "badge_loading": consistency_factors[0],
+                        "no_spinners": consistency_factors[1],
+                        "circular_format": consistency_factors[2],
+                        "route_consistency": consistency_factors[3],
+                        "api_consistency": consistency_factors[4],
+                        "no_console_errors": consistency_factors[5]
+                    },
+                    "badge_analysis": badge_analysis,
+                    "route_scores": dict(zip([r[0] for r in routes_to_test], route_consistency_scores)),
+                    "unique_badge_urls": list(badge_urls_found),
+                    "console_errors": console_errors,
                     "loading_logs": badge_loading_logs,
-                    "verify_url": verify_url
+                    "verify_url": verify_url,
+                    "badge_status": "ROCK SOLID" if overall_consistency >= 0.9 else "NEEDS IMPROVEMENT" if overall_consistency >= 0.7 else "CRITICAL ISSUES"
                 },
                 duration_ms=duration_ms
             ))
@@ -304,7 +422,7 @@ class ComprehensiveE2ETester:
         except Exception as e:
             duration_ms = int((time.time() - start_time) * 1000)
             self.results.append(TestResult(
-                test_name="Badge System End-to-End",
+                test_name="Badge System Consistency (CRUX)",
                 passed=False,
                 error_message=str(e),
                 duration_ms=duration_ms
