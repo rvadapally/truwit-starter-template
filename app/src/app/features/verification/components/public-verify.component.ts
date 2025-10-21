@@ -120,13 +120,14 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     
     // Use trustmarkId for URL consistency (matches the actual verification URL)
     const trustmarkId = this.getTrustmarkIdFromUrl();
-    const verificationUrl = `https://truwit.ai/app/t/`;
+    const verificationUrl = `https://truwit.ai/app/t/${trustmarkId}`;
     
     // Use the correct badge URL format
     let imageUrl = this.verifyData.badgeUrl;
     if (!imageUrl) {
-      // Use the correct API endpoint for badges
-      imageUrl = `https://api.truwit.ai/assets/proof/${trustmarkId}-800.png`;
+      // Use the NEW proof card endpoint for beautiful cards with QR codes
+      const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
+      imageUrl = `${apiUrl}/cards/proof/${trustmarkId}-800.png`;
     } else if (!/^https?:\/\//i.test(imageUrl)) {
       imageUrl = new URL(imageUrl, window.location.origin).toString();
     }

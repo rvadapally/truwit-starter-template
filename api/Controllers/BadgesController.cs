@@ -257,15 +257,17 @@ public class BadgesController : ControllerBase
 
     private string GenerateEmbedCode(string proofId)
     {
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
         return $"""
-        <a href="https://truwit.ai/app/t/{proofId}" target="_blank">
-            <img src="https://api.truwit.ai/v1/badge/{proofId}.svg" alt="Verified by Truwit" />
+        <a href="https://truwit.ai/app/t/{proofId}" target="_blank" rel="noopener">
+            <img src="{baseUrl}/cards/proof/{proofId}-800.png" alt="Verified by Truwit" style="max-width: 200px; height: auto;" />
         </a>
         """;
     }
 
     private string GenerateMarkdownCode(string proofId)
     {
-        return $"[![Verified by Truwit](https://api.truwit.ai/v1/badge/{proofId}.svg)](https://truwit.ai/app/t/{proofId})";
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        return $"[![Verified by Truwit]({baseUrl}/cards/proof/{proofId}-800.png)](https://truwit.ai/app/t/{proofId})";
     }
 }
