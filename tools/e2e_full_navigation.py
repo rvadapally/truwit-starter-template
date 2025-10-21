@@ -131,6 +131,11 @@ async def visit_route(playwright: Playwright, browser: Browser, path: str) -> Pa
         console_messages.append({"type": msg.type, "text": msg.text})
         if msg.type == "error":
             failed = True
+        # Also fail on warnings that indicate real issues
+        if msg.type == "warning" and any(keyword in msg.text.lower() for keyword in [
+            "failed to load", "loading badge", "message channel", "deprecated parameters"
+        ]):
+            failed = True
 
     page.on("console", on_console)
 
@@ -176,6 +181,26 @@ async def visit_route(playwright: Playwright, browser: Browser, path: str) -> Pa
     pending_ui_states = await collect_visible_pending_states(page)
     if pending_ui_states:
         failed = True
+    
+    # Check for stuck badge loading spinners specifically
+    badge_loading_elements = await page.evaluate("""
+        () => {
+            const loadingElements = document.querySelectorAll('.badge-loading, .loading-spinner');
+            const loadingTexts = Array.from(document.querySelectorAll('.loading-text')).map(el => el.textContent);
+            return {
+                count: loadingElements.length,
+                texts: loadingTexts,
+                hasBadgeLoading: loadingTexts.some(text => text && text.includes('Loading badge'))
+            };
+        }
+    """)
+    
+    if badge_loading_elements.get('hasBadgeLoading'):
+        failed = True
+        console_messages.append({
+            "type": "error", 
+            "text": f"Badge loading spinner detected: {badge_loading_elements['texts']}"
+        })
 
     links = await extract_internal_links(page, url)
 
