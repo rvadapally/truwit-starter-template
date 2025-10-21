@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
     <footer class="tw-footer">
       <div class="container">
         <div class="footer-left">
-          <img src="/assets/verified-circular-badge.jpg" 
+          <img src="assets/verified-circular-badge.jpg" 
                alt="Verified by TruWit" 
                class="verified-badge" />
           <p class="footer-text">

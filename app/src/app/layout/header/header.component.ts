@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LogoComponent } from '../../shared/components/logo/logo.component';
+import { ThemeToggleComponent } from '../../shared/components/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterModule, CommonModule, LogoComponent],
+  imports: [RouterModule, CommonModule, LogoComponent, ThemeToggleComponent],
   template: `
     <header class="tw-header">
       <div class="container">
@@ -15,6 +16,7 @@ import { LogoComponent } from '../../shared/components/logo/logo.component';
           <a routerLink="/" aria-label="Home">Home</a>
           <a routerLink="/about" aria-label="About">About</a>
           <a routerLink="/app/#/verify" aria-label="Verify Content">Verify</a>
+          <app-theme-toggle></app-theme-toggle>
         </nav>
       </div>
     </header>

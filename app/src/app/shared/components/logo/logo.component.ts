@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   imports: [RouterModule, CommonModule],
   template: `
     <a routerLink="/" class="logo-link">
-      <img src="/assets/logo.svg" alt="TruWit - Where Provenance Meets Proof" class="logo" />
+      <img src="assets/logo.svg" alt="TruWit - Where Provenance Meets Proof" class="logo" />
     </a>
   `,
   styles: [`
