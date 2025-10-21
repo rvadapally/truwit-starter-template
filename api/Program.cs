@@ -29,8 +29,20 @@ try
     {
         c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
         {
-            Title = "Truwit API",
-            Version = "v1"
+            Title = "Truwit API (UI Testing)",
+            Version = "v1",
+            Description = "Subset of endpoints used by the UI for testing"
+        });
+
+        // Expose only main UI routes in Swagger
+        c.DocInclusionPredicate((docName, apiDesc) =>
+        {
+            var path = apiDesc.RelativePath?.ToLowerInvariant() ?? string.Empty;
+            // keep only these route prefixes
+            return path.StartsWith("v1/proofs")
+                || path.StartsWith("v1/badge")
+                || path.StartsWith("cards/proof")
+                || path.StartsWith("health"); // keep health for convenience
         });
     });
 
@@ -125,46 +137,22 @@ try
     builder.Services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
 
     // Register repository implementation based on environment
-    var databaseType = builder.Configuration.GetValue<string>("Database:Type", "sqlite");
+    // Database: Postgres only
+    var postgresConnectionString = builder.Configuration.GetConnectionString("Postgres")
+        ?? "Host=localhost;Database=truwit;Username=postgres;Password=password";
 
-    switch (databaseType.ToLower())
-    {
-        case "postgres":
-            // Use Postgres database
-            var postgresConnectionString = builder.Configuration.GetConnectionString("Postgres")
-                ?? "Host=localhost;Database=truwit;Username=postgres;Password=password";
+    // Configure AppContext to use UTC timestamps for PostgreSQL
+    AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            // Configure AppContext to use UTC timestamps for PostgreSQL
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(postgresConnectionString));
 
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(postgresConnectionString));
+    builder.Services.AddScoped<IVerificationRepository, PostgresVerificationRepository>();
 
-            builder.Services.AddScoped<IVerificationRepository, PostgresVerificationRepository>();
+    Console.WriteLine("✅ Using Postgres database");
 
-            Console.WriteLine("✅ Using Postgres database");
-            break;
-
-        case "sqlite":
-            // Use SQLite database
-            var sqliteConnectionString = builder.Configuration.GetConnectionString("Sqlite")
-                ?? "Data Source=truwit.db";
-
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(sqliteConnectionString));
-
-            builder.Services.AddScoped<IVerificationRepository, PostgresVerificationRepository>();
-
-            Console.WriteLine("✅ Using SQLite database");
-            break;
-
-        default:
-            // Use in-memory repository for development
-            builder.Services.AddScoped<IVerificationRepository, InMemoryVerificationRepository>();
-
-            Console.WriteLine("✅ Using in-memory repository");
-            break;
-    }
+    // For legacy startup flow below
+    var databaseType = "postgres";
 
     var app = builder.Build();
     
