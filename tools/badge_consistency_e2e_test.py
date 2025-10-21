@@ -701,13 +701,13 @@ async def main():
     
     # Return exit code based on results
     if summary['overall_consistency_score'] >= 0.9:
-        print("\n🎉 BADGE CONSISTENCY IS ROCK SOLID!")
+        print("\n[SUCCESS] BADGE CONSISTENCY IS ROCK SOLID!")
         return 0
     elif summary['overall_consistency_score'] >= 0.7:
-        print("\n⚠️  Badge consistency needs improvement")
+        print("\n[WARNING] Badge consistency needs improvement")
         return 1
     else:
-        print("\n❌ CRITICAL: Badge consistency issues detected")
+        print("\n[CRITICAL] Badge consistency issues detected")
         return 2
 
 

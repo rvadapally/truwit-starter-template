@@ -62,13 +62,13 @@ set test_result=%errorlevel%
 echo.
 echo ========================================
 if %test_result% equ 0 (
-    echo 🎉 BADGE CONSISTENCY TESTS PASSED!
+    echo [SUCCESS] BADGE CONSISTENCY TESTS PASSED!
     echo The unified circular badge system is ROCK SOLID!
 ) else if %test_result% equ 1 (
-    echo ⚠️  BADGE CONSISTENCY TESTS WARNING
+    echo [WARNING] BADGE CONSISTENCY TESTS WARNING
     echo Badge consistency needs improvement
 ) else (
-    echo ❌ BADGE CONSISTENCY TESTS FAILED
+    echo [CRITICAL] BADGE CONSISTENCY TESTS FAILED
     echo CRITICAL: Badge consistency issues detected
 )
 echo ========================================
