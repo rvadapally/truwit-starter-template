@@ -46,20 +46,12 @@ try
         });
     });
 
-    // Add CORS
+    // Add CORS - Allow all origins for development/testing
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll", policy =>
         {
-            policy.WithOrigins(
-                    "http://localhost:4200",
-                    "https://truwit.ai",
-                    "https://www.truwit.ai",
-                    "https://truwit-starter-template-production.up.railway.app",
-                    "https://6b7eb0da.truwit-starter-template.pages.dev",
-                    "https://502082c8.truwit-starter-template.pages.dev",
-                    "https://*.truwit-starter-template.pages.dev"
-                  )
+            policy.AllowAnyOrigin()
                   .AllowAnyMethod()
                   .AllowAnyHeader()
                   .WithExposedHeaders("*");
