@@ -1,0 +1,837 @@
+{
+  "summary": {
+    "total_tests": 20,
+    "passed": 17,
+    "failed": 3,
+    "success_rate": "85.0%",
+    "timestamp": "2025-10-20 20:06:07",
+    "base_url": "https://truwit.ai",
+    "api_url": "https://truwit-starter-template-production.up.railway.app"
+  },
+  "categories": {
+    "Frontend Route": {
+      "passed": 11,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Frontend Route: /",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3756
+        },
+        {
+          "test_name": "Frontend Route: /about",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/about",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3027
+        },
+        {
+          "test_name": "Frontend Route: /contact",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/contact",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3646
+        },
+        {
+          "test_name": "Frontend Route: /how-it-works",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/how-it-works",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3135
+        },
+        {
+          "test_name": "Frontend Route: /technology",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/technology",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3104
+        },
+        {
+          "test_name": "Frontend Route: /pricing",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/pricing",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 2931
+        },
+        {
+          "test_name": "Frontend Route: /investors",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/investors",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3018
+        },
+        {
+          "test_name": "Frontend Route: /use-cases",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/use-cases",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3022
+        },
+        {
+          "test_name": "Frontend Route: /verify",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/verify",
+            "status": 200,
+            "console_errors": [
+              {
+                "type": "warning",
+                "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+              },
+              {
+                "type": "warning",
+                "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+              }
+            ],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 2681
+        },
+        {
+          "test_name": "Frontend Route: /app",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/app",
+            "status": 200,
+            "console_errors": [],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 3536
+        },
+        {
+          "test_name": "Frontend Route: /app/#/verify",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit.ai/app/#/verify",
+            "status": 200,
+            "console_errors": [],
+            "loading_elements": {
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false
+            }
+          },
+          "duration_ms": 2933
+        }
+      ]
+    },
+    "API": {
+      "passed": 3,
+      "failed": 1,
+      "tests": [
+        {
+          "test_name": "API: Health Check",
+          "passed": false,
+          "error_message": "Missing no-cache headers: ",
+          "details": {
+            "url": "https://truwit-starter-template-production.up.railway.app/health",
+            "status": 200,
+            "content_type": "application/json; charset=utf-8",
+            "cache_control": "",
+            "content_length": null
+          },
+          "duration_ms": 4833
+        },
+        {
+          "test_name": "API: Badge SVG",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit-starter-template-production.up.railway.app/v1/badge/TW-E6F13C97.svg",
+            "status": 200,
+            "content_type": "image/svg+xml",
+            "cache_control": "no-cache, no-store, must-revalidate",
+            "content_length": "1230"
+          },
+          "duration_ms": 430
+        },
+        {
+          "test_name": "API: Proof Card",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit-starter-template-production.up.railway.app/cards/proof/TW-E6F13C97-800.png",
+            "status": 200,
+            "content_type": "image/png",
+            "cache_control": "no-cache, no-store, must-revalidate",
+            "content_length": "62111"
+          },
+          "duration_ms": 641
+        },
+        {
+          "test_name": "API: Static Badge",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit-starter-template-production.up.railway.app/assets/proof/TW-E6F13C97-800.png",
+            "status": 200,
+            "content_type": "image/png",
+            "cache_control": "no-cache, no-store, must-revalidate",
+            "content_length": "62111"
+          },
+          "duration_ms": 495
+        }
+      ]
+    },
+    "Other": {
+      "passed": 1,
+      "failed": 1,
+      "tests": [
+        {
+          "test_name": "Badge System End-to-End",
+          "passed": false,
+          "error_message": "No badge elements found",
+          "details": {
+            "badge_elements": {
+              "badgeCount": 0,
+              "spinnerCount": 0,
+              "loadingTexts": [],
+              "hasStuckLoading": false,
+              "badgeSources": []
+            },
+            "loading_logs": [],
+            "verify_url": "https://truwit.ai/app/#/verify"
+          },
+          "duration_ms": 6067
+        },
+        {
+          "test_name": "CORS Functionality",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "success": true,
+            "status": 200,
+            "headers": {
+              "access-control-allow-origin": "https://truwit.ai",
+              "access-control-expose-headers": "*",
+              "cache-control": "no-cache, no-store, must-revalidate",
+              "content-length": "1230",
+              "content-type": "image/svg+xml",
+              "date": "Tue, 21 Oct 2025 01:06:06 GMT",
+              "server": "railway-edge",
+              "vary": "Origin",
+              "x-railway-edge": "railway/us-east4-eqdc4a",
+              "x-railway-request-id": "Qt4vi4EtQTyk_YaEwoOzXw",
+              "x-request-id": "3966e260"
+            }
+          },
+          "duration_ms": 23467
+        }
+      ]
+    },
+    "Verification Page": {
+      "passed": 0,
+      "failed": 1,
+      "tests": [
+        {
+          "test_name": "Verification Page: TW-E6F13C97",
+          "passed": false,
+          "error_message": "No TW- prefix found. Found: []",
+          "details": {
+            "page_content": {
+              "proofIds": [],
+              "badgeCount": 0,
+              "badgeSources": [],
+              "hasTWPrefix": false
+            },
+            "console_messages": [
+              {
+                "type": "log",
+                "text": "\ud83d\udd27 ApiService initialized with API URL: https://truwit-starter-template-production.up.railway.app"
+              }
+            ],
+            "verify_url": "https://truwit.ai/app/t/TW-E6F13C97"
+          },
+          "duration_ms": 4238
+        }
+      ]
+    },
+    "Caching Test": {
+      "passed": 2,
+      "failed": 0,
+      "tests": [
+        {
+          "test_name": "Caching Test: TW-E6F13C97.svg",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit-starter-template-production.up.railway.app/v1/badge/TW-E6F13C97.svg",
+            "cache_control_1": "no-cache, no-store, must-revalidate",
+            "cache_control_2": "no-cache, no-store, must-revalidate",
+            "status_1": 200,
+            "status_2": 200
+          },
+          "duration_ms": 613
+        },
+        {
+          "test_name": "Caching Test: TW-E6F13C97-800.png",
+          "passed": true,
+          "error_message": "",
+          "details": {
+            "url": "https://truwit-starter-template-production.up.railway.app/cards/proof/TW-E6F13C97-800.png",
+            "cache_control_1": "no-cache, no-store, must-revalidate",
+            "cache_control_2": "no-cache, no-store, must-revalidate",
+            "status_1": 200,
+            "status_2": 200
+          },
+          "duration_ms": 547
+        }
+      ]
+    }
+  },
+  "all_results": [
+    {
+      "test_name": "Frontend Route: /",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3756
+    },
+    {
+      "test_name": "Frontend Route: /about",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/about",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3027
+    },
+    {
+      "test_name": "Frontend Route: /contact",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/contact",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3646
+    },
+    {
+      "test_name": "Frontend Route: /how-it-works",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/how-it-works",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3135
+    },
+    {
+      "test_name": "Frontend Route: /technology",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/technology",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3104
+    },
+    {
+      "test_name": "Frontend Route: /pricing",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/pricing",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 2931
+    },
+    {
+      "test_name": "Frontend Route: /investors",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/investors",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3018
+    },
+    {
+      "test_name": "Frontend Route: /use-cases",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/use-cases",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3022
+    },
+    {
+      "test_name": "Frontend Route: /verify",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/verify",
+        "status": 200,
+        "console_errors": [
+          {
+            "type": "warning",
+            "text": "Failed to decode downloaded font: https://truwit.ai/fonts/Inter-Var.woff2"
+          },
+          {
+            "type": "warning",
+            "text": "OTS parsing error: invalid sfntVersion: 1008813135"
+          }
+        ],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 2681
+    },
+    {
+      "test_name": "Frontend Route: /app",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/app",
+        "status": 200,
+        "console_errors": [],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 3536
+    },
+    {
+      "test_name": "Frontend Route: /app/#/verify",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit.ai/app/#/verify",
+        "status": 200,
+        "console_errors": [],
+        "loading_elements": {
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false
+        }
+      },
+      "duration_ms": 2933
+    },
+    {
+      "test_name": "API: Health Check",
+      "passed": false,
+      "error_message": "Missing no-cache headers: ",
+      "details": {
+        "url": "https://truwit-starter-template-production.up.railway.app/health",
+        "status": 200,
+        "content_type": "application/json; charset=utf-8",
+        "cache_control": "",
+        "content_length": null
+      },
+      "duration_ms": 4833
+    },
+    {
+      "test_name": "API: Badge SVG",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit-starter-template-production.up.railway.app/v1/badge/TW-E6F13C97.svg",
+        "status": 200,
+        "content_type": "image/svg+xml",
+        "cache_control": "no-cache, no-store, must-revalidate",
+        "content_length": "1230"
+      },
+      "duration_ms": 430
+    },
+    {
+      "test_name": "API: Proof Card",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit-starter-template-production.up.railway.app/cards/proof/TW-E6F13C97-800.png",
+        "status": 200,
+        "content_type": "image/png",
+        "cache_control": "no-cache, no-store, must-revalidate",
+        "content_length": "62111"
+      },
+      "duration_ms": 641
+    },
+    {
+      "test_name": "API: Static Badge",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit-starter-template-production.up.railway.app/assets/proof/TW-E6F13C97-800.png",
+        "status": 200,
+        "content_type": "image/png",
+        "cache_control": "no-cache, no-store, must-revalidate",
+        "content_length": "62111"
+      },
+      "duration_ms": 495
+    },
+    {
+      "test_name": "Badge System End-to-End",
+      "passed": false,
+      "error_message": "No badge elements found",
+      "details": {
+        "badge_elements": {
+          "badgeCount": 0,
+          "spinnerCount": 0,
+          "loadingTexts": [],
+          "hasStuckLoading": false,
+          "badgeSources": []
+        },
+        "loading_logs": [],
+        "verify_url": "https://truwit.ai/app/#/verify"
+      },
+      "duration_ms": 6067
+    },
+    {
+      "test_name": "Verification Page: TW-E6F13C97",
+      "passed": false,
+      "error_message": "No TW- prefix found. Found: []",
+      "details": {
+        "page_content": {
+          "proofIds": [],
+          "badgeCount": 0,
+          "badgeSources": [],
+          "hasTWPrefix": false
+        },
+        "console_messages": [
+          {
+            "type": "log",
+            "text": "\ud83d\udd27 ApiService initialized with API URL: https://truwit-starter-template-production.up.railway.app"
+          }
+        ],
+        "verify_url": "https://truwit.ai/app/t/TW-E6F13C97"
+      },
+      "duration_ms": 4238
+    },
+    {
+      "test_name": "Caching Test: TW-E6F13C97.svg",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit-starter-template-production.up.railway.app/v1/badge/TW-E6F13C97.svg",
+        "cache_control_1": "no-cache, no-store, must-revalidate",
+        "cache_control_2": "no-cache, no-store, must-revalidate",
+        "status_1": 200,
+        "status_2": 200
+      },
+      "duration_ms": 613
+    },
+    {
+      "test_name": "Caching Test: TW-E6F13C97-800.png",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "url": "https://truwit-starter-template-production.up.railway.app/cards/proof/TW-E6F13C97-800.png",
+        "cache_control_1": "no-cache, no-store, must-revalidate",
+        "cache_control_2": "no-cache, no-store, must-revalidate",
+        "status_1": 200,
+        "status_2": 200
+      },
+      "duration_ms": 547
+    },
+    {
+      "test_name": "CORS Functionality",
+      "passed": true,
+      "error_message": "",
+      "details": {
+        "success": true,
+        "status": 200,
+        "headers": {
+          "access-control-allow-origin": "https://truwit.ai",
+          "access-control-expose-headers": "*",
+          "cache-control": "no-cache, no-store, must-revalidate",
+          "content-length": "1230",
+          "content-type": "image/svg+xml",
+          "date": "Tue, 21 Oct 2025 01:06:06 GMT",
+          "server": "railway-edge",
+          "vary": "Origin",
+          "x-railway-edge": "railway/us-east4-eqdc4a",
+          "x-railway-request-id": "Qt4vi4EtQTyk_YaEwoOzXw",
+          "x-request-id": "3966e260"
+        }
+      },
+      "duration_ms": 23467
+    }
+  ]
+}
