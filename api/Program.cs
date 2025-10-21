@@ -57,6 +57,7 @@ try
                     "https://www.truwit.ai",
                     "https://truwit-starter-template-production.up.railway.app",
                     "https://6b7eb0da.truwit-starter-template.pages.dev",
+                    "https://502082c8.truwit-starter-template.pages.dev",
                     "https://*.truwit-starter-template.pages.dev"
                   )
                   .AllowAnyMethod()
@@ -239,6 +240,18 @@ try
     
     // CORS must be before static files to apply headers to static content
     app.UseCors("AllowAll");
+    
+    // Handle OPTIONS requests globally for CORS preflight
+    app.Use(async (context, next) =>
+    {
+        if (context.Request.Method == "OPTIONS")
+        {
+            context.Response.StatusCode = 200;
+            await context.Response.WriteAsync("");
+            return;
+        }
+        await next();
+    });
     
     // Enable static file serving for proof cards and assets with CORS support - CACHING DISABLED FOR TESTING
     app.UseStaticFiles(new StaticFileOptions

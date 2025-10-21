@@ -81,6 +81,12 @@ public class ProofsController : ControllerBase
         _c2paLocalParser = c2paLocalParser;
     }
 
+    [HttpOptions("proofs/url")]
+    public IActionResult OptionsProofsUrl()
+    {
+        return Ok();
+    }
+
     [HttpPost("proofs/url")]
     [ProducesResponseType(typeof(CreateProofFromUrlResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
