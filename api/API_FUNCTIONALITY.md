@@ -11,14 +11,12 @@ Note: Base path examples assume default local hosting. Swagger is enabled at `/s
 - Health: `/health`, `/health/tools`
 - Badges: `/v1/badge/{id}.*`
 - Proof lifecycle: create proof from URL or file, store artifacts, verify C2PA when applicable, expose verification/lookup
-- Storage: Repositories with environment-driven backing (Postgres/SQLite/In-memory)
+- Storage: Repositories backed by Postgres
 - External tools: `yt-dlp`, `ffmpeg`, `c2patool` (local and/or hosted verifier)
 
 ## Configuration
 Application config is read from `appsettings*.json` and environment:
-- `Database:Type`: `postgres` | `sqlite` | other (falls back to in-memory)
-  - Postgres: `ConnectionStrings:Postgres`
-  - SQLite: `ConnectionStrings:Sqlite` (default `Data Source=truwit.db`)
+- Postgres connection: `ConnectionStrings:Postgres`
 - `C2pa`: `C2paOptions`
   - `UseHostedVerifier` (default true)
   - `HostedVerifierBaseUrl` (default `https://verify.contentcredentials.org/api`)
@@ -165,9 +163,7 @@ Repositories under `Infrastructure/Repositories` and `Infrastructure/Data` imple
 - `Assets`, `LinkIndex` (URL ↔ asset/proof mapping), `Proofs`, `Receipts`, `Idempotency`
 
 Database selection in `Program.cs`:
-- `postgres`: uses `ApplicationDbContext` with Npgsql and `PostgresVerificationRepository`.
-- `sqlite`: uses `ApplicationDbContext` with Sqlite but is currently wired to `PostgresVerificationRepository` in code (likely a temporary placeholder; adjust if needed).
-- other: falls back to `InMemoryVerificationRepository`.
+- Postgres: uses `ApplicationDbContext` with Npgsql and `PostgresVerificationRepository`.
 
 On startup, when not using in-memory:
 - Ensures database creation
@@ -201,5 +197,4 @@ On startup, when not using in-memory:
 - UI at `/swagger` with a single document `v1` titled “Truwit API v1”.
 
 ## Known Quirks
-- SQLite branch in `Program.cs` currently registers `PostgresVerificationRepository` (likely a copy/paste mismatch). Consider swapping to a SQLite-compatible repository implementation if needed.
 

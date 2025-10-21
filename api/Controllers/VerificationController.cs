@@ -7,6 +7,7 @@ namespace HumanProof.Api.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[ApiExplorerSettings(IgnoreApi = true)]
 public class VerificationController : ControllerBase
 {
     private readonly IVerificationService _verificationService;
@@ -26,38 +27,13 @@ public class VerificationController : ControllerBase
     public async Task<ActionResult<ApiResponse<VerificationResultDto>>> UploadFile(
         [FromForm] VerificationRequestDto request)
     {
-        try
+        _logger.LogInformation("Legacy verification endpoint disabled: upload");
+        return StatusCode(StatusCodes.Status410Gone, new ApiResponse<object>
         {
-            if (request.File == null)
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "File is required",
-                    Status = StatusCodes.Status400BadRequest
-                });
-            }
-
-            var result = await _verificationService.VerifyContentAsync(request);
-            
-            return Ok(new ApiResponse<VerificationResultDto>
-            {
-                Data = result,
-                Success = true,
-                Message = "File verified successfully",
-                Status = StatusCodes.Status200OK
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error uploading file");
-            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
-            {
-                Success = false,
-                Message = "An error occurred while processing the file",
-                Status = StatusCodes.Status500InternalServerError
-            });
-        }
+            Success = false,
+            Message = "Legacy verification endpoints are disabled. Use v1/proofs/url or the new flows.",
+            Status = StatusCodes.Status410Gone
+        });
     }
 
     [HttpPost("url")]
@@ -66,38 +42,13 @@ public class VerificationController : ControllerBase
     public async Task<ActionResult<ApiResponse<VerificationResultDto>>> VerifyUrl(
         [FromBody] VerificationRequestDto request)
     {
-        try
+        _logger.LogInformation("Legacy verification endpoint disabled: url");
+        return StatusCode(StatusCodes.Status410Gone, new ApiResponse<object>
         {
-            if (string.IsNullOrEmpty(request.Url))
-            {
-                return BadRequest(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "URL is required",
-                    Status = StatusCodes.Status400BadRequest
-                });
-            }
-
-            var result = await _verificationService.VerifyContentAsync(request);
-            
-            return Ok(new ApiResponse<VerificationResultDto>
-            {
-                Data = result,
-                Success = true,
-                Message = "URL verified successfully",
-                Status = StatusCodes.Status200OK
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error verifying URL: {Url}", request.Url);
-            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
-            {
-                Success = false,
-                Message = "An error occurred while processing the URL",
-                Status = StatusCodes.Status500InternalServerError
-            });
-        }
+            Success = false,
+            Message = "Legacy verification endpoints are disabled. Use v1/proofs/url or the new flows.",
+            Status = StatusCodes.Status410Gone
+        });
     }
 
     [HttpGet("proof/{proofId}")]
@@ -105,65 +56,25 @@ public class VerificationController : ControllerBase
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<ProofDetailsDto>>> GetProofDetails(string proofId)
     {
-        try
+        _logger.LogInformation("Legacy verification endpoint disabled: proof details");
+        return StatusCode(StatusCodes.Status410Gone, new ApiResponse<object>
         {
-            var result = await _verificationService.GetProofDetailsAsync(proofId);
-            
-            if (result == null)
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Success = false,
-                    Message = "Proof not found",
-                    Status = StatusCodes.Status404NotFound
-                });
-            }
-
-            return Ok(new ApiResponse<ProofDetailsDto>
-            {
-                Data = result,
-                Success = true,
-                Message = "Proof details retrieved successfully",
-                Status = StatusCodes.Status200OK
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving proof details for {ProofId}", proofId);
-            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
-            {
-                Success = false,
-                Message = "An error occurred while retrieving proof details",
-                Status = StatusCodes.Status500InternalServerError
-            });
-        }
+            Success = false,
+            Message = "Legacy verification endpoints are disabled. Use v1/proofs/* endpoints.",
+            Status = StatusCodes.Status410Gone
+        });
     }
 
     [HttpGet("validate/{proofId}")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<bool>>> ValidateProof(string proofId)
     {
-        try
+        _logger.LogInformation("Legacy verification endpoint disabled: validate");
+        return StatusCode(StatusCodes.Status410Gone, new ApiResponse<object>
         {
-            var isValid = await _verificationService.ValidateProofAsync(proofId);
-            
-            return Ok(new ApiResponse<bool>
-            {
-                Data = isValid,
-                Success = true,
-                Message = isValid ? "Proof is valid" : "Proof is invalid",
-                Status = StatusCodes.Status200OK
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error validating proof {ProofId}", proofId);
-            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
-            {
-                Success = false,
-                Message = "An error occurred while validating the proof",
-                Status = StatusCodes.Status500InternalServerError
-            });
-        }
+            Success = false,
+            Message = "Legacy verification endpoints are disabled. Use v1/proofs/* endpoints.",
+            Status = StatusCodes.Status410Gone
+        });
     }
 }
