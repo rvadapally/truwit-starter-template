@@ -27,13 +27,38 @@ public class VerificationController : ControllerBase
     public async Task<ActionResult<ApiResponse<VerificationResultDto>>> UploadFile(
         [FromForm] VerificationRequestDto request)
     {
-        _logger.LogInformation("Legacy verification endpoint disabled: upload");
-        return StatusCode(StatusCodes.Status410Gone, new ApiResponse<object>
+        try
         {
-            Success = false,
-            Message = "Legacy verification endpoints are disabled. Use v1/proofs/url or the new flows.",
-            Status = StatusCodes.Status410Gone
-        });
+            if (request.File == null)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "File is required",
+                    Status = StatusCodes.Status400BadRequest
+                });
+            }
+
+            var result = await _verificationService.VerifyContentAsync(request);
+            
+            return Ok(new ApiResponse<VerificationResultDto>
+            {
+                Data = result,
+                Success = true,
+                Message = "File verified successfully",
+                Status = StatusCodes.Status200OK
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading file");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse<object>
+            {
+                Success = false,
+                Message = "An error occurred while processing the file",
+                Status = StatusCodes.Status500InternalServerError
+            });
+        }
     }
 
     [HttpPost("url")]
