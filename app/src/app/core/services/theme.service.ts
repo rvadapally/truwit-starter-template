@@ -13,7 +13,7 @@ export class ThemeService {
 
   constructor() {
     // Initialize theme on service creation
-    this.setTheme(this.getStoredTheme());
+    this.setTheme(this.getStoredTheme() as 'light' | 'dark');
   }
 
   getCurrentTheme(): string {
