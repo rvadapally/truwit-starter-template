@@ -13,17 +13,16 @@ import { routes } from './app.routes';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    HomeComponent,
-    VerifyPageComponent,
-    ToastNotificationComponent
+    HomeComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     HttpClientModule,
     RouterModule.forRoot(routes, { useHash: true, scrollPositionRestoration: 'enabled' }),
-    VerificationModule
+    VerificationModule,
+    AppComponent,
+    VerifyPageComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

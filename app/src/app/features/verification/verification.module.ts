@@ -9,13 +9,13 @@ import { VerificationResultComponent } from './components/verification-result.co
 
 @NgModule({
   declarations: [
-    VerificationFormComponent,
     PublicVerifyComponent
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     HttpClientModule,
+    VerificationFormComponent,
     VerificationResultComponent
   ],
   exports: [

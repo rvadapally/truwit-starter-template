@@ -1,12 +1,19 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subject, takeUntil, filter } from 'rxjs';
+import { HeaderComponent } from './layout/header/header.component';
+import { FooterComponent } from './layout/footer/footer.component';
+import { ToastNotificationComponent } from './shared/components/toast-notification/toast-notification.component';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [CommonModule, RouterModule, HeaderComponent, FooterComponent, ToastNotificationComponent]
 })
 export class AppComponent implements OnInit, OnDestroy {
   currentYear = new Date().getFullYear();
