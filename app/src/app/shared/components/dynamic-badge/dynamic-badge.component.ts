@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
@@ -339,7 +339,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     if (this.proofId) {
@@ -359,6 +359,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.hasError = false;
     this.imageLoaded = false;
+    this.cdr.markForCheck();
 
     // Force HTTPS and strip trailing slash
     let apiUrl = (environment.apiUrl || 'https://api.truwit.ai').trim();
@@ -368,6 +369,8 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
     // Try to load proof card from correct endpoint (beautiful cards with QR codes)
     const badgeUrl = `${apiUrl}/cards/proof/${badgeId}-800.png`;
     
+    console.log(`🖼️ Loading badge from: ${badgeUrl}`);
+    
     // Use GET request to load the beautiful proof card PNG
     this.http.get(badgeUrl, { 
       observe: 'response',
@@ -376,14 +379,17 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (resp) => {
+          console.log(`✅ Badge loaded successfully: ${badgeUrl}`);
           // Badge exists and loaded successfully
           this.badgeUrl = badgeUrl;
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         error: (error: any) => {
-          console.error('Error loading badge:', error);
+          console.error(`❌ Error loading badge from ${badgeUrl}:`, error);
           this.hasError = true;
           this.isLoading = false;
+          this.cdr.markForCheck();
         }
       });
   }
@@ -443,11 +449,14 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
 
   onImageLoad(): void {
     this.imageLoaded = true;
+    this.cdr.markForCheck();
   }
 
   onImageError(): void {
+    console.error('Image failed to load:', this.badgeUrl);
     this.hasError = true;
-    this.isLoading = false;
+    this.imageLoaded = false;
+    this.cdr.markForCheck();
   }
 
   viewVerification(): void {
