@@ -228,14 +228,21 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
           // Force immediate UI update
           setTimeout(() => {
             this.verificationStep = 'Verification complete!';
-            this.successMessage = `🎉 Proof created successfully! Proof ID: ${result.proofId}`;
+            
+            // Show different message based on deduplication
+            if (result.deduped) {
+              this.successMessage = `✓ Existing proof found! This resource was already verified. Proof ID: ${result.proofId}`;
+            } else {
+              this.successMessage = `🎉 Proof created successfully! Proof ID: ${result.proofId}`;
+            }
+            
             this.isVerifying = false;
             this.createdProof = result;
             
             // Force change detection
             this.cdr.detectChanges();
             
-            console.log('✅ Proof created:', result.proofId);
+            console.log('✅ Proof:', result.deduped ? 'Existing (deduped)' : 'Newly created');
             console.log('🔗 Verify URL:', result.verifyUrl);
             console.log('🏆 Badge URL:', result.badgeUrl);
             console.log('🎉 SUCCESS MESSAGE SHOULD BE VISIBLE NOW!');

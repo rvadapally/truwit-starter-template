@@ -66,6 +66,7 @@ export interface CreateProofResponse {
   proofId: string;
   verifyUrl: string;
   badgeUrl: string;
+  deduped?: boolean;  // Add this field
 }
 
 export interface VerifyResponse {

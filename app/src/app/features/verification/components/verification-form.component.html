@@ -17,10 +17,17 @@
     <!-- Success Message -->
     <div class="status-message success" *ngIf="successMessage">
       <div class="success-content">
-        <div class="success-icon">🎉</div>
+        <div class="success-icon">
+          <span *ngIf="createdProof?.deduped">ℹ️</span>
+          <span *ngIf="!createdProof?.deduped">🎉</span>
+        </div>
         <div class="success-text">
-          <span class="success-title">Proof Created Successfully!</span>
+          <span class="success-title" *ngIf="!createdProof?.deduped">Proof Created Successfully!</span>
+          <span class="success-title" *ngIf="createdProof?.deduped">Existing Proof Found!</span>
           <span class="success-subtitle">{{ successMessage }}</span>
+          <span *ngIf="createdProof?.deduped" class="dedup-note">
+            (No new verification was performed - showing existing proof)
+          </span>
           <div class="success-actions" *ngIf="createdProof">
             <button class="btn-primary" (click)="visitVerificationPage()">
               View Verification Details
