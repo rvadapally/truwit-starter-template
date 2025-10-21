@@ -6,6 +6,7 @@ import { VerificationService } from '../../../core/services/verification.service
 import { NotificationService } from '../../../core/services/notification.service';
 import type { VerifyResponse } from '../../../core/models';
 import { environment } from '../../../../environments/environment';
+import { UnifiedBadgeService } from '../../../core/services/unified-badge.service';
 
 @Component({
   selector: 'app-public-verify',
@@ -28,7 +29,8 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private notificationService: NotificationService,
     private title: Title,
-    private meta: Meta
+    private meta: Meta,
+    private unifiedBadgeService: UnifiedBadgeService
   ) {}
 
   ngOnInit(): void {
@@ -273,22 +275,12 @@ This content has been cryptographically verified for authenticity and provenance
 
   getBadgeUrl(): string {
     if (!this.verifyData) {
-      return '/assets/signed_badge.png'; // fallback with leading slash
+      return this.unifiedBadgeService.getStaticCircularBadgeUrl();
     }
     
-    // Try dynamic badge first, fallback to static
-    let badgeUrl = this.verifyData.badgeUrl;
-    if (!badgeUrl) {
-      // Use the NEW proof card endpoint for beautiful cards with QR codes
-      const trustmarkId = this.getTrustmarkIdFromUrl();
-      const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
-      badgeUrl = `${apiUrl}/cards/proof/${trustmarkId}-800.png`;
-    } else if (!/^https?:\/\//i.test(badgeUrl)) {
-      // Convert relative URLs to absolute HTTPS URLs
-      badgeUrl = new URL(badgeUrl, window.location.origin).toString();
-    }
-    
-    return badgeUrl;
+    // Use unified badge service to ensure circular badge
+    const trustmarkId = this.getTrustmarkIdFromUrl();
+    return this.unifiedBadgeService.getCircularBadgeUrl(trustmarkId, 800);
   }
 
   onBadgeError(event: any): void {

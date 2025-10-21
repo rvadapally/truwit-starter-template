@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Subject, takeUntil } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { UnifiedBadgeService } from '../../../core/services/unified-badge.service';
 
 @Component({
   selector: 'app-dynamic-badge',
@@ -339,7 +340,7 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private http: HttpClient, private cdr: ChangeDetectorRef) {}
+  constructor(private http: HttpClient, private cdr: ChangeDetectorRef, private unifiedBadgeService: UnifiedBadgeService) {}
 
   ngOnInit(): void {
     if (this.proofId) {
@@ -361,33 +362,22 @@ export class DynamicBadgeComponent implements OnInit, OnDestroy {
     this.imageLoaded = false;
     this.cdr.markForCheck();
 
-    // Force HTTPS and strip trailing slash
-    let apiUrl = (environment.apiUrl || 'https://api.truwit.ai').trim();
-    if (apiUrl.startsWith('http://')) apiUrl = 'https://' + apiUrl.substring('http://'.length);
-    apiUrl = apiUrl.replace(/\/$/, '');
+    console.log(`🖼️ Loading circular badge for: ${badgeId}`);
     
-    // Try to load proof card from correct endpoint (beautiful cards with QR codes)
-    const badgeUrl = `${apiUrl}/cards/proof/${badgeId}-800.png`;
-    
-    console.log(`🖼️ Loading badge from: ${badgeUrl}`);
-    
-    // Use GET request to load the beautiful proof card PNG
-    this.http.get(badgeUrl, { 
-      observe: 'response',
-      responseType: 'blob' // Expect PNG content
-    })
+    // Use unified badge service to ensure circular badge
+    this.unifiedBadgeService.getBestBadgeUrl(badgeId, 800)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (resp) => {
-          console.log(`✅ Badge loaded successfully: ${badgeUrl}`);
-          // Badge exists and loaded successfully
+        next: (badgeUrl: string) => {
+          console.log(`✅ Circular badge loaded: ${badgeUrl}`);
           this.badgeUrl = badgeUrl;
           this.isLoading = false;
           this.cdr.markForCheck();
         },
         error: (error: any) => {
-          console.error(`❌ Error loading badge from ${badgeUrl}:`, error);
-          this.hasError = true;
+          console.error(`❌ Error loading circular badge:`, error);
+          // Fallback to static circular badge
+          this.badgeUrl = this.unifiedBadgeService.getStaticCircularBadgeUrl();
           this.isLoading = false;
           this.cdr.markForCheck();
         }
