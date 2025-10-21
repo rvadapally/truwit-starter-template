@@ -180,12 +180,13 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
   async shareToXWithImage(): Promise<void> {
     if (!this.verifyData) return;
 
-    // Build absolute image URL with HTTPS
+    // Build absolute image URL using the NEW proof card endpoint
     let imgUrl = this.verifyData.badgeUrl || '';
     if (!imgUrl) {
-      // Use the correct API endpoint for badges with HTTPS
+      // Use the NEW proof card endpoint for beautiful cards with QR codes
       const trustmarkId = this.getTrustmarkIdFromUrl();
-      imgUrl = `https://api.truwit.ai/assets/proof/${trustmarkId}-800.png`;
+      const apiUrl = environment.apiUrl || 'https://api.truwit.ai';
+      imgUrl = `${apiUrl}/cards/proof/${trustmarkId}-800.png`;
     } else if (!/^https?:\/\//i.test(imgUrl)) {
       imgUrl = new URL(imgUrl, window.location.origin).toString();
     }
@@ -199,16 +200,20 @@ export class PublicVerifyComponent implements OnInit, OnDestroy {
         const item = new (window as any).ClipboardItem({ [blob.type]: blob });
         await (navigator.clipboard as any).write([item]);
         copied = true;
-        this.notificationService.showSuccess('Badge image copied. Paste it in X composer.');
+        this.notificationService.showSuccess('Beautiful proof card copied! Paste it in X composer.');
       }
     } catch {
       // Ignore; we will still open the share URL
       this.notificationService.showError('Could not copy image automatically. You can attach it manually.');
     }
 
-    // Open X share intent with page URL; OG tags ensure preview
-    const text = `Verified by Truwit: ${this.verifyData.proofId}`;
-    const url = imgUrl;
+    // Open X share intent with verification page URL and descriptive text
+    const text = `✅ Verified by Truwit! 
+
+This content has been cryptographically verified for authenticity and provenance. Scan the QR code or click to verify.
+
+#Verified #Truwit #Provenance #Trust #AI #ContentVerification`;
+    const url = window.location.href;
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
     window.open(twitterUrl, '_blank');
 
