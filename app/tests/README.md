@@ -1,351 +1,189 @@
-# Playwright E2E Tests for Truwit Verification App
+# E2E Navigation and Badge Test Suite
 
 ## Overview
+This comprehensive test suite verifies complete navigation integrity and badge functionality across all public routes of the Truwit application.
 
-Comprehensive end-to-end tests that verify the entire user experience in real browsers.
+## Test Files Created
 
-## Test Suites
+### 1. `tests/helpers/test-utils.ts`
+Utility functions for:
+- Console error monitoring
+- Spinner detection and waiting
+- Badge image verification
+- API integration for existing proofs
+- Page integrity verification
 
-### 1. **Layout & Viewport Tests** (`layout-viewport.spec.ts`)
-Tests responsiveness and prevents UI issues like:
-- ✅ Elements requiring scrolling to see
-- ✅ Content overflow
-- ✅ Mobile/tablet layout breakage
-- ✅ Hidden buttons or messages
-- ✅ Horizontal scrolling issues
+### 2. `tests/e2e/navigation-integrity.spec.ts`
+Comprehensive navigation tests:
+- All public routes (`/`, `/verify`, `/t/:id`)
+- Complete page loading verification
+- Console error monitoring (fails on any error)
+- Spinner hang detection
+- Network failure monitoring
+- Responsive design testing
+- Browser navigation (back/forward)
 
-**Example caught bugs:**
-- Status messages appearing below the fold
-- Buttons not visible without scrolling
-- Form elements cut off on mobile
+### 3. `tests/e2e/badge-full-flow.spec.ts`
+End-to-end badge flow tests:
+- YouTube URL proof creation (`https://youtu.be/9DBJXRy5dvk?si=0TvNF1BF11J3d4nH`)
+- Complete creation → verification flow
+- Badge display verification
+- Action button functionality
+- Meta tag verification
+- Error handling
 
----
+### 4. `tests/e2e/dynamic-badge-component.spec.ts`
+Focused badge component tests:
+- Loading state verification
+- Error state handling
+- Multiple proof testing
+- Network timeout handling
+- Memory usage verification
+- Accessibility features
 
-### 2. **URL Verification Flow** (`url-verification.spec.ts`)
-Tests the complete URL verification journey:
-- ✅ TikTok URL processing
-- ✅ YouTube URL processing (with bot detection handling)
-- ✅ Invalid URL rejection
-- ✅ Loading states
-- ✅ Success/error messages
-- ✅ Navigation to proof page
+## Configuration Updates
 
-**Example caught bugs:**
-- Buttons not clickable due to form validation
-- Error messages not displayed
-- Loading state not showing
+### `playwright.config.ts`
+- Production environment support (`TEST_ENV=production`)
+- Increased timeouts for badge operations
+- Video recording for production tests
+- Conditional web server (disabled for production)
 
----
-
-### 3. **File Upload Flow** (`file-upload.spec.ts`)
-Tests file upload functionality:
-- ✅ MP4/MOV/AVI/WebM upload
-- ✅ File size validation
-- ✅ File type validation
-- ✅ Upload progress indicators
-- ✅ File name display
-- ✅ Switching between URL and file
-
-**Example caught bugs:**
-- File input not working
-- Large files crashing browser
-- Wrong file types accepted
-
----
-
-### 4. **Proof Verification Page** (`proof-verification.spec.ts`)
-Tests viewing proof details:
-- ✅ Content hash display
-- ✅ Timestamp formatting (UTC + Local)
-- ✅ Copy to clipboard functionality
-- ✅ Social sharing
-- ✅ Badge display
-- ✅ Direct URL sharing
-
-**Example caught bugs:**
-- Routing not working (showed home page instead)
-- Content hash overflowing container
-- Copy button copying wrong text
-
----
-
-### 5. **Deduplication & Idempotency** (`deduplication.spec.ts`)
-Tests proof deduplication:
-- ✅ Same URL returns same proof
-- ✅ Faster response for cached proofs
-- ✅ Different URLs create different proofs
-- ✅ URL parameter handling
-
-**Example caught bugs:**
-- New proof generated for same URL
-- Cache not working
-
----
-
-## Installation
-
-```bash
-cd app
-npm install
-npx playwright install
-```
-
-This installs Playwright and downloads browsers (Chrome, Firefox, Safari).
-
----
+### `package.json`
+Added npm scripts:
+- `test:e2e:prod` - Run all tests against production
+- `test:e2e:prod:navigation` - Navigation tests only
+- `test:e2e:prod:badge-flow` - Badge flow tests only
+- `test:e2e:prod:badge-component` - Badge component tests only
 
 ## Running Tests
 
 ### Local Development
-
 ```bash
-# Run all tests (starts dev server automatically)
+# Run all tests against localhost
 npm run test:e2e
 
-# Run tests in UI mode (interactive)
-npm run test:e2e:ui
-
-# Run specific test file
-npx playwright test layout-viewport.spec.ts
-
-# Run tests in specific browser
-npx playwright test --project=chromium-desktop
-
-# Debug tests
-npm run test:e2e:debug
+# Run specific test suites
+npm run test:e2e:navigation
+npm run test:e2e:badge-flow
+npm run test:e2e:badge-component
 ```
 
 ### Production Testing
-
 ```bash
-# Test against production
-BASE_URL=https://www.truwit.ai npx playwright test
+# Run all tests against production
+npm run test:e2e:prod
 
-# Generate report
-npm run test:e2e:report
+# Run specific test suites against production
+npm run test:e2e:prod:navigation
+npm run test:e2e:prod:badge-flow
+npm run test:e2e:prod:badge-component
 ```
 
----
-
-## Test Configuration
-
-**Browsers tested:**
-- ✅ Chrome Desktop (1920x1080)
-- ✅ Firefox Desktop (1920x1080)
-- ✅ Safari Desktop (1920x1080)
-- ✅ Chrome Mobile (Pixel 5)
-- ✅ Safari Mobile (iPhone 12)
-- ✅ iPad Pro
-
-**Features:**
-- Screenshot on failure
-- Video recording on failure
-- Trace collection for debugging
-- Parallel execution
-- Automatic retry on failure (CI only)
-
----
-
-## Adding Test Fixtures
-
-Place test files in `tests/fixtures/`:
-
-```
-tests/fixtures/
-├── sample.mp4          # Small test video (~5MB)
-├── large-video.mp4     # Large test video (~500MB+)
-├── test-file.txt       # Non-video file for validation
-└── README.md           # Instructions for creating fixtures
-```
-
-**Creating test fixtures:**
-
+### Debug Mode
 ```bash
-# Create a small test video (5MB, 10 seconds)
-ffmpeg -f lavfi -i testsrc=duration=10:size=1280x720:rate=30 \
-       -f lavfi -i sine=frequency=1000:duration=10 \
-       -pix_fmt yuv420p -c:v libx264 -c:a aac \
-       tests/fixtures/sample.mp4
-
-# Create a text file
-echo "This is a test file" > tests/fixtures/test-file.txt
-```
-
----
-
-## CI/CD Integration
-
-### GitHub Actions
-
-```yaml
-name: E2E Tests
-on: [push, pull_request]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        run: cd app && npm ci
-      
-      - name: Install Playwright
-        run: cd app && npx playwright install --with-deps
-      
-      - name: Run Playwright tests
-        run: cd app && npm run test:e2e
-      
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-report
-          path: app/playwright-report/
-```
-
----
-
-## Debugging
-
-### Visual Debugging
-
-```bash
-# Run tests with UI (see browser in action)
-npm run test:e2e:ui
+# Debug against production
+npm run test:e2e:prod:debug
 
 # Debug specific test
-npx playwright test --debug layout-viewport.spec.ts
+TEST_ENV=production playwright test tests/e2e/badge-full-flow.spec.ts --debug
 ```
 
-### Trace Viewer
+## Success Criteria
 
-```bash
-# View trace of failed test
-npx playwright show-trace test-results/.../trace.zip
-```
+✅ **All routes load to `document.readyState === "complete"`**
+✅ **Zero console errors in production**
+✅ **No spinners visible after 10s timeout on any page**
+✅ **Badge images load successfully (naturalWidth > 0)**
+✅ **All network requests complete with status < 400**
+✅ **Full creation → verification flow works end-to-end**
+✅ **YouTube thumbnail link creates proof successfully**
+✅ **Badge displays on verification page without errors**
 
-### Screenshots & Videos
+## Test Coverage
 
-Failed tests automatically save:
-- Screenshot: `test-results/.../test-failed-1.png`
-- Video: `test-results/.../video.webm`
+### Navigation Tests
+- Home page (`/`)
+- Verification form (`/verify`)
+- Public verification pages (`/t/:id`)
+- Invalid proof IDs
+- Browser navigation
+- Responsive design
+- Static asset loading
 
----
+### Badge Flow Tests
+- YouTube URL proof creation
+- Badge display verification
+- Action button functionality
+- Meta tag verification
+- Error handling
+- Multiple proof creation
 
-## Best Practices
+### Badge Component Tests
+- Loading states
+- Error states
+- Network timeouts
+- Memory usage
+- Accessibility
+- Edge cases
 
-### Writing Tests
+## Monitoring Features
 
-1. **Use semantic selectors:**
-   ```typescript
-   // Good
-   page.getByRole('button', { name: 'Generate Proof' })
-   page.getByLabel('URL')
-   
-   // Bad
-   page.locator('.btn-primary')
-   page.locator('#url-input')
-   ```
+### Console Error Detection
+- Monitors all console messages
+- Fails test on any error
+- Allows warnings (configurable)
+- Logs error details
 
-2. **Wait for visibility, not timeouts:**
-   ```typescript
-   // Good
-   await expect(page.getByText('Success')).toBeVisible()
-   
-   // Bad
-   await page.waitForTimeout(5000)
-   ```
+### Network Failure Detection
+- Monitors all HTTP responses
+- Fails test on status ≥ 400
+- Logs failed request details
+- Tracks network performance
 
-3. **Use test.skip() for environment-specific tests:**
-   ```typescript
-   test.skip(process.env.BASE_URL?.includes('localhost'), 'Production only');
-   ```
+### Spinner Hang Detection
+- Monitors loading indicators
+- Fails test if spinner remains visible
+- Supports multiple spinner selectors
+- Configurable timeout
 
-4. **Check viewport visibility:**
-   ```typescript
-   await expect(page.getByRole('button')).toBeInViewport()
-   ```
+### Badge Image Verification
+- Verifies image loads successfully
+- Checks natural dimensions > 0
+- Handles fallback scenarios
+- Tests multiple viewports
 
----
+## Environment Variables
+
+- `TEST_ENV=production` - Run against production
+- `BASE_URL` - Override base URL
+- `CI=true` - CI environment settings
 
 ## Troubleshooting
 
-### Tests fail locally but pass in CI
+### Common Issues
+1. **Timeout errors**: Increase timeout in playwright.config.ts
+2. **Network failures**: Check API availability
+3. **Badge not loading**: Verify image URLs and fallbacks
+4. **Console errors**: Check browser console for details
 
-- Clear browser cache: `npx playwright clean`
-- Update browsers: `npx playwright install`
-- Check for stale state: Restart dev server
-
-### "Element not found" errors
-
-- Element might be in viewport but not visible
-- Check for overlapping elements
-- Verify selector is correct
-
-### Flaky tests
-
-- Add explicit waits: `await page.waitForLoadState('networkidle')`
-- Increase timeout for slow operations
-- Use `test.retry()` for known flaky tests
-
-### Browser not launching
-
-- Install system dependencies: `npx playwright install-deps`
-- Check disk space (browsers need ~1GB)
-- Try single browser: `--project=chromium-desktop`
-
----
-
-## Performance Tips
-
-1. **Run tests in parallel:**
-   ```bash
-   npx playwright test --workers=4
-   ```
-
-2. **Skip slow tests in development:**
-   ```typescript
-   test.skip(!process.env.CI, 'Slow test - CI only');
-   ```
-
-3. **Use selective test execution:**
-   ```bash
-   npx playwright test --grep="@fast"
-   ```
-
----
-
-## Coverage Report
-
-View test coverage:
-
+### Debug Commands
 ```bash
-# Run tests with coverage
-npm run test:e2e
+# Run with UI for visual debugging
+npm run test:e2e:prod:ui
 
-# Open HTML report
+# Run specific test with debug
+TEST_ENV=production playwright test tests/e2e/badge-full-flow.spec.ts --debug
+
+# Generate detailed report
 npm run test:e2e:report
 ```
 
-**Expected coverage:**
-- ✅ All critical user flows
-- ✅ Desktop + Mobile + Tablet
-- ✅ Chrome + Firefox + Safari
-- ✅ Happy path + Error cases
+## Implementation Notes
 
----
-
-## Further Reading
-
-- [Playwright Documentation](https://playwright.dev/)
-- [Best Practices](https://playwright.dev/docs/best-practices)
-- [Selectors Guide](https://playwright.dev/docs/selectors)
-- [Assertions](https://playwright.dev/docs/test-assertions)
-
-
-
-
+- Tests use real YouTube URL for proof creation
+- Badge verification uses existing proof IDs from API
+- Console monitoring prevents any JavaScript errors
+- Network monitoring ensures API reliability
+- Spinner detection prevents UI hangs
+- Comprehensive error handling and fallbacks

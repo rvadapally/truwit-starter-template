@@ -30,6 +30,7 @@
     "@astrojs/sitemap": "^3.2.1",
     "astro": "^4.16.18",
     "node-fetch": "^3.3.2",
+    "playwright": "^1.56.1",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
@@ -39,9 +40,25 @@
     "wrangler": "^3.95.0"
   },
   "optionalDependencies": {
+    "@rollup/rollup-darwin-x64": "^4.28.1",
     "@rollup/rollup-linux-x64-gnu": "^4.28.1",
     "@rollup/rollup-linux-x64-musl": "^4.28.1",
-    "@rollup/rollup-darwin-x64": "^4.28.1",
     "@rollup/rollup-win32-x64-msvc": "^4.28.1"
-  }
+  },
+  "description": "<!-- Test deployment: Cloudflare Pages build verification - Angular logo fix --> ### **Description**",
+  "main": "build-integration.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rvadapally/truwit-starter-template.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rvadapally/truwit-starter-template/issues"
+  },
+  "homepage": "https://github.com/rvadapally/truwit-starter-template#readme"
 }

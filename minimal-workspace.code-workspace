@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"name": "API",
+			"path": "./api"
+		},
+		{
+			"name": "Angular App",
+			"path": "./app"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/node_modules": true,
+			"**/bin": true,
+			"**/obj": true,
+			"**/dist": true,
+			"**/.angular": true,
+			"**/temp_downloads": true,
+			"**/uploads": true,
+			"**/test-results": true,
+			"**/playwright-report": true
+		},
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/bin": true,
+			"**/obj": true,
+			"**/dist": true,
+			"**/temp_downloads": true,
+			"**/uploads": true
+		}
+	}
+}
