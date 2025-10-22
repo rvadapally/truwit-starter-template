@@ -96,6 +96,13 @@ img {
   height: 20px;
 }
 
+/* Fix footer icon - remove any background */
+.footer img {
+  background: none !important;
+  mix-blend-mode: normal;
+  filter: none;
+}
+
 .landing-content {
   text-align: center;
   margin-bottom: 0.5rem;

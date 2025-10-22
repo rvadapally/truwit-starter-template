@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ThemeService } from '../../core/services/theme.service';
+import { ThemeService, Theme } from '../../core/services/theme.service';
 import { AccessibilityService } from '../../core/services/accessibility.service';
 
 @Component({
@@ -12,11 +12,12 @@ import { AccessibilityService } from '../../core/services/accessibility.service'
         <select 
           id="theme-select" 
           class="toolbar-control"
-          [value]="currentTheme"
+          [value]="currentTheme.name"
           (change)="onThemeChange($event)"
           aria-label="Theme selection">
-          <option value="light">Light Theme</option>
-          <option value="dark">Dark Theme</option>
+          <option *ngFor="let theme of themes" [value]="theme.name">
+            {{ theme.displayName }}
+          </option>
         </select>
       </div>
 
@@ -161,7 +162,8 @@ import { AccessibilityService } from '../../core/services/accessibility.service'
   `]
 })
 export class AccessibilityToolbarComponent implements OnInit {
-  currentTheme: string = 'dark';
+  themes: Theme[] = [];
+  currentTheme: Theme;
   fontSize: number;
   isHighContrast: boolean;
 
@@ -175,14 +177,16 @@ export class AccessibilityToolbarComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // No need for complex theme subscription - just get current theme
-    this.currentTheme = this.themeService.getCurrentTheme();
+    this.themes = this.themeService.getThemes();
+    
+    this.themeService.currentTheme$.subscribe(theme => {
+      this.currentTheme = theme;
+    });
   }
 
   onThemeChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    this.themeService.setTheme(target.value as 'light' | 'dark');
-    this.currentTheme = target.value;
+    this.themeService.setTheme(target.value);
   }
 
   increaseFontSize(): void {

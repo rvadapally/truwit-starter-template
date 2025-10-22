@@ -2,12 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
 import { NotificationService, ToastNotification } from '../../../core/services/notification.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-toast-notification',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './toast-notification.component.html',
   styleUrls: ['./toast-notification.component.scss'],
   animations: [

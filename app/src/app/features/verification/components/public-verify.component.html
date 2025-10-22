@@ -14,107 +14,104 @@
 
   <!-- Verification Data -->
   <div *ngIf="verifyData && !isLoading" class="verify-content">
-    <!-- Header -->
+    <!-- Header with Circular Badge -->
     <div class="verify-header">
-      <div class="verdict-badge" [style.background-color]="getVerdictColor()">
-        {{ getVerdictText() }}
-      </div>
+      <img src="assets/verified-circular-badge.jpg" alt="Verified" class="verified-badge-img">
       <h1>Verification Report</h1>
       <p class="proof-id">Proof ID: {{ verifyData.proofId }}</p>
     </div>
 
-    <!-- Content Details -->
-    <div class="content-details">
-      <div class="detail-card">
-        <h3>Content Information</h3>
-        <div class="detail-row">
-          <span class="label">Content Hash:</span>
-          <span class="value">{{ verifyData.contentHash }}</span>
-          <button class="copy-btn" (click)="copyToClipboard(verifyData.contentHash)">Copy</button>
+    <!-- Two Column Layout for Cards -->
+    <div class="cards-layout">
+      <!-- Left Column -->
+      <div class="left-column">
+        <!-- Trustmark Badge Card -->
+        <div class="detail-card badge-card">
+          <h3>TrustMark Badge</h3>
+          <img [src]="getBadgeUrl()" 
+               (error)="onBadgeError($event)" 
+               alt="Truwit TrustMark Badge" 
+               class="badge-image">
+          <p class="badge-description">
+            Add this badge to your content to show it's verified by Truwit.
+          </p>
         </div>
-        <div class="detail-row" *ngIf="verifyData.mime">
-          <span class="label">MIME Type:</span>
-          <span class="value">{{ verifyData.mime }}</span>
-        </div>
-        <div class="detail-row" *ngIf="verifyData.duration">
-          <span class="label">Duration:</span>
-          <span class="value">{{ verifyData.duration }}s</span>
-        </div>
-        <div class="detail-row" *ngIf="verifyData.resolution">
-          <span class="label">Resolution:</span>
-          <span class="value">{{ verifyData.resolution }}</span>
+
+        <!-- Verification Details Card -->
+        <div class="detail-card">
+          <h3>Verification Details</h3>
+          <div class="detail-row">
+            <span class="label">Issued At (UTC):</span>
+            <span class="value">{{ formatUtcTime(verifyData.issuedAt) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">Issued At (Your Time):</span>
+            <span class="value">{{ formatLocalTime(verifyData.issuedAt) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">C2PA Signature Status:</span>
+            <span class="value c2pa-status" [ngClass]="getC2paStatusClass(verifyData.origin)">
+              {{ getC2paStatusText(verifyData.origin) }}
+            </span>
+          </div>
         </div>
       </div>
 
-      <div class="detail-card">
-        <h3>Declared Information</h3>
-        <div class="detail-row">
-          <span class="label">Generator:</span>
-          <span class="value">{{ verifyData.declared.generator }}</span>
+      <!-- Right Column -->
+      <div class="right-column">
+        <!-- Content Information Card -->
+        <div class="detail-card">
+          <h3>Content Information</h3>
+          <div class="detail-row" *ngIf="verifyData.canonicalUrl">
+            <span class="label">Canonical URL:</span>
+            <span class="value truncate">{{ verifyData.canonicalUrl }}</span>
+            <button class="copy-btn" (click)="copyToClipboard(verifyData.canonicalUrl)">Copy</button>
+          </div>
+          <div class="detail-row">
+            <span class="label">Content Hash:</span>
+            <span class="value truncate">{{ verifyData.contentHash }}</span>
+            <button class="copy-btn" (click)="copyToClipboard(verifyData.contentHash)">Copy</button>
+          </div>
+          <div class="detail-row" *ngIf="verifyData.duration">
+            <span class="label">Duration:</span>
+            <span class="value">{{ verifyData.duration }}s</span>
+          </div>
+          <div class="detail-row" *ngIf="verifyData.resolution">
+            <span class="label">Resolution:</span>
+            <span class="value">{{ verifyData.resolution }}</span>
+          </div>
         </div>
-        <div class="detail-row">
-          <span class="label">Prompt:</span>
-          <span class="value">{{ verifyData.declared.prompt }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">License:</span>
-          <span class="value">{{ verifyData.declared.license }}</span>
-        </div>
-      </div>
 
-      <div class="detail-card">
-        <h3>Verification Details</h3>
-        <div class="detail-row">
-          <span class="label">Issued At (UTC):</span>
-          <span class="value">{{ formatUtcTime(verifyData.issuedAt) }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Issued At (Your Time):</span>
-          <span class="value">{{ formatLocalTime(verifyData.issuedAt) }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">C2PA Signature Status:</span>
-          <span class="value c2pa-status" [ngClass]="getC2paStatusClass(verifyData.origin)">
-            {{ getC2paStatusText(verifyData.origin) }}
-          </span>
+        <!-- Declared Information Card -->
+        <div class="detail-card">
+          <h3>Declared Information</h3>
+          <div class="detail-row">
+            <span class="label">Generator:</span>
+            <span class="value">{{ verifyData.declared?.generator || verifyData.generator || 'Unknown' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="label">License:</span>
+            <span class="value">TW-{{ verifyData.proofId }}</span>
+            <button class="copy-btn" (click)="copyToClipboard('TW-' + verifyData.proofId)">Copy</button>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Actions -->
+    <!-- Actions Section (Full Width) -->
     <div class="actions-section">
       <button class="btn-primary" (click)="copyVerificationLink()">
         Copy Verification Link
       </button>
       <button class="btn-secondary" (click)="shareToXWithImage()" title="Copy image to clipboard and open X">
-        Share on X (copies image)
+        Share on X
       </button>
-      <button class="btn-secondary" (click)="copyImageUrl()" title="Copy direct image URL">Copy Image URL</button>
+      <button class="btn-secondary" (click)="copyImageUrl()" title="Copy direct image URL">
+        Copy Image URL
+      </button>
       <a [href]="getBadgeUrl()" target="_blank" class="btn-outline">
         View Badge
       </a>
-    </div>
-
-    <!-- Badge Preview -->
-    <div class="badge-preview">
-      <h3>TrustMark Badge</h3>
-      <img [src]="getBadgeUrl()" 
-           (error)="onBadgeError($event)" 
-           alt="Truwit TrustMark Badge" 
-           class="badge-image">
-      <p class="badge-description">
-        Add this badge to your content description to show it's verified by Truwit.
-      </p>
-    </div>
-
-    <!-- Use This Badge (Copy/Paste Snippet) -->
-    <div class="embed-snippet">
-      <h3>Use This Badge</h3>
-      <p>Copy and paste this HTML snippet into your post or site:</p>
-      <textarea class="embed-textarea" readonly [value]="embedCode"></textarea>
-      <div>
-        <button class="btn-secondary" (click)="copyEmbedCodeFromVerification()">Copy Embed Code</button>
-      </div>
     </div>
   </div>
 </div>

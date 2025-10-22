@@ -1,20 +1,20 @@
 ﻿---
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
+import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Section from '../components/Section.astro';
 import FeatureCard from '../components/FeatureCard.astro';
 import CTA from '../components/CTA.astro';
 ---
-<html lang="en">
-  <BaseHead title="How TruWit Works — Sign & Verify in Seconds" />
+<html lang="en" data-theme="dark">
+  <BaseHead title="How Truwit Works — Sign & Verify in Seconds" />
   <body>
-    <Header />
+    <Nav />
     <Section kicker="PRODUCT" title="How it works">
       <div class="grid-3">
-        <FeatureCard icon="🖇️" title="1) Add your media" body="Paste a public link or upload your file. TruWit accepts popular video and image formats."/>
+        <FeatureCard icon="🖇️" title="1) Add your media" body="Paste a public link or upload your file. Truwit accepts popular video and image formats."/>
         <FeatureCard icon="🔐" title="2) Generate a proof" body="We create a proprietary cryptographic fingerprint bound to the key attributes that define origin."/>
-        <FeatureCard icon="✅" title="3) Share & verify" body="Publish your content with a TruWit badge. Anyone can check the proof and confirm authenticity."/>
+        <FeatureCard icon="✅" title="3) Share & verify" body="Publish your content with a Truwit badge. Anyone can check the proof and confirm authenticity."/>
       </div>
       <div class="hr"></div>
       <div class="grid-2">

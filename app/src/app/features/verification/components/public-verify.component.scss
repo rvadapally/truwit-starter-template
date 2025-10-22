@@ -1,5 +1,5 @@
 .public-verify-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
   min-height: 100vh;
@@ -51,14 +51,12 @@
     text-align: center;
     margin-bottom: 3rem;
 
-    .verdict-badge {
-      display: inline-block;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.9rem;
+    .verified-badge-img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
       margin-bottom: 1rem;
+      border-radius: 50%;
     }
 
     h1 {
@@ -77,113 +75,101 @@
     }
   }
 
-  .content-details {
+  // Two-column layout for cards
+  .cards-layout {
     display: grid;
-    gap: 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
     margin-bottom: 3rem;
+  }
 
-    .detail-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      padding: 1.5rem;
+  .left-column,
+  .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-      h3 {
-        color: #0ea5e9;
-        margin-bottom: 1rem;
-        font-size: 1.2rem;
+  .detail-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+
+    h3 {
+      color: #0ea5e9;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .detail-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      gap: 1rem;
+
+      .label {
+        font-weight: 600;
+        min-width: 140px;
+        color: #9fb3d9;
+        flex-shrink: 0;
+        padding-top: 2px;
       }
 
-      .detail-row {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-        gap: 1rem;
+      .value {
+        flex: 1;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.6;
 
-        .label {
-          font-weight: 600;
-          min-width: 180px;
-          color: #9fb3d9;
-          flex-shrink: 0;
-          padding-top: 2px;
-        }
-
-        .value {
-          flex: 1;
-          font-family: 'Courier New', monospace;
-          font-size: 0.85rem;
-          word-break: break-word;
-          overflow-wrap: break-word;
-          line-height: 1.6;
-
-          &.valid {
-            color: #22c55e;
-          }
-
-          &.invalid {
-            color: #ef4444;
-          }
-
-          &.unknown {
-            color: #eab308;
-          }
-
-          .status-explanation {
-            display: block;
-            font-size: 0.75rem;
-            color: #9fb3d9;
-            margin-top: 0.25rem;
-            font-style: italic;
-            font-family: system-ui, -apple-system, sans-serif;
-          }
-        }
-
-        &:has(.copy-btn) {
-          .value {
-            max-width: calc(100% - 80px);
-            overflow-x: auto;
-            white-space: nowrap;
-            scrollbar-width: thin;
-            scrollbar-color: rgba(14, 165, 233, 0.5) rgba(255, 255, 255, 0.1);
-            
-            &::-webkit-scrollbar {
-              height: 6px;
-            }
-            
-            &::-webkit-scrollbar-track {
-              background: rgba(255, 255, 255, 0.1);
-              border-radius: 3px;
-            }
-            
-            &::-webkit-scrollbar-thumb {
-              background: rgba(14, 165, 233, 0.5);
-              border-radius: 3px;
-              
-              &:hover {
-                background: rgba(14, 165, 233, 0.7);
-              }
-            }
-          }
-        }
-
-        .copy-btn {
-          background: rgba(14, 165, 233, 0.2);
-          border: 1px solid #0ea5e9;
-          color: #0ea5e9;
-          padding: 0.25rem 0.75rem;
-          border-radius: 4px;
-          font-size: 0.8rem;
-          cursor: pointer;
-          transition: all 0.2s;
+        &.truncate {
+          overflow: hidden;
+          text-overflow: ellipsis;
           white-space: nowrap;
-          flex-shrink: 0;
-          margin-left: auto;
+        }
 
-          &:hover {
-            background: rgba(14, 165, 233, 0.3);
-          }
+        &.c2pa-status {
+          font-family: system-ui, -apple-system, sans-serif;
         }
       }
+
+      .copy-btn {
+        background: rgba(14, 165, 233, 0.2);
+        border: 1px solid #0ea5e9;
+        color: #0ea5e9;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+        flex-shrink: 0;
+
+        &:hover {
+          background: rgba(14, 165, 233, 0.3);
+        }
+      }
+    }
+  }
+
+  .badge-card {
+    text-align: center;
+
+    .badge-image {
+      max-width: 250px;
+      width: 100%;
+      height: auto;
+      margin: 1rem 0;
+      border-radius: 8px;
+    }
+
+    .badge-description {
+      color: #9fb3d9;
+      font-size: 0.85rem;
+      line-height: 1.5;
     }
   }
 
@@ -236,30 +222,6 @@
     }
   }
 
-  .badge-preview {
-    text-align: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 2rem;
-
-    h3 {
-      color: #0ea5e9;
-      margin-bottom: 1rem;
-    }
-
-    .badge-image {
-      max-width: 200px;
-      height: auto;
-      margin-bottom: 1rem;
-      border-radius: 8px;
-    }
-
-    .badge-description {
-      color: #9fb3d9;
-      font-size: 0.9rem;
-    }
-  }
 }
 
 @keyframes spin {
@@ -280,12 +242,24 @@
   }
 
   .verify-content {
-    .verify-header h1 {
-      font-size: 2rem;
+    .verify-header {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .verified-badge-img {
+        width: 60px;
+        height: 60px;
+      }
     }
 
-    .content-details {
-      .detail-card .detail-row {
+    .cards-layout {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .detail-card {
+      .detail-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
@@ -297,19 +271,31 @@
 
         .value {
           width: 100%;
-          max-width: 100% !important;
+          &.truncate {
+            white-space: normal;
+          }
         }
 
         .copy-btn {
-          margin-left: 0;
-          margin-top: 0.5rem;
+          align-self: flex-start;
         }
       }
     }
 
+    .badge-card .badge-image {
+      max-width: 200px;
+    }
+
     .actions-section {
       flex-direction: column;
-      align-items: center;
+      gap: 0.75rem;
+
+      .btn-primary,
+      .btn-secondary,
+      .btn-outline {
+        width: 100%;
+        text-align: center;
+      }
     }
   }
 }
