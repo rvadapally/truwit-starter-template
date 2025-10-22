@@ -115,7 +115,7 @@ import Footer from '../components/Footer.astro';
   
   .features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
     margin-bottom: 3rem;
   }
@@ -168,6 +168,13 @@ import Footer from '../components/Footer.astro';
     color: #9fb3d9;
     margin-top: 1rem;
     font-size: 0.9rem;
+  }
+
+  @media (max-width: 1024px) {
+    .features {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
   }
 
   @media (max-width: 768px) {

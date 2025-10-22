@@ -10,7 +10,7 @@
 #>
 
 Write-Host ""
-Write-Host "🖼️  Image Sync Tool" -ForegroundColor Cyan
+Write-Host "Image Sync Tool" -ForegroundColor Cyan
 Write-Host "==================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -18,43 +18,35 @@ $source = "app\src\assets"
 $destination = "public\images"
 
 if (-not (Test-Path $source)) {
-    Write-Host "❌ Source folder not found: $source" -ForegroundColor Red
+    Write-Host "ERROR: Source folder not found: $source" -ForegroundColor Red
     exit 1
 }
 
 if (-not (Test-Path $destination)) {
-    Write-Host "📁 Creating destination folder: $destination" -ForegroundColor Yellow
+    Write-Host "Creating destination folder: $destination" -ForegroundColor Yellow
     New-Item -ItemType Directory -Path $destination -Force | Out-Null
 }
 
-Write-Host "📂 Source: $source" -ForegroundColor Cyan
-Write-Host "📂 Destination: $destination" -ForegroundColor Cyan
+Write-Host "Source: $source" -ForegroundColor Cyan
+Write-Host "Destination: $destination" -ForegroundColor Cyan
 Write-Host ""
 
-Write-Host "🔄 Syncing images..." -ForegroundColor Cyan
+Write-Host "Syncing images..." -ForegroundColor Cyan
 
-try {
-    # Copy all files from source to destination
-    $files = Get-ChildItem -Path $source -File
-    $count = 0
-    
-    foreach ($file in $files) {
-        Copy-Item -Path $file.FullName -Destination $destination -Force
-        Write-Host "  ✅ $($file.Name)" -ForegroundColor Green
-        $count++
-    }
-    
-    Write-Host ""
-    Write-Host "✅ Successfully synced $count file(s)" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "📝 Next steps:" -ForegroundColor Cyan
-    Write-Host "  1. Review changes with: git status" -ForegroundColor Gray
-    Write-Host "  2. Commit both folders together" -ForegroundColor Gray
-    Write-Host ""
-    
-} catch {
-    Write-Host ""
-    Write-Host "❌ Sync failed: $_" -ForegroundColor Red
-    exit 1
+# Copy all files from source to destination
+$files = Get-ChildItem -Path $source -File
+$count = 0
+
+foreach ($file in $files) {
+    Copy-Item -Path $file.FullName -Destination $destination -Force
+    Write-Host "  Copied: $($file.Name)" -ForegroundColor Green
+    $count++
 }
 
+Write-Host ""
+Write-Host "Successfully synced $count file(s)" -ForegroundColor Green
+Write-Host ""
+Write-Host "Next steps:" -ForegroundColor Cyan
+Write-Host "  1. Review changes with: git status" -ForegroundColor Gray
+Write-Host "  2. Commit both folders together" -ForegroundColor Gray
+Write-Host ""

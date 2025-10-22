@@ -95,23 +95,23 @@
             <button class="copy-btn" (click)="copyToClipboard('TW-' + verifyData.proofId)">Copy</button>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Actions Section (Full Width) -->
-    <div class="actions-section">
-      <button class="btn-primary" (click)="copyVerificationLink()">
-        Copy Verification Link
-      </button>
-      <button class="btn-secondary" (click)="shareToXWithImage()" title="Copy image to clipboard and open X">
-        Share on X
-      </button>
-      <button class="btn-secondary" (click)="copyImageUrl()" title="Copy direct image URL">
-        Copy Image URL
-      </button>
-      <a [href]="getBadgeUrl()" target="_blank" class="btn-outline">
-        View Badge
-      </a>
+        <!-- Actions Section (Right Column) -->
+        <div class="actions-section">
+          <button class="btn-primary" (click)="copyVerificationLink()">
+            Copy Verification Link
+          </button>
+          <button class="btn-secondary" (click)="shareToXWithImage()" title="Copy image to clipboard and open X">
+            Share on X
+          </button>
+          <button class="btn-secondary" (click)="copyImageUrl()" title="Copy direct image URL">
+            Copy Image URL
+          </button>
+          <a [href]="getBadgeUrl()" target="_blank" class="btn-outline">
+            View Badge
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </div>
