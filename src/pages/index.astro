@@ -3,13 +3,14 @@ import BaseHead from '../components/BaseHead.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 ---
-<html lang="en">
+<html lang="en" data-theme="dark">
   <BaseHead
     title="Truwit — Where Provenance Meets Proof"
     description="The cryptographic verification layer for the AI age. Sign your media and verify origin in seconds."
     ogImage="/images/og-truwit.png"
   />
   <body>
+    <script>document.documentElement.setAttribute('data-theme', 'dark');</script>
     <Nav />
 
     <!-- Hero Section matching Angular favorite page -->
