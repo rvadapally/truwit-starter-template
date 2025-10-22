@@ -282,6 +282,22 @@ img {
   border-top: 1px solid rgba(159, 179, 217, 0.2);
 }
 
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  background: none !important;
+  mix-blend-mode: normal;
+  border-radius: 50%;
+}
+
 .footer p {
   color: #9fb3d9;
   font-size: 0.9rem;

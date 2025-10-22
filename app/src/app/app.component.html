@@ -20,6 +20,9 @@
   <router-outlet></router-outlet>
 
   <footer class="footer" *ngIf="!currentRoute.startsWith('/t/')">
-    <p>© {{currentYear}} Truwit. All rights reserved.</p>
+    <div class="footer-content">
+      <img src="assets/verified-circular-badge.jpg" alt="Verified by Truwit" class="footer-logo" />
+      <p>© {{currentYear}} Truwit. All rights reserved.</p>
+    </div>
   </footer>
 </div>
