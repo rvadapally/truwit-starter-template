@@ -293,9 +293,10 @@ img {
   width: 48px;
   height: 48px;
   object-fit: contain;
-  background: none !important;
-  mix-blend-mode: normal;
+  background: transparent !important;
+  mix-blend-mode: multiply;
   border-radius: 50%;
+  filter: brightness(1.1) contrast(1.05);
 }
 
 .footer p {
