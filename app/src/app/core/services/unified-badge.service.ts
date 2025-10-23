@@ -47,8 +47,8 @@ export class UnifiedBadgeService {
    * Get circular badge URL (guaranteed to be circular)
    */
   getCircularBadgeUrl(proofId: string, size: number = this.config.preferredSize): string {
-    // Always prefer the new proof cards (they are circular/square with QR codes)
-    return `${this.apiUrl}/cards/proof/${proofId}-${size}.png`;
+    // Use the new circular SVG badges for new proofs, fallback to PNG cards
+    return `${this.apiUrl}/v1/badge/${proofId}.svg`;
   }
 
   /**
