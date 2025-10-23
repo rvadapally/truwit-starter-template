@@ -975,3 +975,147 @@ textarea:focus {
     .home-features { margin-top: 1.25rem; }
   }
 }
+
+/* === Verification Report Hotfix (v1.0) === */
+/* Scope with .tw-report if you added the wrapper; otherwise these still help. */
+
+.tw-report {
+  /* Container & page padding */
+  --container: 1280px;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 16px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left));
+  color: #eaf2f3;
+  background: #0b1220; /* dark surface */
+
+  /* Main grid: summary/left rail + content/right */
+  .report-grid {
+    display: grid;
+    gap: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    .report-grid {
+      grid-template-columns: 360px 1fr; /* left column width, right fills */
+      align-items: start;
+    }
+  }
+
+  /* Card normalization (applies to all panels) */
+  .card, .panel, .section, .box, .detail-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 16px;
+  }
+
+  /* TrustMark badge box (keeps image nicely sized) */
+  .trustmark, .badge-box, .badge-preview, .badge-card {
+    display: grid;
+    place-items: center;
+    padding: 16px;
+  }
+  .trustmark img,
+  .badge-box img,
+  .badge-preview img,
+  .badge-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+  }
+
+  /* Key–value sections (Content Info, Declared Info, Details) */
+  .kv, .kv-list, .kv-group, .detail-row {
+    display: grid;
+    gap: 10px;
+  }
+  .kv-row, .kv-item, .detail-row {
+    display: grid;
+    grid-template-columns: 180px 1fr; /* label / value */
+    gap: 12px;
+    align-items: center;
+  }
+  @media (max-width: 480px) {
+    .kv-row, .kv-item, .detail-row { grid-template-columns: 1fr; } /* stack on small phones */
+  }
+  .kv-key, .label, .field-label {
+    color: #9fb0b6;
+    white-space: nowrap;
+  }
+  .kv-val, .value, .field-value {
+    color: #eaf2f3;
+    white-space: nowrap;              /* FIX: stop date/hash breaking into columns */
+    overflow: hidden; text-overflow: ellipsis;
+    writing-mode: horizontal-tb !important;  /* FIX: cancel any accidental vertical writing */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    line-height: 1.4;
+  }
+
+  /* Issued At (UTC) very specific safety net */
+  .issued-at, [data-field="issuedAt"], .kv-val[data-key="issuedAt"] {
+    white-space: nowrap;
+    writing-mode: horizontal-tb !important;
+    display: inline-block;
+  }
+
+  /* Buttons block (Copy link / Share / Copy image / View badge) */
+  .btn-row, .actions, .cta-stack, .actions-section {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;      /* stack by default */
+  }
+  @media (min-width: 768px) {
+    .btn-row, .actions, .cta-stack, .actions-section { grid-template-columns: 1fr 1fr; } /* two-up on tablets+ */
+  }
+
+  .btn, .btn-primary, .btn-ghost, .btn-outline, .btn-secondary, .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;                 /* tap target */
+    padding: 12px 16px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #eaf2f3;
+    background: rgba(255,255,255,0.04);
+    transition: transform .08s ease;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #00c4cc, #007a85);
+    color: #081018;
+    border-color: rgba(0,196,204,0.25);
+    box-shadow: 0 6px 16px rgba(0, 196, 204, 0.25);
+  }
+  .btn:active, .btn-primary:active { transform: translateY(1px); }
+
+  /* "View Badge" container often has a fixed height; reset it */
+  .view-badge, .badge-link, .badge-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    height: auto !important;          /* FIX: remove tall empty box */
+  }
+
+  /* Prevent any weird inherited overflow that breaks sticky or padding */
+  .scroll-area, .right-rail, .right-column {
+    overflow: visible;
+  }
+
+  /* Ensure proper column layout */
+  .left-column, .right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* If you didn't add the wrapper, apply the critical fixes globally to the report page selectors too */
+.issued-at, [data-field="issuedAt"], .kv-val[data-key="issuedAt"] {
+  white-space: nowrap;
+  writing-mode: horizontal-tb !important;
+  display: inline-block;
+}
