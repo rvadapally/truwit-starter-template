@@ -14,10 +14,10 @@ const projectRoot = join(__dirname, '..');
 // Required files that must exist in dist/ after build
 const requiredFiles = [
   { path: 'dist/images/verified-circular-badge.jpg', minSize: 10000, description: 'Astro badge image' },
-  { path: 'dist/images/verified-by-truwit.png', minSize: 10000, description: 'Astro verified badge' },
+  { path: 'dist/images/verified-by-truwit.JPG', minSize: 10000, description: 'Astro verified badge' },
   { path: 'dist/favicon-truwit.svg', minSize: 100, description: 'Astro favicon' },
   { path: 'dist/app/assets/verified-circular-badge.jpg', minSize: 10000, description: 'Angular badge image' },
-  { path: 'dist/app/assets/verified-by-truwit.png', minSize: 10000, description: 'Angular verified badge' },
+  { path: 'dist/app/assets/verified-by-truwit.JPG', minSize: 10000, description: 'Angular verified badge' },
   { path: 'dist/index.html', minSize: 1000, description: 'Astro homepage' },
   { path: 'dist/app/index.html', minSize: 1000, description: 'Angular app' },
 ];
