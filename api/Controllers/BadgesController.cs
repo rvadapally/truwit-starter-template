@@ -185,38 +185,8 @@ public class BadgesController : ControllerBase
 
     private string GenerateBadgeSvg(Domain.Entities.Proof proof, string trustmarkId)
     {
-        var statusText = proof.C2paPresent ? "✓ Signed & Verified" : "Verified by Truwit";
-        var color = proof.C2paPresent ? "#22c55e" : "#0ea5e9";
-        
-        return $"""
-        <svg width="240" height="80" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" style="stop-color:{color};stop-opacity:1" />
-                    <stop offset="100%" style="stop-color:#0ea5e9;stop-opacity:1" />
-                </linearGradient>
-            </defs>
-            <rect width="240" height="80" fill="url(#grad)" rx="12"/>
-            
-            <!-- Truwit Logo (Shield Icon) -->
-            <g transform="translate(15, 10)">
-                <!-- Shield shape -->
-                <path d="M10 5 L20 5 L25 10 L25 20 L20 25 L10 25 L5 20 L5 10 Z" fill="white" opacity="0.9"/>
-                <!-- Checkmark - Dark Teal, Centered -->
-                <path d="M13 15 L16.5 18.5 L21 14" stroke="#0d9488" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-            </g>
-            
-            <!-- Status Text -->
-            <text x="120" y="35" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
-                {statusText}
-            </text>
-            
-            <!-- Proof ID - Double the font size -->
-            <text x="120" y="60" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold" opacity="0.95">
-                {trustmarkId}
-            </text>
-        </svg>
-        """;
+        // New system proofs use the circular badge design
+        return GenerateCircularBadgeSvg(proof, trustmarkId);
     }
 
     private string GenerateLegacyBadgeSvg(Domain.Entities.VerificationProof proof, string proofId)
@@ -252,6 +222,59 @@ public class BadgesController : ControllerBase
             <text x="120" y="60" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="16" font-weight="bold" opacity="0.95">
                 {proofId}
             </text>
+        </svg>
+        """;
+    }
+
+    private string GenerateCircularBadgeSvg(Domain.Entities.Proof proof, string proofId)
+    {
+        var safeId = proofId; // sanitize or shorten if needed
+
+        return $"""
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="512" height="512">
+          <defs>
+            <radialGradient id="bg" cx="50%" cy="35%" r="70%">
+              <stop offset="0%" stop-color="#1FE4D0"/>
+              <stop offset="100%" stop-color="#007A85"/>
+            </radialGradient>
+
+            <radialGradient id="innerGlow" cx="50%" cy="65%" r="55%">
+              <stop offset="0%" stop-color="#00F5E0" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+            </radialGradient>
+
+            <path id="bottomArc" d="M 152,512 A 360,360 0 0 0 872,512" fill="none"/>
+
+            <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.35"/>
+            </filter>
+          </defs>
+
+          <circle cx="512" cy="512" r="512" fill="url(#bg)"/>
+          <circle cx="512" cy="512" r="460" fill="url(#innerGlow)" opacity="0.45"/>
+          <circle cx="512" cy="512" r="400" fill="none" stroke="#0A646C" stroke-width="28" opacity="0.25"/>
+          <circle cx="512" cy="512" r="310" fill="#06242A" opacity="0.92"/>
+
+          <path d="M 432 512 L 488 568 L 604 436"
+                fill="none" stroke="#F5F8F9" stroke-width="36"
+                stroke-linecap="round" stroke-linejoin="round"
+                filter="url(#softShadow)"/>
+
+          <text font-family="Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
+                font-size="36" letter-spacing="0.08em" fill="#EAF2F3">
+            <textPath href="#bottomArc" startOffset="50%" text-anchor="middle" dominant-baseline="ideographic">
+              VERIFIED BY TRUWIT • PROVENANCE • PROOF • TRUST
+            </textPath>
+          </text>
+
+          <!-- Optional compact ID plate -->
+          <g transform="translate(0, 56)">
+            <g transform="translate(292, 706)" filter="url(#softShadow)">
+              <rect x="0" y="0" width="440" height="102" rx="18" ry="18" fill="#FFFFFF" opacity="0.98"/>
+              <text x="22" y="38" font-size="22" fill="#666">truwit.ai/t/</text>
+              <text x="22" y="76" font-size="38" font-weight="700" fill="#0B1116">{safeId}</text>
+            </g>
+          </g>
         </svg>
         """;
     }
