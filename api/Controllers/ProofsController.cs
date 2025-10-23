@@ -179,8 +179,8 @@ public class ProofsController : ControllerBase
             
             if (platform == MediaPlatform.YouTube)
             {
-                // Extract video ID for YouTube handling
-                var videoIdMatch = Regex.Match(request.Url, @"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})");
+                // Extract video ID for YouTube handling (supports watch, shorts, and short URLs)
+                var videoIdMatch = Regex.Match(request.Url, @"(?:youtube\.com/(?:watch\?v=|shorts/)|youtu\.be/)([a-zA-Z0-9_-]{11})");
                 if (!videoIdMatch.Success)
                 {
                     throw new InvalidOperationException($"Could not extract YouTube video ID from URL: {request.Url}");
