@@ -158,9 +158,10 @@ public class BadgesController : ControllerBase
             // Try multiple possible paths for the static badge
             var possiblePaths = new[]
             {
-                Path.Combine(Directory.GetCurrentDirectory(), "uploads", "verified-by-truwit.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "assets", "verified-by-truwit.png"),
-                Path.Combine(Directory.GetCurrentDirectory(), "app", "src", "assets", "verified-by-truwit.png")
+                Path.Combine(Directory.GetCurrentDirectory(), "CardTemplates", "verified-by-truwit.JPG"),
+                Path.Combine(Directory.GetCurrentDirectory(), "uploads", "verified-by-truwit.JPG"),
+                Path.Combine(Directory.GetCurrentDirectory(), "assets", "verified-by-truwit.JPG"),
+                Path.Combine(Directory.GetCurrentDirectory(), "app", "src", "assets", "verified-by-truwit.JPG")
             };
 
             foreach (var badgePath in possiblePaths)

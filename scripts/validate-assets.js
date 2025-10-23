@@ -15,14 +15,28 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..');
 
-// Required assets configuration
-const requiredAssets = [
-  { path: 'public/images/verified-circular-badge.jpg', minSize: 10000, description: 'Astro badge image' },
-  { path: 'public/images/verified-by-truwit.png', minSize: 10000, description: 'Astro verified badge' },
-  { path: 'public/favicon-truwit.svg', minSize: 100, description: 'Astro favicon' },
-  { path: 'app/src/assets/verified-circular-badge.jpg', minSize: 10000, description: 'Angular badge image' },
-  { path: 'app/src/assets/verified-by-truwit.png', minSize: 10000, description: 'Angular verified badge' },
-  { path: 'public/images/logo.svg', minSize: 100, description: 'Main logo (organized in images folder)' }
+// Canonical source assets (single source of truth)
+const canonicalAssets = [
+  { path: 'app/src/assets/banner.png', minSize: 50000, description: 'Banner logo for navbars' },
+  { path: 'app/src/assets/verified-circular-badge.png', minSize: 100000, description: 'Circular badge PNG' },
+  { path: 'app/src/assets/signed_badge.png', minSize: 100000, description: 'Signed badge icon' },
+  { path: 'app/src/assets/verified-by-truwit.JPG', minSize: 50000, description: 'Verified by TruWit badge JPG' },
+  { path: 'app/src/assets/verified-circular-badge.jpg', minSize: 50000, description: 'Circular badge JPG' },
+  { path: 'app/src/assets/logo.svg', minSize: 500, description: 'TruWit logo SVG' },
+  { path: 'app/src/assets/truwit-logo.png', minSize: 50000, description: 'TruWit logo PNG' }
+];
+
+// Target locations (copied from canonical source during build)
+const targetAssets = [
+  // Astro public assets
+  { path: 'public/images/banner.png', minSize: 50000, description: 'Banner for Astro navbar', optional: false },
+  { path: 'public/images/signed_badge.png', minSize: 100000, description: 'Signed badge for Astro pages', optional: false },
+  { path: 'public/images/verified-circular-badge.jpg', minSize: 50000, description: 'Circular badge for Astro footer', optional: false },
+  
+  // API CardTemplates
+  { path: 'api/CardTemplates/verified-by-truwit.JPG', minSize: 50000, description: 'API template asset', optional: false },
+  { path: 'api/CardTemplates/verified-circular-badge.jpg', minSize: 50000, description: 'API template asset', optional: false },
+  { path: 'api/CardTemplates/proof-card.svg', minSize: 1000, description: 'API SVG template', optional: false }
 ];
 
 // Critical directories that should NOT be gitignored
@@ -60,26 +74,26 @@ for (const dir of criticalDirs) {
   console.log(`✅ ${dir}/ is not gitignored`);
 }
 
-// Validate each required asset
-console.log('\n📄 Checking required assets...');
+// Validate canonical source assets (single source of truth)
+console.log('\n📄 Checking canonical source assets...');
 let allValid = true;
 
-for (const asset of requiredAssets) {
+for (const asset of canonicalAssets) {
   const fullPath = join(projectRoot, asset.path);
   const relativePath = asset.path;
   
-  console.log(`\n🔍 Validating: ${relativePath}`);
+  console.log(`\n🔍 Validating canonical: ${relativePath}`);
   
   // Check if file exists on filesystem
   if (!existsSync(fullPath)) {
-    console.error(`❌ File does not exist: ${relativePath}`);
+    console.error(`❌ Canonical file does not exist: ${relativePath}`);
     allValid = false;
     continue;
   }
   
   // Check if file is tracked by git
   if (!gitTrackedFiles.includes(relativePath)) {
-    console.error(`❌ File not tracked by git: ${relativePath}`);
+    console.error(`❌ Canonical file not tracked by git: ${relativePath}`);
     console.error(`   Run: git add ${relativePath}`);
     allValid = false;
     continue;
@@ -91,26 +105,67 @@ for (const asset of requiredAssets) {
     const fileSize = stats.size;
     
     if (fileSize < asset.minSize) {
-      console.error(`❌ File too small: ${relativePath} (${fileSize} bytes, minimum ${asset.minSize})`);
+      console.error(`❌ Canonical file too small: ${relativePath} (${fileSize} bytes, minimum ${asset.minSize})`);
       allValid = false;
       continue;
     }
     
     console.log(`✅ ${relativePath} - ${fileSize} bytes (${asset.description})`);
   } catch (error) {
-    console.error(`❌ Failed to get file stats: ${relativePath}`, error.message);
+    console.error(`❌ Failed to get canonical file stats: ${relativePath}`, error.message);
+    allValid = false;
+  }
+}
+
+// Validate target assets (copied during build)
+console.log('\n📄 Checking target assets (build outputs)...');
+
+for (const asset of targetAssets) {
+  const fullPath = join(projectRoot, asset.path);
+  const relativePath = asset.path;
+  
+  console.log(`\n🔍 Validating target: ${relativePath}`);
+  
+  // Check if file exists on filesystem
+  if (!existsSync(fullPath)) {
+    if (!asset.optional) {
+      console.error(`❌ Target file does not exist: ${relativePath}`);
+      console.error(`   Run: npm run prebuild to copy from canonical source`);
+      allValid = false;
+    } else {
+      console.log(`⚠️  Optional target file missing: ${relativePath}`);
+    }
+    continue;
+  }
+  
+  // Check file size
+  try {
+    const stats = statSync(fullPath);
+    const fileSize = stats.size;
+    
+    if (fileSize < asset.minSize) {
+      console.error(`❌ Target file too small: ${relativePath} (${fileSize} bytes, minimum ${asset.minSize})`);
+      allValid = false;
+      continue;
+    }
+    
+    console.log(`✅ ${relativePath} - ${fileSize} bytes (${asset.description})`);
+  } catch (error) {
+    console.error(`❌ Failed to get target file stats: ${relativePath}`, error.message);
     allValid = false;
   }
 }
 
 // Summary
-console.log('\n' + '='.repeat(50));
+console.log('\n' + '='.repeat(60));
 if (allValid) {
-  console.log('✅ All required assets are valid!');
+  console.log('✅ All canonical source assets are valid!');
+  console.log('✅ All target assets are properly copied!');
   console.log('✅ All critical directories are tracked');
-  console.log('✅ Ready for build');
+  console.log('✅ Asset consolidation successful - ready for build');
 } else {
   console.log('❌ Asset validation failed!');
   console.log('❌ Fix the issues above before building');
+  console.log('💡 Try running: npm run prebuild');
   process.exit(1);
 }

@@ -286,7 +286,7 @@ This content has been cryptographically verified for authenticity and provenance
 
   onBadgeError(event: any): void {
     // Fallback to static badge if dynamic fails
-    event.target.src = '/assets/signed_badge.png';
+    event.target.src = 'assets/signed_badge.png';
   }
 
   private getTrustmarkIdFromUrl(): string {

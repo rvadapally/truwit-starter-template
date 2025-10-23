@@ -13,50 +13,44 @@ import Footer from '../components/Footer.astro';
     <script>document.documentElement.setAttribute('data-theme', 'dark');</script>
     <Nav />
 
-    <!-- Hero Section matching Angular favorite page -->
-    <div class="landing-content">
-      <p class="subtitle gradient-text">Where Provenance Meets Proof</p>
-      
-      <div class="landing-card">
-        <h2 class="card-title">
-          <span class="gradient-text-primary">Verify origin. Prove consent.</span>
-          <span class="gradient-text-secondary"> Publish with confidence.</span>
-        </h2>
-        <p class="card-description">
-          Truwit attaches cryptographic provenance, consent, and authenticity to digital media. 
-          Verify the origin and prove consent for AI-generated content.
-        </p>
+    <!-- Hero Section matching Angular home page -->
+    <div class="hero-section">
+      <div class="hero-left">
+        <h1>Where Provenance Meets Proof</h1>
+        <p class="hero-sub">Redefining trust in the age of AI. Truwit is the lightweight verification layer for digital media—attaching cryptographic provenance, consent, and authenticity to AI-generated or user-created content.</p>
+        <div class="hero-ctas">
+          <a class="btn-primary" href="/app/verify">Start Verification</a>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-visual">Preview coming soon</div>
+      </div>
+    </div>
         
+        <!-- Features matching Angular exactly -->
         <div class="features">
           <div class="feature">
-            <div class="feature-icon">🔒</div>
+            <div class="feature-icon">🛡️</div>
             <h3>Cryptographic Proof</h3>
-            <p>Immutable verification using blockchain technology</p>
+            <p>Immutable, verifiable attestations for your media.</p>
           </div>
           <div class="feature">
-            <div class="feature-icon">✅</div>
+            <div class="feature-icon">🤝</div>
             <h3>Consent Tracking</h3>
-            <p>Track and verify consent for likeness usage</p>
+            <p>Prove likeness/rights with traceable consent.</p>
           </div>
           <div class="feature">
-            <div class="feature-icon">🎯</div>
+            <div class="feature-icon">✨</div>
             <h3>AI Detection</h3>
-            <p>Identify and verify AI-generated content</p>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">
-              <img src="/images/signed_badge.png" alt="Verified by Truwit" style="width: 48px; height: 48px; object-fit: contain;">
-            </div>
-            <h3>Show Trust</h3>
-            <p>Use "Verified by Truwit" badges on posts, thumbnails, and sites</p>
+            <p>Identify and label AI-assisted or generated content.</p>
           </div>
         </div>
         
+        <!-- CTA Section matching Angular -->
         <div class="cta-section">
-          <a class="cta-button" href="/app">
-            Launch App
-          </a>
-          <p class="cta-subtitle">Upload your content to begin</p>
+          <h2>Verify origin. Prove consent. Publish with confidence.</h2>
+          <a class="btn-primary" href="/app/verify">Start Verification</a>
+          <p class="cta-subtitle">We hash locally. Your files are not stored.</p>
         </div>
       </div>
     </div>
