@@ -39,3 +39,6 @@ truwit-api/node_modules/
 *.zip
 *.tar.gz
 *.rar
+
+# SVG files (Cursor tries to process as images but doesn't support SVG format)
+*.svg
