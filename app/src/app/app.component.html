@@ -4,10 +4,9 @@
   <!-- Navigation Header (hidden on public verify pages) -->
   <header class="header" *ngIf="!currentRoute.startsWith('/t/')">
     <nav class="nav">
-      <div class="nav-brand">
-        <img src="assets/logo.svg" alt="Truwit Logo" class="nav-logo" />
-        <h1 class="brand-name">Truwit</h1>
-      </div>
+      <a routerLink="/app" class="hdr-logo">
+        <img src="/assets/logo.svg" alt="Truwit" width="120" height="28" />
+      </a>
       <div class="nav-links">
         <a href="https://truwit.ai" class="nav-link">Home</a>
         <a href="https://truwit.ai/how-it-works" class="nav-link">How It Works</a>
@@ -21,8 +20,13 @@
 
   <footer class="footer" *ngIf="!currentRoute.startsWith('/t/')">
     <div class="footer-content">
-      <img src="assets/verified-circular-badge.png" alt="Verified by Truwit" class="footer-logo" />
-      <p>© {{currentYear}} Truwit. All rights reserved.</p>
+      <p class="footer-links">
+        <a routerLink="/privacy" class="footer-link">Privacy</a> • 
+        <a routerLink="/terms" class="footer-link">Terms</a> • 
+        <a routerLink="/contact" class="footer-link">Contact</a> • 
+        <a href="https://x.com/TruwitAi" target="_blank" rel="noopener noreferrer" class="footer-link">X</a>
+      </p>
+      <p class="footer-copyright">© 2025 Truwit. All rights reserved.</p>
     </div>
   </footer>
 </div>
