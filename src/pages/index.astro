@@ -13,183 +13,39 @@ import Footer from '../components/Footer.astro';
     <script>document.documentElement.setAttribute('data-theme', 'dark');</script>
     <Nav />
 
-    <!-- Hero Section matching Angular favorite page -->
-    <div class="landing-content">
-      <p class="subtitle gradient-text">Where Provenance Meets Proof</p>
-      
-      <div class="landing-card">
-        <h2 class="card-title">
-          <span class="gradient-text-primary">Verify origin. Prove consent.</span>
-          <span class="gradient-text-secondary"> Publish with confidence.</span>
-        </h2>
-        <p class="card-description">
-          Truwit attaches cryptographic provenance, consent, and authenticity to digital media. 
-          Verify the origin and prove consent for AI-generated content.
-        </p>
-        
-        <div class="features">
-          <div class="feature">
-            <div class="feature-icon">🔒</div>
-            <h3>Cryptographic Proof</h3>
-            <p>Immutable verification using blockchain technology</p>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">✅</div>
-            <h3>Consent Tracking</h3>
-            <p>Track and verify consent for likeness usage</p>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">🎯</div>
-            <h3>AI Detection</h3>
-            <p>Identify and verify AI-generated content</p>
-          </div>
-          <div class="feature">
-            <div class="feature-icon">
-              <img src="/images/signed_badge.png" alt="Verified by Truwit" style="width: 48px; height: 48px; object-fit: contain;">
-            </div>
-            <h3>Show Trust</h3>
-            <p>Use "Verified by Truwit" badges on posts, thumbnails, and sites</p>
+    <!-- Hero Section synced with Angular Home (dark-only) -->
+    <div class="tw-home">
+      <section class="home-hero">
+        <div class="hero-left">
+          <h1>Where Provenance Meets Proof</h1>
+          <p class="hero-sub">Redefining trust in the age of AI. Truwit is the lightweight verification layer for digital media—attaching cryptographic provenance, consent, and authenticity to AI-generated or user-created content.</p>
+          <div class="hero-ctas">
+            <a class="btn-primary" href="/app/verify" aria-label="Start Verification" role="button">Start Verification</a>
           </div>
         </div>
-        
-        <div class="cta-section">
-          <a class="cta-button" href="/app">
-            Launch App
-          </a>
-          <p class="cta-subtitle">Upload your content to begin</p>
+        <div class="hero-right">
+          <img
+            src="/images/truwit-banner.png"
+            alt="Truwit verification demo"
+            class="hero-image"
+            width="1200"
+            height="800"
+            loading="lazy"
+            decoding="async"
+            sizes="(max-width: 639px) 100vw, (max-width: 1023px) 80vw, 560px">
         </div>
-      </div>
+      </section>
+
+      <!-- CTA block aligned with Angular -->
+      <section class="home-cta">
+        <h2>Verify origin. Prove consent. Publish with confidence.</h2>
+        <a class="btn-primary" href="/app/verify" aria-label="Start Verification" role="button">Start Verification</a>
+        <p class="microcopy">We hash locally. Your files are not stored.</p>
+      </section>
     </div>
 
     <Footer />
   </body>
 </html>
 
-<style>
-  .landing-content {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .subtitle {
-    font-size: 1.5rem;
-    text-align: center;
-    margin-bottom: 2rem;
-    background: linear-gradient(135deg, #0ea5e9, #22c55e);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .landing-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 3rem;
-    text-align: center;
-  }
-  
-  .card-title {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    line-height: 1.2;
-  }
-  
-  .gradient-text-primary {
-    color: #0ea5e9;
-  }
-  
-  .gradient-text-secondary {
-    color: #22c55e;
-  }
-  
-  .card-description {
-    font-size: 1.1rem;
-    color: #9fb3d9;
-    margin-bottom: 3rem;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .features {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
-    margin-bottom: 3rem;
-  }
-  
-  .feature {
-    text-align: center;
-  }
-  
-  .feature-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
-  
-  .feature h3 {
-    color: #0ea5e9;
-    margin-bottom: 0.5rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
-  
-  .feature p {
-    color: #9fb3d9;
-    font-size: 0.9rem;
-  }
-  
-  .cta-section {
-    text-align: center;
-  }
-  
-  .cta-button {
-    background: linear-gradient(135deg, #0ea5e9, #22c55e);
-    color: white;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  .cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
-  }
-  
-  .cta-subtitle {
-    color: #9fb3d9;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-  }
-
-  @media (max-width: 1024px) {
-    .features {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .card-title {
-      font-size: 2rem;
-    }
-    
-    .features {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-    
-    .cta-button {
-      padding: 1rem 2rem;
-      font-size: 1rem;
-    }
-  }
-</style>
+<!-- Styles handled via global.css to mirror Angular visuals -->

@@ -198,3 +198,142 @@ strong{font-weight:700;color:var(--text-primary)}
   .hero h1{font-size:28px}
   .home-grid{grid-template-columns:1fr}
 }
+
+/* Dark-only homepage hero styles to mirror Angular Home */
+.tw-home {
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  padding-top: 16px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  min-height: calc(100vh - 200px);
+  color: var(--text-primary);
+  background: var(--bg-0);
+}
+
+.tw-home .home-hero h1 {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, var(--teal), #2de2b5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.tw-home .home-hero .hero-sub {
+  font-size: clamp(0.95rem, 2.7vw, 1.05rem);
+  line-height: 1.5;
+  color: #b8c7cc;
+  margin: 0 0 16px 0;
+  max-width: 70ch;
+}
+
+.tw-home .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  background: linear-gradient(135deg, #00c4cc, #007a85);
+  color: #081018;
+  box-shadow: 0 6px 16px rgba(0, 196, 204, 0.25);
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+  touch-action: manipulation;
+  cursor: pointer;
+  border: none;
+}
+
+.tw-home .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(34, 224, 195, 0.3); }
+.tw-home .btn-primary:active { transform: translateY(1px); }
+
+.tw-home .home-hero {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+  margin: 16px 0 24px 0;
+  max-width: var(--w-container);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1.5rem;
+}
+
+.tw-home .hero-left { order: 1; text-align: center; }
+.tw-home .hero-right { order: 2; width: 100%; text-align: center; }
+
+.tw-home .hero-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.tw-home .hero-ctas { margin-bottom: 1rem; }
+
+.tw-home .home-cta {
+  text-align: center;
+  padding: 20px 16px;
+  border-radius: 16px;
+  background: radial-gradient(120% 120% at 50% 0%, rgba(0, 196, 204, 0.2), rgba(0, 122, 133, 0.08) 60%, rgba(7, 16, 27, 0.6) 100%);
+  border: 1px solid rgba(0, 196, 204, 0.25);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  margin: 2rem 1.5rem;
+  max-width: calc(var(--w-container) - 3rem);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tw-home .home-cta h2 {
+  font-size: clamp(1.15rem, 3.2vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 10px 0;
+  color: var(--text-primary);
+}
+
+.tw-home .home-cta .btn-primary { margin-bottom: 1rem; }
+.tw-home .microcopy { font-size: 0.9rem; color: #9fb0b6; margin-top: 8px; margin-bottom: 0; }
+
+@media (min-width: 640px) {
+  .tw-home .home-hero { gap: 20px; margin: 20px 0 28px 0; }
+}
+
+@media (min-width: 768px) {
+  .tw-home .home-hero { /* features grid not used on Astro home */ }
+}
+
+@media (min-width: 1024px) {
+  .tw-home .home-hero {
+    grid-template-columns: 1.05fr 0.95fr;
+    flex-direction: row;
+    gap: 4rem;
+    align-items: center;
+    text-align: left;
+    margin: 24px 0 36px 0;
+  }
+  .tw-home .hero-left { flex: 1; text-align: left; order: 1; }
+  .tw-home .hero-right { flex: 1; max-width: none; order: 2; }
+}
+
+/* Handle missing banner image gracefully */
+.tw-home .hero-right .hero-image[src*="truwit-banner"] { display: block; }
+.tw-home .hero-right:has(.hero-image[src*="truwit-banner"]:not([src])) .hero-image,
+.tw-home .hero-right .hero-image[alt]:empty { display: none; }
+.tw-home .hero-right:has(.hero-image[src*="truwit-banner"]:not([src]))::after,
+.tw-home .hero-right:has(.hero-image[alt]:empty)::after {
+  content: "Preview coming soon";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 300px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-style: italic;
+}
