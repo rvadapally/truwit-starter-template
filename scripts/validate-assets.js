@@ -22,7 +22,7 @@ const requiredAssets = [
   { path: 'public/favicon-truwit.svg', minSize: 100, description: 'Astro favicon' },
   { path: 'app/src/assets/verified-circular-badge.jpg', minSize: 10000, description: 'Angular badge image' },
   { path: 'app/src/assets/verified-by-truwit.png', minSize: 10000, description: 'Angular verified badge' },
-  { path: 'public/logo.svg', minSize: 100, description: 'Main logo' }
+  { path: 'public/images/logo.svg', minSize: 100, description: 'Main logo (organized in images folder)' }
 ];
 
 // Critical directories that should NOT be gitignored
