@@ -10,8 +10,9 @@ const links = [
 ---
 <nav style="background:var(--bg-1);border-bottom:1px solid var(--border)">
   <div class="container" style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px">
-    <a href="/" style="display:flex;align-items:center;gap:10px;color:var(--text-primary);font-weight:700;font-size:1.5rem">
-      <img src="/logo.svg" alt="Truwit Logo" width="32" height="32" style="display:block"/> Truwit
+    <a href="/" class="nav-brand" style="display:flex;align-items:center;gap:1rem;text-decoration:none">
+      <img src="/logo.svg" alt="Truwit Logo" class="nav-logo" width="32" height="32" style="display:block;background:transparent;mix-blend-mode:normal"/> 
+      <span class="brand-name">Truwit</span>
     </a>
     <div style="display:flex;gap:18px;align-items:center">
       {links.map(l => <a href={l.href} style="color:var(--text-primary)">{l.label}</a>)}
