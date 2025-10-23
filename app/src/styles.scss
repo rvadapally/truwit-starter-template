@@ -913,3 +913,65 @@ textarea:focus {
     }
   }
 }
+
+/* ==== Truwit Home Page Micro-Patch (v1.0.2) ==== */
+/* Append to end of app/src/styles.scss */
+
+.tw-home {
+  /* Ensure content is centered and not drifting on large screens */
+  max-width: var(--w-container);
+  margin-left: auto;
+  margin-right: auto;
+
+  /* Hero: prevent the right panel from sprawling & keep ratio */
+  .home-hero {
+    /* slightly more air on desktop; no change to mobile grid */
+    gap: clamp(1rem, 2vw, 2.5rem);
+  }
+
+  .hero-right img,
+  .hero-right .hero-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    border: 1px dashed rgba(255,255,255,0.10);
+    object-fit: cover;
+  }
+
+  /* Features: normalize spacing & center the three cards */
+  .home-features {
+    /* keep your mobile 1-col and tablet 2-col; tighten desktop gaps */
+    gap: clamp(0.75rem, 1.5vw, 2rem);
+  }
+
+  .home-features .feature {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: clamp(1rem, 1.6vw, 1.5rem);
+    transition: transform .2s ease;
+  }
+  .home-features .feature:hover { transform: translateY(-2px); }
+
+  /* CTA: recentre and ensure consistent rhythm with page */
+  .home-cta {
+    margin: clamp(1.25rem, 3vw, 3rem) 1rem 0;
+    padding: clamp(1.25rem, 2.5vw, 2rem) 1rem;
+    max-width: calc(var(--w-container) - 2rem);
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .home-cta h2 { margin-bottom: .75rem; }
+  .home-cta .btn-primary { display: inline-flex; margin-top: .5rem; }
+}
+
+/* Small screens: be explicit about stacking & centering */
+@media (max-width: 768px) {
+  .tw-home {
+    padding-inline: 1rem;
+    .home-hero { grid-template-columns: 1fr; text-align: center; }
+    .hero-left, .hero-right { justify-self: center; }
+    .home-features { margin-top: 1.25rem; }
+  }
+}
