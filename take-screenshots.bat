@@ -1,10 +1,10 @@
 @echo off
-REM Screenshot Capture Tool for Truwit
-REM Takes screenshots of all key pages in multiple viewports
+REM Desktop Screenshot Capture Tool for Truwit
+REM Takes desktop-only screenshots of all key pages (1920x1080)
 
 echo.
 echo ======================================
-echo    Truwit Screenshot Capture Tool
+echo  Truwit Desktop Screenshot Tool
 echo ======================================
 echo.
 
@@ -16,8 +16,8 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Run the PowerShell script
-powershell -ExecutionPolicy Bypass -File "%~dp0take-screenshots.ps1" -Environment production
+REM Run the PowerShell script with desktop-only viewport
+powershell -ExecutionPolicy Bypass -File "%~dp0take-screenshots.ps1" -Environment production -ViewportType desktop
 
 if errorlevel 1 (
     echo.
@@ -27,6 +27,6 @@ if errorlevel 1 (
 )
 
 echo.
-echo Screenshot capture completed successfully!
+echo Desktop screenshot capture completed successfully!
 pause
 

@@ -26,11 +26,10 @@ const siteUrl = 'https://truwit.ai';
 <link rel="manifest" href="/manifest.webmanifest" />
 <meta name="generator" content={Astro.generator} />
 
-<!-- Theme initialization to prevent FOUC -->
+<!-- Force dark theme (remove theme toggle) -->
 <script is:inline>
   (function() {
-    const theme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-theme', 'dark');
   })();
 </script>
 

@@ -1,6 +1,7 @@
 param(
     [string]$Environment = 'production',
-    [string]$BaseUrl = ''
+    [string]$BaseUrl = '',
+    [string]$ViewportType = 'all'  # 'all', 'desktop', 'mobile', 'tablet'
 )
 
 # Set base URL
@@ -17,6 +18,7 @@ Write-Host "Screenshot Capture Tool" -ForegroundColor Cyan
 Write-Host "=======================" -ForegroundColor Cyan
 Write-Host "Environment: $Environment"
 Write-Host "Base URL: $BaseUrl"
+Write-Host "Viewport Type: $ViewportType"
 Write-Host ""
 
 # Check Playwright
@@ -41,7 +43,17 @@ Write-Host ""
 Write-Host "Starting screenshot capture..." -ForegroundColor Cyan
 Write-Host ""
 
-$scriptPath = Join-Path $PSScriptRoot "scripts/capture-screenshots.cjs"
+# Choose the appropriate script based on viewport type
+if ($ViewportType -eq 'desktop') {
+    $scriptPath = Join-Path $PSScriptRoot "scripts/capture-screenshots-desktop.cjs"
+    Write-Host "Using desktop-only capture script" -ForegroundColor Yellow
+} else {
+    $scriptPath = Join-Path $PSScriptRoot "scripts/capture-screenshots.cjs"
+    if ($ViewportType -ne 'all') {
+        Write-Host "Note: ViewportType '$ViewportType' not specifically supported, using all viewports" -ForegroundColor Yellow
+    }
+}
+
 node $scriptPath $BaseUrl $outputDir
 
 Write-Host ""
