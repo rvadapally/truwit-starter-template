@@ -26,11 +26,19 @@
   gap: 2rem;
 }
 
-.nav-brand {
+.nav-brand,
+.hdr-logo {
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 1rem;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.nav-brand:hover,
+.hdr-logo:hover {
+  opacity: 0.9;
 }
 
 .nav-logo {
@@ -39,6 +47,29 @@
   object-fit: contain;
   background: transparent;
   mix-blend-mode: normal;
+}
+
+/* Handle missing logo.svg gracefully */
+.nav-logo[src*="logo.svg"] {
+  display: block;
+}
+
+.nav-logo:not([src]),
+.nav-logo[src=""],
+.nav-logo[alt]:empty {
+  display: none;
+}
+
+/* Show brand name when logo is missing or fails to load */
+.nav-brand:has(.nav-logo:not([src])) .brand-name,
+.nav-brand:has(.nav-logo[src=""]) .brand-name,
+.nav-brand:has(.nav-logo[alt]:empty) .brand-name {
+  display: block;
+}
+
+/* Hide brand name when logo loads successfully */
+.nav-brand:has(.nav-logo[src*="logo.svg"]:not([alt]:empty)) .brand-name {
+  display: none;
 }
 
 .nav-brand .brand-name {
@@ -286,6 +317,45 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.footer-link {
+  color: #9fb3d9;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 400;
+  transition: color 0.2s ease;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+}
+
+.footer-link:hover {
+  color: #0ea5e9;
+}
+
+.footer-separator {
+  color: #6b7a96;
+  font-size: 0.8rem;
+  user-select: none;
+}
+
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 1rem;
 }
 
@@ -316,9 +386,27 @@ img {
     flex-direction: column;
     gap: 1rem;
   }
-  
+
+  .nav-brand,
+  .hdr-logo {
+    justify-content: center;
+  }
+
   .nav-links {
     gap: 1.5rem;
+  }
+
+  .footer-content {
+    gap: 1rem;
+  }
+
+  .footer-links {
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .footer-separator {
+    margin: 0 0.25rem;
   }
   
   .brand-name {
@@ -342,4 +430,28 @@ img {
     padding: 1rem 2rem;
     font-size: 1rem;
   }
+}
+
+/* Ensure clean rendering on dark backgrounds for tw-home and tw-verify */
+.tw-home .header,
+.tw-verify .header,
+.tw-home .footer,
+.tw-verify .footer {
+  background: rgba(14, 27, 53, 0.95);
+  backdrop-filter: blur(12px);
+}
+
+.tw-home .footer-link,
+.tw-verify .footer-link {
+  color: #c8d2db;
+}
+
+.tw-home .footer-link:hover,
+.tw-verify .footer-link:hover {
+  color: var(--teal, #22E0C3);
+}
+
+.tw-home .footer-separator,
+.tw-verify .footer-separator {
+  color: #8fa2b1;
 }
