@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build",
+    "build": "ng build --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:e2e": "playwright test",
@@ -13,7 +13,7 @@
     "test:e2e:report": "playwright show-report",
     "dev:ssr": "ng run humanproof-web:serve-ssr",
     "serve:ssr": "node dist/humanproof-web/server/main.js",
-    "build:ssr": "ng run humanproof-web:build && ng run humanproof-web:server",
+    "build:ssr": "ng run humanproof-web:build:production && ng run humanproof-web:server:production",
     "prerender": "ng run humanproof-web:prerender",
     "postprerender": "node scripts/generate-sitemap.mjs"
   },
