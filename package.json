@@ -3,18 +3,15 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
-  "workspaces": [
-    "app"
-  ],
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "npm --workspace app run start",
-    "build": "npm --workspace app run build",
-    "build:ssr": "npm --workspace app run build:ssr",
-    "prerender": "npm --workspace app run prerender",
-    "serve:ssr": "npm --workspace app run serve:ssr",
+    "dev": "cd app && npm start",
+    "build": "cd app && npm run build",
+    "build:ssr": "cd app && npm run build:ssr",
+    "prerender": "cd app && npm run prerender",
+    "serve:ssr": "cd app && npm run serve:ssr",
     "deploy": "npm run prerender && npx wrangler pages deploy ./app/dist/humanproof-web/browser --project-name=truwit-starter-template",
     "postdeploy": "node scripts/verify-deployment.js",
     "verify:assets": "node scripts/validate-assets.js",
