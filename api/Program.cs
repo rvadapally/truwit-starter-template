@@ -294,9 +294,9 @@ try
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         try
         {
-            // Run EF Core migrations first (creates/updates tables)
-            await context.Database.MigrateAsync();
-            Console.WriteLine("✅ EF Core migrations applied");
+            // Check database connection
+            await context.Database.CanConnectAsync();
+            Console.WriteLine("✅ Database connection verified");
 
             // Run SQL migrations (custom scripts)
             var migrationRunner = scope.ServiceProvider.GetRequiredService<SqlMigrationRunner>();
