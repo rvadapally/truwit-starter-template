@@ -5,9 +5,14 @@ using HumanProof.Api.Infrastructure.Repositories;
 using HumanProof.Api.Infrastructure.Services;
 using HumanProof.Api.Infrastructure.Data;
 using HumanProof.Api.Infrastructure.Middleware;
+using HumanProof.Api.Controllers;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using NLog;
 using NLog.Web;
 
@@ -118,6 +123,15 @@ try
     builder.Services.Configure<DownloaderOptions>(builder.Configuration.GetSection("Downloader"));
     builder.Services.Configure<C2paToolOptions>(builder.Configuration.GetSection("C2paTool"));
     builder.Services.Configure<FeatureFlags>(builder.Configuration.GetSection("Features"));
+    
+    // Configure multi-sign options
+    builder.Services.Configure<GroupingOptions>(builder.Configuration.GetSection("Grouping"));
+    builder.Services.Configure<OAuthOptions>(builder.Configuration.GetSection("OAuth"));
+    
+    // Register multi-sign services
+    builder.Services.AddScoped<IPHashService, PHashService>();
+    builder.Services.AddScoped<IGroupingService, GroupingService>();
+    builder.Services.AddScoped<IImageInfoService, ImageInfoService>();
 
     // Register SQL migration runner
     builder.Services.AddScoped<SqlMigrationRunner>();
@@ -146,6 +160,37 @@ try
 
     // For legacy startup flow below
     var databaseType = "postgres";
+    
+    // Configure Authentication (OAuth + JWT)
+    var oauthConfig = builder.Configuration.GetSection("OAuth");
+    var jwtSecret = oauthConfig["JwtSecret"] ?? "CHANGE_THIS_SECRET_IN_PRODUCTION_MIN_32_CHARS_REQUIRED";
+    
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "Truwit",
+            ValidAudience = "Truwit-API",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+            ClockSkew = TimeSpan.Zero // Remove default 5 minute clock skew
+        };
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = oauthConfig["Google:ClientId"] ?? "YOUR_GOOGLE_CLIENT_ID_HERE";
+        options.ClientSecret = oauthConfig["Google:ClientSecret"] ?? "YOUR_GOOGLE_CLIENT_SECRET_HERE";
+        options.CallbackPath = "/v1/auth/callback/google";
+        options.SaveTokens = true;
+    });
 
     var app = builder.Build();
     
@@ -261,6 +306,7 @@ try
     
     app.UseRequestId();
     app.UseGlobalExceptionHandler();
+    app.UseAuthentication(); // Add authentication middleware
     app.UseAuthorization();
     app.MapControllers();
 

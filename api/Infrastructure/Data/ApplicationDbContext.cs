@@ -21,6 +21,13 @@ public class ApplicationDbContext : DbContext
     
     // Service configuration
     public DbSet<ServiceSetting> ServiceSettings { get; set; } = null!;
+    
+    // Multi-sign entities
+    public DbSet<AssetGroup> AssetGroups { get; set; } = null!;
+    public DbSet<AssetFile> AssetFiles { get; set; } = null!;
+    public DbSet<Identity> Identities { get; set; } = null!;
+    public DbSet<Signature> Signatures { get; set; } = null!;
+    public DbSet<ManifestEvent> ManifestEvents { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -129,6 +136,96 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Value).IsRequired();
             entity.Property(e => e.UpdatedBy).HasMaxLength(255);
             entity.HasIndex(e => e.Key);
+        });
+        
+        // Configure multi-sign entities
+        modelBuilder.Entity<AssetGroup>(entity =>
+        {
+            entity.HasKey(e => e.GroupId);
+            entity.Property(e => e.GroupId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.PHash).IsRequired();
+            entity.Property(e => e.PHashAlgo).HasMaxLength(50).HasDefaultValue("phash-dct");
+            entity.Property(e => e.PHashBits).HasDefaultValue(64);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.HasIndex(e => e.PHash).HasDatabaseName("ix_assetgroup_phash");
+            
+            // Relationships
+            entity.HasMany(e => e.Files)
+                  .WithOne(e => e.Group)
+                  .HasForeignKey(e => e.GroupId)
+                  .OnDelete(DeleteBehavior.Cascade);
+                  
+            entity.HasMany(e => e.ManifestEvents)
+                  .WithOne(e => e.Group)
+                  .HasForeignKey(e => e.GroupId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        modelBuilder.Entity<AssetFile>(entity =>
+        {
+            entity.HasKey(e => e.FileId);
+            entity.Property(e => e.FileId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.Sha256).IsRequired();
+            entity.Property(e => e.Mime).HasMaxLength(100);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.HasIndex(e => e.Sha256).IsUnique();
+            entity.HasIndex(e => e.GroupId).HasDatabaseName("ix_assetfile_group");
+            
+            // Relationships
+            entity.HasMany(e => e.Signatures)
+                  .WithOne(e => e.File)
+                  .HasForeignKey(e => e.FileId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+        
+        modelBuilder.Entity<Identity>(entity =>
+        {
+            entity.HasKey(e => e.IdentityId);
+            entity.Property(e => e.IdentityId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.Provider).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.Handle).HasMaxLength(255);
+            entity.Property(e => e.DisplayName).HasMaxLength(255);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            // CHECK constraint for provider values
+            entity.ToTable(t => t.HasCheckConstraint(
+                "CK_Identity_Provider",
+                "\"Provider\" IN ('x', 'google', 'github', 'behance', 'anon')"
+            ));
+            
+            entity.HasIndex(e => new { e.Provider, e.Handle }).IsUnique();
+            
+            // Relationships
+            entity.HasMany(e => e.Signatures)
+                  .WithOne(e => e.Identity)
+                  .HasForeignKey(e => e.IdentityId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+        
+        modelBuilder.Entity<Signature>(entity =>
+        {
+            entity.HasKey(e => e.SigId);
+            entity.Property(e => e.SigId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.SignatureType).HasMaxLength(50).HasDefaultValue("eddsa");
+            entity.Property(e => e.SignedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.StatementJson).HasColumnType("jsonb");
+            
+            entity.HasIndex(e => e.FileId).HasDatabaseName("ix_signature_file");
+            entity.HasIndex(e => e.IdentityId).HasDatabaseName("ix_signature_identity");
+            entity.HasIndex(e => new { e.FileId, e.IdentityId }).IsUnique();
+        });
+        
+        modelBuilder.Entity<ManifestEvent>(entity =>
+        {
+            entity.HasKey(e => e.EventId);
+            entity.Property(e => e.EventId).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.Kind).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Payload).HasColumnType("jsonb");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.HasIndex(e => e.GroupId);
         });
     }
 }
