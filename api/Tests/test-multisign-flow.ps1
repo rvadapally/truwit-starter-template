@@ -21,16 +21,16 @@ function Write-TestHeader($message) {
 }
 
 function Write-TestSuccess($message) {
-    Write-Host "✅ $message" -ForegroundColor Green
+    Write-Host "[PASS] $message" -ForegroundColor Green
 }
 
 function Write-TestFailure($message) {
-    Write-Host "❌ $message" -ForegroundColor Red
+    Write-Host "[FAIL] $message" -ForegroundColor Red
 }
 
 function Write-TestInfo($message) {
     if ($Verbose) {
-        Write-Host "ℹ️  $message" -ForegroundColor Yellow
+        Write-Host "[INFO] $message" -ForegroundColor Yellow
     }
 }
 
@@ -570,11 +570,11 @@ function Show-TestSummary {
     Write-Host "`n========================================`n" -ForegroundColor Cyan
     
     if ($failed -eq 0 -and $passed -gt 0) {
-        Write-Host "🎉 ALL TESTS PASSED!" -ForegroundColor Green
+        Write-Host "SUCCESS: ALL TESTS PASSED!" -ForegroundColor Green
         Write-Host "Implementation complete, all verification steps passed." -ForegroundColor Green
     }
     elseif ($failed -gt 0) {
-        Write-Host "⚠️  SOME TESTS FAILED" -ForegroundColor Red
+        Write-Host "WARNING: SOME TESTS FAILED" -ForegroundColor Red
         Write-Host "Please review the failures above." -ForegroundColor Red
     }
     
