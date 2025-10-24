@@ -428,10 +428,10 @@ function Test-GetBadge {
             
             Write-TestSuccess "Badge SVG retrieved successfully"
             Write-TestInfo "Badge size: $badgeSize bytes"
-            Write-TestInfo "Target size: <25KB (25600 bytes)"
+            Write-TestInfo "Target size: less than 25KB (25600 bytes)"
             
             if ($badgeSize -lt 25600) {
-                Write-TestSuccess "Badge size is within target (<25KB)"
+                Write-TestSuccess "Badge size is within target (less than 25KB)"
             }
             else {
                 Write-TestFailure "Badge size exceeds target (>25KB)"
@@ -448,7 +448,7 @@ function Test-GetBadge {
             $hasVerifiedText = $response.Content.Contains("Verified by Truwit")
             
             Write-TestInfo "Badge contains:"
-            Write-TestInfo "  - <title> tag: $hasTitle"
+            Write-TestInfo "  - title tag: $hasTitle"
             Write-TestInfo "  - QR code elements: $hasQrCode"
             Write-TestInfo "  - 'Verified by Truwit' text: $hasVerifiedText"
             
