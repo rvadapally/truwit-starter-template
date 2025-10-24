@@ -5,6 +5,9 @@
   min-height: 100vh;
   background: radial-gradient(1200px 600px at 70% -10%, #0e1b35 0%, #0b1220 60%);
   color: #e6eefc;
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .loading-state {
@@ -81,6 +84,9 @@
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     margin-bottom: 3rem;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .left-column,
@@ -88,6 +94,7 @@
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    min-width: 0; // Allow flex items to shrink below content size
   }
 
   .detail-card {
@@ -95,6 +102,8 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 1.5rem;
+    min-width: 0; // Allow card to shrink
+    overflow: hidden;
 
     h3 {
       color: #0ea5e9;
@@ -108,6 +117,7 @@
       align-items: flex-start;
       margin-bottom: 1rem;
       gap: 1rem;
+      min-width: 0; // Allow row to shrink
 
       .label {
         font-weight: 600;
@@ -121,9 +131,11 @@
         flex: 1;
         font-family: 'Courier New', monospace;
         font-size: 0.85rem;
-        word-break: break-word;
-        overflow-wrap: break-word;
+        word-break: break-all; // Changed from break-word to break-all for long hashes
+        overflow-wrap: anywhere;
         line-height: 1.6;
+        min-width: 0; // Allow value to shrink
+        max-width: 100%;
 
         &.truncate {
           overflow: hidden;
@@ -133,6 +145,7 @@
 
         &.c2pa-status {
           font-family: system-ui, -apple-system, sans-serif;
+          word-break: normal; // Don't break status text
         }
       }
 
@@ -240,12 +253,14 @@
 @media (max-width: 768px) {
   .public-verify-container {
     padding: 1rem;
+    overflow-x: hidden;
   }
 
   .verify-content {
     .verify-header {
       h1 {
         font-size: 2rem;
+        word-break: break-word;
       }
 
       .verified-badge-img {
@@ -260,6 +275,8 @@
     }
 
     .detail-card {
+      overflow: hidden;
+      
       .detail-row {
         flex-direction: column;
         align-items: flex-start;
@@ -272,6 +289,9 @@
 
         .value {
           width: 100%;
+          max-width: 100%;
+          word-break: break-all;
+          
           &.truncate {
             white-space: normal;
           }
