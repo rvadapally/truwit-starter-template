@@ -401,15 +401,20 @@ textarea:focus {
     border: 1px solid rgba(0, 196, 204, 0.25);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     
-    /* Center on screen */
+    /* Center on screen - break out of parent padding */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 60vh;
-    margin: 4rem auto !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    
+    /* Negative margins to compensate for parent's 16px padding */
+    margin-left: -16px !important;
+    margin-right: -16px !important;
+    margin-top: 4rem;
+    margin-bottom: 4rem;
+    width: calc(100% + 32px) !important;
+    max-width: calc(100% + 32px) !important;
   }
 
   .home-cta h2 {
