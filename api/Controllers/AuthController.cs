@@ -210,7 +210,7 @@ public class AuthController : ControllerBase
 
         var claims = new[]
         {
-            new Claim("identity_id", identity.IdentityId.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, identity.IdentityId.ToString()),
             new Claim("provider", identity.Provider),
             new Claim("handle", identity.Handle ?? string.Empty),
             new Claim("display_name", identity.DisplayName ?? string.Empty),
