@@ -428,13 +428,13 @@ function Test-GetBadge {
             
             Write-TestSuccess "Badge SVG retrieved successfully"
             Write-TestInfo "Badge size: $badgeSize bytes"
-            Write-TestInfo "Target size: less than 25KB (25600 bytes)"
+            Write-TestInfo "Target size: less than 25KB - 25600 bytes"
             
             if ($badgeSize -lt 25600) {
-                Write-TestSuccess "Badge size is within target (less than 25KB)"
+                Write-TestSuccess "Badge size is within target - less than 25KB"
             }
             else {
-                Write-TestFailure "Badge size exceeds target (>25KB)"
+                Write-TestFailure "Badge size exceeds target - more than 25KB"
             }
             
             # Save badge to file
