@@ -2,42 +2,33 @@
   "name": "@example/truwit-integrated",
   "type": "module",
   "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "app"
+  ],
   "engines": {
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "dev:app": "cd app && npm start",
-    "dev:both": "concurrently \"npm run dev:app\" \"npm run dev\"",
-    "start": "echo ❌ ERROR: Don't run npm start here! && echo ✅ Use start.bat instead! && exit 1",
-    "prebuild": "node scripts/copy-canonical-assets.js && node scripts/sync-api-assets.js && node scripts/validate-assets.js",
-    "build": "npm run build:app && npm run build:astro && npm run integrate",
-    "postbuild": "node scripts/asset-reference-scanner.js && node scripts/verify-build-output.js",
-    "build:astro": "astro build",
-    "build:app": "cd app && npm install && npm run build",
-    "integrate": "node build-integration.js",
-    "preview": "astro preview",
-    "astro": "astro",
-    "deploy": "npm run build && npx wrangler pages deploy ./dist --project-name=truwit-starter-template",
+    "dev": "npm --workspace app run start",
+    "build": "npm --workspace app run build",
+    "build:ssr": "npm --workspace app run build:ssr",
+    "prerender": "npm --workspace app run prerender",
+    "serve:ssr": "npm --workspace app run serve:ssr",
+    "deploy": "npm run prerender && npx wrangler pages deploy ./app/dist/humanproof-web/browser --project-name=truwit-starter-template",
     "postdeploy": "node scripts/verify-deployment.js",
-    "sync:api-assets": "node scripts/sync-api-assets.js",
-    "scan:asset-references": "node scripts/asset-reference-scanner.js",
     "verify:assets": "node scripts/validate-assets.js",
     "verify:build": "node scripts/verify-build-output.js",
     "verify:deployment": "node scripts/verify-deployment.js",
     "verify:gitignore": "node scripts/validate-gitignore.js"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@astrojs/sitemap": "^3.2.1",
-    "astro": "^4.16.18",
     "node-fetch": "^3.3.2",
     "playwright": "^1.56.1",
     "typescript": "^5.7.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241218.0",
-    "concurrently": "^8.2.2",
     "rollup": "^4.28.1",
     "wrangler": "^3.95.0"
   },

@@ -1,39 +1,8 @@
-<app-toast-notification></app-toast-notification>
-
-<div class="main-container">
-  <!-- Navigation Header (hidden on public verify pages) -->
-  <header class="header" *ngIf="!currentRoute.startsWith('/t/')">
-    <nav class="nav">
-      <a routerLink="/" class="hdr-logo nav-brand">
-        <img src="assets/logo.svg" alt="Truwit" width="120" height="28" class="nav-logo" />
-        <h1 class="brand-name">Truwit</h1>
-      </a>
-      <div class="nav-links">
-        <a href="https://truwit.ai" class="nav-link">Home</a>
-        <a href="https://truwit.ai/how-it-works" class="nav-link">How It Works</a>
-        <a routerLink="/verify" class="nav-link" [class.active]="currentRoute === '/verify'">Verify</a>
-      </div>
-    </nav>
-  </header>
-
-  <!-- Router Outlet for all routes -->
-  <router-outlet></router-outlet>
-
-  <footer class="footer" *ngIf="!currentRoute.startsWith('/t/')">
-    <div class="footer-content">
-      <div class="footer-links">
-        <a routerLink="/privacy" class="footer-link">Privacy</a>
-        <span class="footer-separator">•</span>
-        <a routerLink="/terms" class="footer-link">Terms</a>
-        <span class="footer-separator">•</span>
-        <a routerLink="/contact" class="footer-link">Contact</a>
-        <span class="footer-separator">•</span>
-        <a href="https://x.com/TruwitAi" target="_blank" rel="noopener noreferrer" class="footer-link">X</a>
-      </div>
-      <div class="footer-info">
-        <img src="assets/verified-circular-badge.png" alt="Verified by Truwit" class="footer-logo" />
-        <p>© 2025 Truwit. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
+<div class="app-container">
+  <app-header *ngIf="!isPublicVerifyPage"></app-header>
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+  <app-footer *ngIf="!isPublicVerifyPage"></app-footer>
+  <app-toast-notification></app-toast-notification>
 </div>
