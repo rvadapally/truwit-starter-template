@@ -129,6 +129,5 @@ import { RouterModule } from '@angular/router';
   `]
 })
 export class HeaderComponent {
-  showProductsDropdown = false;
 }
 
