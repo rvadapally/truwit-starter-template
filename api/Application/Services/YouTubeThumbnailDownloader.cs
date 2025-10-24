@@ -33,11 +33,17 @@ public class YouTubeThumbnailDownloader : IYouTubeThumbnailDownloader
         _logger.LogInformation("Downloading YouTube thumbnail for video: {VideoId}", videoId);
 
         // YouTube thumbnail URLs (in order of quality preference)
+        // Include live variants and additional fallbacks for broader coverage
         var thumbnailUrls = new[]
         {
-            $"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg",  // 1920x1080
-            $"https://img.youtube.com/vi/{videoId}/sddefault.jpg",      // 640x480
-            $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg"       // 480x360
+            $"https://img.youtube.com/vi/{videoId}/maxresdefault.jpg",        // 1920x1080
+            $"https://img.youtube.com/vi/{videoId}/maxresdefault_live.jpg",   // Live stream variant
+            $"https://img.youtube.com/vi/{videoId}/sddefault.jpg",            // 640x480
+            $"https://img.youtube.com/vi/{videoId}/sddefault_live.jpg",       // Live stream variant
+            $"https://img.youtube.com/vi/{videoId}/hqdefault.jpg",            // 480x360
+            $"https://img.youtube.com/vi/{videoId}/hqdefault_live.jpg",       // Live stream variant
+            $"https://img.youtube.com/vi/{videoId}/mqdefault.jpg",            // 320x180
+            $"https://img.youtube.com/vi/{videoId}/default.jpg"               // 120x90
         };
 
         Exception? lastException = null;

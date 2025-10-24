@@ -18,8 +18,16 @@ public interface IUrlCanonicalizer
 
 public class UrlCanonicalizer : IUrlCanonicalizer
 {
+    // Matches common YouTube URL forms and captures the 11-char video ID
+    // Supported:
+    // - https://www.youtube.com/watch?v=VIDEOID
+    // - https://youtu.be/VIDEOID
+    // - https://www.youtube.com/shorts/VIDEOID
+    // - https://www.youtube.com/live/VIDEOID
+    // - https://www.youtube.com/embed/VIDEOID
+    // - https://www.youtube.com/v/VIDEOID
     private static readonly Regex YouTubeVideoRegex = new(
-        @"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})",
+        @"(?:youtube\.com/(?:watch\?v=|shorts/|live/|embed/|v/)|youtu\.be/)([a-zA-Z0-9_-]{11})",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private static readonly Regex TikTokVideoRegex = new(
