@@ -50,7 +50,7 @@ import { Title, Meta } from '@angular/platform-browser';
       </section>
 
       <section class="cta-final">
-        <h2>Verify origins. Prove consent. Publish with confidence.</h2>
+        <h2>Verify origin. Prove consent. Publish with confidence.</h2>
         <div class="cta-actions">
           <a routerLink="/verify/tool" class="btn-primary">Start Verification</a>
         </div>

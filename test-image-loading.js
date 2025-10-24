@@ -216,3 +216,5 @@ testImageLoading()
     console.error('Fatal error during image loading tests:', error);
     process.exit(1);
   });
+
+

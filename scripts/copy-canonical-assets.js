@@ -89,3 +89,5 @@ if (errors.length > 0) {
 }
 
 console.log('\n✅ All canonical assets copied successfully!');
+
+

@@ -169,3 +169,5 @@ if (validationErrors.length > 0) {
 console.log('\n✅ All asset references are valid!');
 console.log('✅ No missing assets detected in deployment targets');
 console.log('✅ Safe to deploy to Cloudflare and Railway');
+
+
