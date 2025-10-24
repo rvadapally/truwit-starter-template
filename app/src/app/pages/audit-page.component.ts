@@ -6,6 +6,7 @@ import { Title, Meta } from '@angular/platform-browser';
   selector: 'app-audit-page',
   standalone: true,
   imports: [CommonModule],
+  styleUrls: ['./audit-page.component.scss'],
   template: `
     <div class="page">
       <section class="hero">
@@ -20,16 +21,7 @@ import { Title, Meta } from '@angular/platform-browser';
         </div>
       </section>
     </div>
-  `,
-  styles: [`
-    .page { min-height: 100vh; background: var(--bg-0); color: var(--text-primary); }
-    .hero { padding: 3rem 0; text-align: center; background: var(--bg-1); }
-    .container { max-width: var(--w-container); margin: 0 auto; padding: 0 1.5rem; }
-    .hero h1 { font-size: 2.5rem; margin: 0 0 1rem; background: linear-gradient(135deg, var(--teal), #2de2b5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { font-size: 1.125rem; color: var(--text-secondary); margin: 0; }
-    .content { padding: 4rem 0; }
-    .content p { color: var(--text-secondary); line-height: 1.6; }
-  `]
+  `
 })
 export class AuditPageComponent implements OnInit {
   constructor(private title: Title, private meta: Meta) {}

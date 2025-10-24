@@ -6,6 +6,7 @@ import { Title, Meta } from '@angular/platform-browser';
   selector: 'app-terms-page',
   standalone: true,
   imports: [CommonModule],
+  styleUrls: ['./terms-page.component.scss'],
   template: `
     <div class="page">
       <section class="hero">
@@ -19,15 +20,7 @@ import { Title, Meta } from '@angular/platform-browser';
         </div>
       </section>
     </div>
-  `,
-  styles: [`
-    .page { min-height: 100vh; background: var(--bg-0); color: var(--text-primary); }
-    .hero { padding: 2rem 0; background: var(--bg-1); }
-    .container { max-width: var(--w-container); margin: 0 auto; padding: 0 1.5rem; }
-    .hero h1 { font-size: 2rem; margin: 0; color: var(--text-primary); }
-    .content { padding: 3rem 0; }
-    .content p { color: var(--text-secondary); line-height: 1.6; }
-  `]
+  `
 })
 export class TermsPageComponent implements OnInit {
   constructor(private title: Title, private meta: Meta) {}

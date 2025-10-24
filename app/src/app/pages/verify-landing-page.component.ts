@@ -7,6 +7,7 @@ import { Title, Meta } from '@angular/platform-browser';
   selector: 'app-verify-landing-page',
   standalone: true,
   imports: [CommonModule, RouterModule],
+  styleUrls: ['./verify-landing-page.component.scss'],
   template: `
     <div class="verify-landing">
       <section class="hero">
@@ -46,100 +47,7 @@ import { Title, Meta } from '@angular/platform-browser';
         </div>
       </section>
     </div>
-  `,
-  styles: [`
-    .verify-landing {
-      min-height: 100vh;
-      background: var(--bg-0);
-      color: var(--text-primary);
-    }
-
-    .hero {
-      padding: 4rem 0;
-      text-align: center;
-      background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
-    }
-
-    .container {
-      max-width: var(--w-container);
-      margin: 0 auto;
-      padding: 0 1.5rem;
-    }
-
-    .hero h1 {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 700;
-      line-height: 1.2;
-      margin: 0 0 1rem 0;
-      background: linear-gradient(135deg, var(--teal), #2de2b5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: 1.125rem;
-      color: var(--text-secondary);
-      max-width: 700px;
-      margin: 0 auto 2rem;
-      line-height: 1.6;
-    }
-
-    .btn-primary {
-      padding: 0.875rem 2rem;
-      border-radius: var(--radius);
-      font-weight: 600;
-      background: linear-gradient(135deg, var(--teal), var(--teal-600));
-      color: #0B1116;
-      border: none;
-      cursor: pointer;
-      font-size: 1.05rem;
-      transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(34, 224, 195, 0.25);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(34, 224, 195, 0.35);
-    }
-
-    .features {
-      padding: 4rem 0;
-    }
-
-    .features h2 {
-      text-align: center;
-      font-size: 2rem;
-      margin: 0 0 3rem;
-      color: var(--text-primary);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-
-    .feature {
-      padding: 1.5rem;
-      background: var(--bg-1);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      text-align: center;
-    }
-
-    .feature h3 {
-      font-size: 1.25rem;
-      color: var(--text-primary);
-      margin: 0 0 0.75rem;
-    }
-
-    .feature p {
-      color: var(--text-secondary);
-      margin: 0;
-      line-height: 1.6;
-    }
-  `]
+  `
 })
 export class VerifyLandingPageComponent implements OnInit {
   constructor(
@@ -160,4 +68,3 @@ export class VerifyLandingPageComponent implements OnInit {
     this.router.navigate(['/verify/tool']);
   }
 }
-
