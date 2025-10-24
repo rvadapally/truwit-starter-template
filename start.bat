@@ -82,28 +82,31 @@ echo ⏳ Waiting for API to be ready (15 seconds)...
 timeout /t 15 /nobreak >nul
 echo.
 
-echo [5/5] Starting Angular development server...
-start "Truwit Angular" cmd /k "cd app && echo Starting Angular app... && echo. && npm start"
+echo [5/5] Starting Angular development server with LIVE RELOAD...
+start "Truwit Angular (Live Reload)" cmd /k "cd app && echo Starting Angular with Live Reload... && echo. && echo 💡 HTML/CSS/TS changes will reload automatically! && echo. && npm start"
 echo ✅ Angular app starting on http://localhost:4200
 echo ⏳ Waiting for Angular to be ready (10 seconds)...
 timeout /t 10 /nobreak >nul
 echo.
 
 echo ========================================
-echo    Servers are running!
+echo    🚀 Development Servers Running!
 echo ========================================
 echo.
 echo 🌐 Frontend:     http://localhost:4200
 echo 🔧 API:          http://localhost:5001
 echo ❤️  Health:       http://localhost:5001/health
-echo 📋 Docker Logs:  docker-compose -f api\docker-compose.yml logs -f
 echo.
-echo 🐳 API running in Docker (same as production!)
+echo ⚡ LIVE RELOAD: Edit HTML/CSS/TS files and see changes instantly!
+echo 📁 Watch folders: app/src/**/*
 echo.
-echo Press any key to run automated tests...
-pause >nul
-
-
+echo 💡 Tips:
+echo    - Changes auto-reload (no manual refresh needed)
+echo    - Check the Angular terminal for compilation status
+echo    - API runs in Docker (matches production environment)
+echo.
+echo 📋 View API Logs:  docker-compose -f api\docker-compose.yml logs -f
+echo 🛑 Stop All:       stop.bat
 echo.
 
 pause
