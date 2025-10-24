@@ -78,23 +78,15 @@
     }
   }
 
-  // Two-column layout for cards
-  .cards-layout {
+  // 2-column grid layout
+  .content-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 3rem;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
     width: 100%;
     max-width: 100%;
     overflow: hidden;
-  }
-
-  .left-column,
-  .right-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    min-width: 0; // Allow flex items to shrink below content size
   }
 
   .detail-card {
@@ -186,10 +178,15 @@
     }
   }
 
-  .actions-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  // Actions card (full width)
+  .actions-card {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
 
     .btn-primary, .btn-secondary, .btn-outline {
       padding: 0.75rem 1.5rem;
@@ -202,7 +199,7 @@
       font-size: 0.9rem;
       text-align: center;
       display: block;
-      width: 100%;
+      white-space: nowrap;
     }
 
     .btn-primary {
@@ -235,7 +232,6 @@
       }
     }
   }
-
 }
 
 @keyframes spin {
@@ -269,7 +265,7 @@
       }
     }
 
-    .cards-layout {
+    .content-grid {
       grid-template-columns: 1fr;
       gap: 1.5rem;
     }
@@ -307,16 +303,9 @@
       max-width: 200px;
     }
 
-    .actions-section {
-      flex-direction: column;
+    .actions-card {
+      grid-template-columns: 1fr;
       gap: 0.75rem;
-
-      .btn-primary,
-      .btn-secondary,
-      .btn-outline {
-        width: 100%;
-        text-align: center;
-      }
     }
   }
 }
