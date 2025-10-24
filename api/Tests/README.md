@@ -1,13 +1,86 @@
 # Multi-Sign System Tests (Phase 7)
 
+## Quick Start - Automated Test Scripts
+
+### PowerShell (Windows) ✨ **RECOMMENDED**
+
+```powershell
+# Start the API first
+cd api
+dotnet run
+
+# In another terminal, run the test script
+cd api/Tests
+.\test-multisign-flow.ps1
+
+# Optional: Use custom test image
+.\test-multisign-flow.ps1 -TestImagePath "C:\path\to\image.png" -Verbose
+
+# Optional: Test against different API
+.\test-multisign-flow.ps1 -ApiUrl "https://api.truwit.ai" -Verbose
+```
+
+### Bash/curl (Linux/Mac)
+
+```bash
+# Start the API first
+cd api
+dotnet run
+
+# In another terminal, run the test script
+cd api/Tests
+chmod +x test-multisign-flow.sh
+./test-multisign-flow.sh
+
+# Optional: Use custom test image
+TEST_IMAGE=/path/to/image.png VERBOSE=true ./test-multisign-flow.sh
+
+# Optional: Test against different API
+API_URL=https://api.truwit.ai ./test-multisign-flow.sh
+```
+
+**What the scripts test:**
+1. ✅ API Health Check
+2. ✅ Initialize Proof (`POST /v1/proofs/init`)
+3. ✅ Finalize Proof with image upload (`POST /v1/proofs/finalize`)
+4. ✅ Anonymous Authentication (`POST /v1/auth/anonymous`)
+5. ✅ Create Signature (`POST /v1/signatures`)
+6. ✅ Get Manifest (`GET /v1/manifest/{groupId}`)
+7. ✅ Get Badge SVG (`GET /v1/badge/{groupId}.svg`)
+8. ✅ Rate Limiting (optional, 15 rapid requests)
+
+**Expected Output:**
+```
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║        Multi-Sign System Integration Test Suite              ║
+║                                                               ║
+║        Testing Phases 4-7 Implementation                      ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+✅ API is healthy
+✅ Init proof succeeded
+✅ Finalize proof succeeded
+✅ Anonymous auth succeeded
+✅ Signature created successfully
+✅ Manifest retrieved successfully
+✅ Badge SVG retrieved successfully
+
+🎉 ALL TESTS PASSED!
+Implementation complete, all verification steps passed.
+```
+
+---
+
 ## Test Coverage
 
-### Unit Tests
+### Unit Tests (Future)
 - **TestHashing.cs**: SHA256 and pHash computation tests
 - **TestSignatures.cs**: Multi-signature and identity tests
 - **TestBadgeRender.cs**: Badge SVG generation tests
 
-### Integration Tests (Manual)
+### Integration Tests (Automated)
 
 To test the full multi-sign workflow:
 
