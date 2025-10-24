@@ -203,27 +203,26 @@ import { Title, Meta } from '@angular/platform-browser';
     }
 
     .cta-final {
-      padding: 60px 40px;
+      padding: 2rem 2.5rem;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 60vh;
       background: radial-gradient(120% 120% at 50% 0%, rgba(0, 196, 204, 0.2), rgba(0, 122, 133, 0.08) 60%, rgba(7, 16, 27, 0.6) 100%);
       border: 1px solid rgba(0, 196, 204, 0.25);
       border-radius: 16px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      margin: 4rem auto;
+      margin: 3rem auto;
       max-width: 900px;
       width: calc(100% - 3rem);
     }
 
     .cta-final h2 {
-      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-size: clamp(1.25rem, 3.5vw, 1.75rem);
       font-weight: 700;
       line-height: 1.3;
-      margin: 0 0 1.5rem 0;
+      margin: 0 0 1rem 0;
       color: var(--text-primary);
     }
 
@@ -232,12 +231,12 @@ import { Title, Meta } from '@angular/platform-browser';
       gap: 1rem;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
 
     .cta-actions .btn-primary {
-      padding: 1rem 2.5rem;
-      font-size: 1.1rem;
+      padding: 0.875rem 2rem;
+      font-size: 1.05rem;
     }
 
     .privacy-note {
