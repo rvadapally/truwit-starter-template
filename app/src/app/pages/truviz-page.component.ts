@@ -10,7 +10,7 @@ import { Title, Meta } from '@angular/platform-browser';
     <div class="page">
       <section class="hero">
         <div class="container">
-          <h1>TruViz</h1>
+          <h1>TruWit</h1>
           <p class="subtitle">Advanced visual content verification</p>
         </div>
       </section>
@@ -34,8 +34,8 @@ import { Title, Meta } from '@angular/platform-browser';
 export class TruVizPageComponent implements OnInit {
   constructor(private title: Title, private meta: Meta) {}
   ngOnInit(): void {
-    this.title.setTitle('TruViz - TruWit');
-    this.meta.updateTag({ name: 'description', content: 'Advanced visual content verification with TruViz' });
+    this.title.setTitle('TruWit - TruWit');
+    this.meta.updateTag({ name: 'description', content: 'Advanced visual content verification with TruWit' });
   }
 }
 

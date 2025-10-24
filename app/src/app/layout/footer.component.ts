@@ -23,8 +23,8 @@ import { RouterModule } from '@angular/router';
           
           <div class="footer-section">
             <h4 class="footer-heading">Products</h4>
-            <a routerLink="/truviz" class="footer-link">TruViz</a>
-            <a routerLink="/audit" class="footer-link">TruViz Audit</a>
+            <a routerLink="/truviz" class="footer-link">TruWit</a>
+            <a routerLink="/audit" class="footer-link">TruWit Audit</a>
             <a routerLink="/products" class="footer-link">Compare</a>
           </div>
           

@@ -19,12 +19,12 @@ import { Title, Meta } from '@angular/platform-browser';
         <div class="container">
           <div class="products-grid">
             <div class="product-card">
-              <h2>TruViz</h2>
+              <h2>TruWit</h2>
               <p>Visual content verification with real-time analysis</p>
               <a routerLink="/truviz" class="btn">Learn More</a>
             </div>
             <div class="product-card">
-              <h2>TruViz Audit</h2>
+              <h2>TruWit Audit</h2>
               <p>Comprehensive audit trails for verified content</p>
               <a routerLink="/audit" class="btn">Learn More</a>
             </div>

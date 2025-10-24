@@ -10,7 +10,7 @@ import { Title, Meta } from '@angular/platform-browser';
     <div class="page">
       <section class="hero">
         <div class="container">
-          <h1>TruViz Audit</h1>
+          <h1>TruWit Audit</h1>
           <p class="subtitle">Comprehensive audit trails for verified content</p>
         </div>
       </section>
@@ -27,15 +27,15 @@ import { Title, Meta } from '@angular/platform-browser';
     .container { max-width: var(--w-container); margin: 0 auto; padding: 0 1.5rem; }
     .hero h1 { font-size: 2.5rem; margin: 0 0 1rem; background: linear-gradient(135deg, var(--teal), #2de2b5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .subtitle { font-size: 1.125rem; color: var(--text-secondary); margin: 0; }
-    .content { padding: 4rem 0; }
+    .content { padding: 4rem 0; text-align: center; }
     .content p { color: var(--text-secondary); line-height: 1.6; }
   `]
 })
 export class AuditPageComponent implements OnInit {
   constructor(private title: Title, private meta: Meta) {}
   ngOnInit(): void {
-    this.title.setTitle('TruViz Audit - TruWit');
-    this.meta.updateTag({ name: 'description', content: 'Comprehensive audit trails with TruViz Audit' });
+    this.title.setTitle('TruWit Audit - TruWit');
+    this.meta.updateTag({ name: 'description', content: 'Comprehensive audit trails with TruWit Audit' });
   }
 }
 
