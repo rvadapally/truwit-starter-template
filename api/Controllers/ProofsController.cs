@@ -33,7 +33,7 @@ public class ProofsController : ControllerBase
     private readonly IMediaDownloader _downloader;
     private readonly IYouTubeThumbnailDownloader _thumbnailDownloader;
     private readonly ISettingsService _settingsService;
-    private readonly IYouTubeVideoHasher _youtubeVideoHasher;
+    // private readonly IYouTubeVideoHasher _youtubeVideoHasher; // Removed for MVP
     private readonly ILogger<ProofsController> _logger;
     private readonly IOptionsSnapshot<FeatureFlags> _featureFlags;
     private readonly DevC2paSigner _devC2paSigner;
@@ -54,7 +54,7 @@ public class ProofsController : ControllerBase
         IMediaDownloader downloader,
         IYouTubeThumbnailDownloader thumbnailDownloader,
         ISettingsService settingsService,
-        IYouTubeVideoHasher youtubeVideoHasher,
+        // IYouTubeVideoHasher youtubeVideoHasher,
         ILogger<ProofsController> logger,
         IOptionsSnapshot<FeatureFlags> featureFlags,
         DevC2paSigner devC2paSigner,
@@ -74,7 +74,7 @@ public class ProofsController : ControllerBase
         _downloader = downloader;
         _thumbnailDownloader = thumbnailDownloader;
         _settingsService = settingsService;
-        _youtubeVideoHasher = youtubeVideoHasher;
+        // _youtubeVideoHasher = youtubeVideoHasher;
         _logger = logger;
         _featureFlags = featureFlags;
         _devC2paSigner = devC2paSigner;
@@ -188,49 +188,12 @@ public class ProofsController : ControllerBase
                 var videoId = videoIdMatch.Groups[1].Value; // Preserve original case
                 
                 // Check admin-configured verification mode
-                var verificationMode = await _settingsService.GetSettingAsync("YOUTUBE_VERIFICATION_MODE") ?? "thumbnail";
-                _logger.LogInformation("🎬 YouTube verification mode: {Mode} (video ID: {VideoId})", verificationMode, videoId);
-                
-                if (verificationMode == "full_video")
-                {
-                    try
-                    {
-                        _logger.LogInformation("🎥 Attempting full video hash for YouTube");
-                        var hashResult = await _youtubeVideoHasher.HashVideoAsync(videoId);
-                        downloadedFilePath = hashResult.FilePath;
-                        fileInfo = new FileInfo(downloadedFilePath);
-                        useFullVideo = true;
-                        _logger.LogInformation("✅ Full video hash completed. File: {FilePath}, Size: {Size} bytes, Truncated: {Truncated}", 
-                            downloadedFilePath, fileInfo.Length, hashResult.WasTruncated);
-                    }
-                    catch (YouTubeCookieException ex)
-                    {
-                        _logger.LogError(ex, "🚫 Cookie authentication failed, falling back to thumbnail mode");
-                        // Will fall through to thumbnail mode below
-                        downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
-                        fileInfo = new FileInfo(downloadedFilePath);
-                        _logger.LogInformation("✅ Thumbnail downloaded successfully (fallback). File: {FilePath}, Size: {Size} bytes", 
-                            downloadedFilePath, fileInfo.Length);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "❌ Full video hash failed, falling back to thumbnail mode");
-                        // Will fall through to thumbnail mode below
-                        downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
-                        fileInfo = new FileInfo(downloadedFilePath);
-                        _logger.LogInformation("✅ Thumbnail downloaded successfully (fallback). File: {FilePath}, Size: {Size} bytes", 
-                            downloadedFilePath, fileInfo.Length);
-                    }
-                }
-                else
-                {
-                    // Thumbnail mode
-                    _logger.LogInformation("📸 Downloading YouTube thumbnail for reliable verification");
-                    downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
-                    fileInfo = new FileInfo(downloadedFilePath);
-                    _logger.LogInformation("✅ Thumbnail downloaded successfully. File: {FilePath}, Size: {Size} bytes", 
-                        downloadedFilePath, fileInfo.Length);
-                }
+                // Force thumbnail mode for MVP to avoid yt-dlp dependency
+                _logger.LogInformation("📸 Downloading YouTube thumbnail for reliable verification");
+                downloadedFilePath = await _thumbnailDownloader.DownloadThumbnailAsync(videoId);
+                fileInfo = new FileInfo(downloadedFilePath);
+                _logger.LogInformation("✅ Thumbnail downloaded successfully. File: {FilePath}, Size: {Size} bytes", 
+                    downloadedFilePath, fileInfo.Length);
             }
             else
             {

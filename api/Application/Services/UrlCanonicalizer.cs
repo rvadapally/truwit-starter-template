@@ -19,7 +19,7 @@ public interface IUrlCanonicalizer
 public class UrlCanonicalizer : IUrlCanonicalizer
 {
     private static readonly Regex YouTubeVideoRegex = new(
-        @"(?:youtube\.com/watch\?v=|youtu\.be/)([a-zA-Z0-9_-]{11})",
+        @"(?:youtube\.com\/(?:watch\?v=|live\/|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     private static readonly Regex TikTokVideoRegex = new(

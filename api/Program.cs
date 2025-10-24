@@ -114,9 +114,8 @@ try
     builder.Services.AddScoped<IUrlCanonicalizer, UrlCanonicalizer>();
     builder.Services.AddSingleton<IVerificationStatusTracker, VerificationStatusTracker>();
     
-    // Register Settings and YouTube Video Hasher services
+    // Register Settings service
     builder.Services.AddScoped<ISettingsService, SettingsService>();
-    builder.Services.AddScoped<IYouTubeVideoHasher, YouTubeVideoHasher>();
 
     // Configure C2PA options
     builder.Services.Configure<C2paOptions>(builder.Configuration.GetSection("C2pa"));
@@ -315,24 +314,7 @@ try
     {
         var toolVersions = new Dictionary<string, string>();
 
-        try
-        {
-            // Get yt-dlp version
-            var ytDlpProcess = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "yt-dlp",
-                Arguments = "--version",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            });
-            if (ytDlpProcess != null)
-            {
-                ytDlpProcess.WaitForExit(5000);
-                toolVersions["yt-dlp"] = ytDlpProcess.StandardOutput.ReadToEnd().Trim();
-            }
-        }
-        catch { toolVersions["yt-dlp"] = "unknown"; }
+        // yt-dlp deprecated for MVP; no version check
 
         try
         {
@@ -367,28 +349,7 @@ try
         var toolVersions = new Dictionary<string, string>();
         var allToolsWorking = true;
 
-        try
-        {
-            // Get yt-dlp version
-            var ytDlpProcess = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-            {
-                FileName = "yt-dlp",
-                Arguments = "--version",
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true
-            });
-            if (ytDlpProcess != null)
-            {
-                ytDlpProcess.WaitForExit(5000);
-                toolVersions["yt-dlp"] = ytDlpProcess.StandardOutput.ReadToEnd().Trim();
-            }
-        }
-        catch
-        {
-            toolVersions["yt-dlp"] = "unknown";
-            allToolsWorking = false;
-        }
+        // yt-dlp deprecated for MVP; no version check
 
         try
         {
