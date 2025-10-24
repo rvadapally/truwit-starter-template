@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Threading.RateLimiting;
 using NLog;
 using NLog.Web;
 
@@ -134,6 +136,8 @@ try
     builder.Services.AddScoped<IPHashService, PHashService>();
     builder.Services.AddScoped<IGroupingService, GroupingService>();
     builder.Services.AddScoped<IImageInfoService, ImageInfoService>();
+    builder.Services.AddScoped<IQrService, QrService>();
+    builder.Services.AddScoped<IBadgeSvgRenderer, BadgeSvgRenderer>();
 
     // Register SQL migration runner
     builder.Services.AddScoped<SqlMigrationRunner>();
@@ -188,13 +192,57 @@ try
     })
     .AddGoogle(options =>
     {
-        options.ClientId = oauthConfig["Google:ClientId"] ?? "YOUR_GOOGLE_CLIENT_ID_HERE";
-        options.ClientSecret = oauthConfig["Google:ClientSecret"] ?? "YOUR_GOOGLE_CLIENT_SECRET_HERE";
-        options.CallbackPath = "/v1/auth/callback/google";
-        options.SaveTokens = true;
-    });
+       options.ClientId = oauthConfig["Google:ClientId"] ?? "YOUR_GOOGLE_CLIENT_ID_HERE";
+       options.ClientSecret = oauthConfig["Google:ClientSecret"] ?? "YOUR_GOOGLE_CLIENT_SECRET_HERE";
+       options.CallbackPath = "/v1/auth/callback/google";
+       options.SaveTokens = true;
+   });
 
-    var app = builder.Build();
+   // Configure Rate Limiting (Phase 6)
+   builder.Services.AddRateLimiter(options =>
+   {
+       // Fixed window for /finalize: 10 req/min, burst 20
+       options.AddFixedWindowLimiter("finalize", opt =>
+       {
+           opt.PermitLimit = 10;
+           opt.Window = TimeSpan.FromMinutes(1);
+           opt.QueueLimit = 20;
+       });
+       
+       // Token bucket for /signatures: 20 req/min
+       options.AddTokenBucketLimiter("signatures", opt =>
+       {
+           opt.TokenLimit = 20;
+           opt.ReplenishmentPeriod = TimeSpan.FromMinutes(1);
+           opt.TokensPerPeriod = 20;
+           opt.QueueLimit = 0;
+       });
+       
+       // Stricter for anonymous: 5 req/min
+       options.AddFixedWindowLimiter("anon", opt =>
+       {
+           opt.PermitLimit = 5;
+           opt.Window = TimeSpan.FromMinutes(1);
+           opt.QueueLimit = 0;
+       });
+       
+       // Global rejection behavior
+       options.OnRejected = async (context, cancellationToken) =>
+       {
+           context.HttpContext.Response.StatusCode = 429;
+           
+           if (context.Lease.TryGetMetadata(System.Threading.RateLimiting.MetadataName.RetryAfter, out var retryAfter))
+           {
+               context.HttpContext.Response.Headers.Append("Retry-After", ((TimeSpan)retryAfter).TotalSeconds.ToString());
+           }
+           
+           await context.HttpContext.Response.WriteAsJsonAsync(
+               new { error = "Rate limit exceeded. Please try again later." },
+               cancellationToken: cancellationToken);
+       };
+   });
+
+   var app = builder.Build();
     
     // CLI command handling (before regular startup)
         if (args.Length > 0)
@@ -310,6 +358,7 @@ try
     app.UseGlobalExceptionHandler();
     app.UseAuthentication(); // Add authentication middleware
     app.UseAuthorization();
+    app.UseRateLimiter(); // Add rate limiting middleware
     app.MapControllers();
 
     // Health check endpoint

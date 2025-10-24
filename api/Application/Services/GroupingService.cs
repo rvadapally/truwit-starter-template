@@ -2,105 +2,84 @@ using HumanProof.Api.Domain.Entities;
 using HumanProof.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace HumanProof.Api.Application.Services;
 
-/// <summary>
-/// Configuration options for perceptual hash grouping
-/// </summary>
-public class GroupingOptions
-{
-    public int PHashThresholdBits { get; set; } = 6;
-    public bool PreserveExif { get; set; } = false;
-}
-
-/// <summary>
-/// Service for grouping assets by perceptual hash similarity
-/// </summary>
 public interface IGroupingService
 {
-    /// <summary>
-    /// Find existing group within threshold or create new group
-    /// </summary>
-    Task<Guid> FindOrCreateGroupAsync(ulong phash, int thresholdBits);
+    Task<AssetGroup> FindOrCreateAssetGroupAsync(byte[] pHash);
 }
 
 public class GroupingService : IGroupingService
 {
     private readonly ApplicationDbContext _context;
     private readonly IPHashService _pHashService;
-    private readonly ILogger<GroupingService> _logger;
     private readonly GroupingOptions _options;
+    private readonly ILogger<GroupingService> _logger;
 
     public GroupingService(
         ApplicationDbContext context,
         IPHashService pHashService,
-        ILogger<GroupingService> logger,
-        IOptions<GroupingOptions> options)
+        IOptions<GroupingOptions> options,
+        ILogger<GroupingService> logger)
     {
         _context = context;
         _pHashService = pHashService;
-        _logger = logger;
         _options = options.Value;
+        _logger = logger;
     }
 
     /// <summary>
-    /// Find existing group within threshold or create new group
+    /// Finds an existing AssetGroup with a pHash within the threshold, or creates a new one.
     /// </summary>
-    public async Task<Guid> FindOrCreateGroupAsync(ulong phash, int thresholdBits)
+    public async Task<AssetGroup> FindOrCreateAssetGroupAsync(byte[] pHashBytes)
     {
-        // Convert ulong to byte array for storage
-        var phashBytes = BitConverter.GetBytes(phash);
-        
-        // Retrieve all existing groups (in Phase 1, we do simple scan; Phase 2 can add LSH/IVFFlat index)
-        var existingGroups = await _context.AssetGroups
-            .Select(g => new { g.GroupId, g.PHash })
+        var pHash = BitConverter.ToUInt64(pHashBytes, 0);
+
+        // Phase 1: Simple SQL scan for candidates
+        // In a real-world scenario with many assets, this would be optimized with LSH/IVFFlat indexes.
+        var candidateGroups = await _context.AssetGroups
+            .AsNoTracking()
             .ToListAsync();
 
-        Guid? nearestGroupId = null;
-        int nearestDistance = int.MaxValue;
+        AssetGroup? bestMatch = null;
+        int minDistance = _options.PHashThresholdBits + 1; // Initialize with a value higher than threshold
 
-        // Scan all groups to find nearest match
-        foreach (var group in existingGroups)
+        foreach (var group in candidateGroups)
         {
             var groupPHash = BitConverter.ToUInt64(group.PHash, 0);
-            var distance = _pHashService.HammingDistance(phash, groupPHash);
+            var distance = _pHashService.HammingDistance(pHash, groupPHash);
 
-            if (distance < nearestDistance)
+            if (distance <= _options.PHashThresholdBits && distance < minDistance)
             {
-                nearestDistance = distance;
-                nearestGroupId = group.GroupId;
+                minDistance = distance;
+                bestMatch = group;
             }
         }
 
-        // If nearest distance is within threshold, reuse that group
-        if (nearestGroupId.HasValue && nearestDistance <= thresholdBits)
+        if (bestMatch != null)
         {
-            _logger.LogInformation(
-                "Grouping: phash={PHash:X16}, nearest_distance={Distance}, threshold={Threshold}, group_id={GroupId}, action=reuse",
-                phash, nearestDistance, thresholdBits, nearestGroupId.Value);
-                
-            return nearestGroupId.Value;
+            _logger.LogInformation("Found existing AssetGroup {GroupId} with pHash distance {Distance}", bestMatch.GroupId, minDistance);
+            return bestMatch;
         }
 
-        // Otherwise, create new group
+        _logger.LogInformation("Creating new AssetGroup for pHash {PHash:X16}", pHash);
         var newGroup = new AssetGroup
         {
-            GroupId = Guid.NewGuid(),
-            PHash = phashBytes,
+            PHash = pHashBytes,
             PHashAlgo = "phash-dct",
             PHashBits = 64,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow // Ensure UTC
         };
-
         _context.AssetGroups.Add(newGroup);
-        await _context.SaveChangesAsync();
-
-        _logger.LogInformation(
-            "Grouping: phash={PHash:X16}, nearest_distance={Distance}, threshold={Threshold}, group_id={GroupId}, action=create",
-            phash, nearestDistance, thresholdBits, newGroup.GroupId);
-
-        return newGroup.GroupId;
+        await _context.SaveChangesAsync(); // Save to get GroupId
+        return newGroup;
     }
 }
 
+public class GroupingOptions
+{
+    public int PHashThresholdBits { get; set; } = 6;
+    public bool PreserveExif { get; set; } = false;
+}

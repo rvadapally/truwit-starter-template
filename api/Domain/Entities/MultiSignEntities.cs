@@ -88,3 +88,4 @@ public class ManifestEvent
     public AssetGroup Group { get; set; } = null!;
 }
 
+
