@@ -77,7 +77,7 @@ import { Title, Meta } from '@angular/platform-browser';
             <p>
               Join us in building the trust layer for digital media. For investor inquiries, please contact:
             </p>
-            <a href="mailto:hello@truwit.ai" class="contact-email">hello@truwit.ai</a>
+            <a href="mailto:hello&#64;truwit.ai" class="contact-email">hello&#64;truwit.ai</a>
           </div>
         </div>
       </section>
@@ -95,7 +95,7 @@ import { Title, Meta } from '@angular/platform-browser';
         <div class="container">
           <h2>Join Our Journey</h2>
           <p>Help us build trust in the age of AI</p>
-          <a href="mailto:hello@truwit.ai" class="btn-primary">Contact Us</a>
+          <a href="mailto:hello&#64;truwit.ai" class="btn-primary">Contact Us</a>
         </div>
       </section>
     </div>
