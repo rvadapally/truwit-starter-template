@@ -407,19 +407,9 @@ textarea:focus {
     align-items: center;
     justify-content: center;
     min-height: 60vh;
-    margin: 4rem 0;
-    
-    /* Break out of parent container */
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
-    
-    /* Add padding back for content */
-    & > * {
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
+    margin: 4rem auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .home-cta h2 {
