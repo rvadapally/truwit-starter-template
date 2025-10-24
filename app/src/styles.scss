@@ -401,20 +401,25 @@ textarea:focus {
     border: 1px solid rgba(0, 196, 204, 0.25);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
     
-    /* Center on screen - break out of container */
+    /* Center on screen */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 60vh;
-    margin: 4rem auto;
-    width: 90%;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    margin: 4rem 0;
+    
+    /* Break out of parent container */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    
+    /* Add padding back for content */
+    & > * {
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 
   .home-cta h2 {
