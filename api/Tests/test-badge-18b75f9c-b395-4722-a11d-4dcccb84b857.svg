@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<svg width="400" height="140" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Verified by Truwit with 0 signature(s)">
-  <title>Verified by Truwit - 0 Signature(s)</title>
+<svg width="400" height="140" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" role="img" aria-label="Verified by Truwit with 1 signature(s)">
+  <title>Verified by Truwit - 1 Signature(s)</title>
   <a xlink:href="https://truwit.ai/v1/manifest/18b75f9c-b395-4722-a11d-4dcccb84b857" target="_blank">
     <defs>
       <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -15,7 +15,7 @@
     </g>
     <g transform="translate(80, 0)">
       <text x="0" y="40" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#14D4C9">Verified by Truwit</text>
-      <text x="0" y="65" font-family="Arial, sans-serif" font-size="14" fill="#333333">Signatures: 0</text>
+      <text x="0" y="65" font-family="Arial, sans-serif" font-size="14" fill="#333333">Signatures: 1</text>
       <text x="0" y="88" font-family="Arial, sans-serif" font-size="14" fill="#666666">First signed: Oct 24, 2025</text>
       <text x="0" y="111" font-family="Arial, sans-serif" font-size="12" fill="#999999">Click to view full manifest</text>
     </g>
