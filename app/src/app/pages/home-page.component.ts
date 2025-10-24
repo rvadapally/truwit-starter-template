@@ -11,51 +11,51 @@ import { Title, Meta } from '@angular/platform-browser';
     <div class="home-page">
       <section class="hero">
         <div class="container">
-          <h1>Verify Truth in the Age of AI</h1>
-          <p class="hero-subtitle">
-            TruWit provides cryptographic proof of content authenticity,
-            ensuring trust and transparency in digital media.
-          </p>
-          <div class="hero-actions">
-            <a routerLink="/verify" class="btn-primary">Start Verifying</a>
-            <a routerLink="/products" class="btn-secondary">Learn More</a>
+          <div class="hero-content">
+            <h1>Where Provenance<br>Meets Proof</h1>
+            <p class="hero-subtitle">
+              Redefining trust in the age of AI. Truwit is the lightweight verification layer for digital media—attaching
+              cryptographic provenance, consent, and authenticity to AI-generated or user-created content.
+            </p>
+            <div class="hero-actions">
+              <a routerLink="/verify/tool" class="btn-primary">Start Verification</a>
+            </div>
+          </div>
+          <div class="hero-visual">
+            <p class="preview-text">Preview coming soon</p>
           </div>
         </div>
       </section>
 
       <section class="features">
         <div class="container">
-          <h2>Why Choose TruWit?</h2>
           <div class="features-grid">
             <div class="feature-card">
-              <div class="feature-icon">🔒</div>
+              <div class="feature-icon">🛡️</div>
               <h3>Cryptographic Proof</h3>
-              <p>C2PA-compliant verification with cryptographic signatures</p>
+              <p>Immutable, verifiable attestations for your media.</p>
             </div>
             <div class="feature-card">
-              <div class="feature-icon">🤖</div>
+              <div class="feature-icon">🤝</div>
+              <h3>Consent Tracking</h3>
+              <p>Prove likeness/rights with traceable consent.</p>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon">✨</div>
               <h3>AI Detection</h3>
-              <p>Advanced AI algorithms to detect synthetic and manipulated content</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">⚡</div>
-              <h3>Instant Results</h3>
-              <p>Get verification results in seconds, not minutes</p>
-            </div>
-            <div class="feature-card">
-              <div class="feature-icon">📊</div>
-              <h3>Detailed Analysis</h3>
-              <p>Comprehensive reports with confidence scores and metadata</p>
+              <p>Identify and label AI-assisted or generated content.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="cta">
+      <section class="cta-final">
         <div class="container">
-          <h2>Ready to Start?</h2>
-          <p>Join thousands of users who trust TruWit for content authenticity verification</p>
-          <a routerLink="/verify" class="btn-primary">Get Started</a>
+          <h2>Verify origin. Prove consent. Publish with confidence.</h2>
+          <div class="cta-actions">
+            <a routerLink="/verify/tool" class="btn-primary">Start Verification</a>
+          </div>
+          <p class="privacy-note">We hash locally. Your files are not stored.</p>
         </div>
       </section>
     </div>

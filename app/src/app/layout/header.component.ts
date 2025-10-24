@@ -11,26 +11,19 @@ import { RouterModule } from '@angular/router';
       <nav class="nav">
         <div class="nav-brand">
           <a routerLink="/" class="logo-link">
-            <img src="/assets/truwit-logo.png" alt="TruWit Logo" class="nav-logo">
+            <img src="/assets/logo.svg" alt="TruWit Logo" class="nav-logo">
             <span class="brand-name">TruWit</span>
           </a>
         </div>
         
         <div class="nav-menu">
-          <div class="nav-item" (mouseenter)="showProductsDropdown = true" (mouseleave)="showProductsDropdown = false">
-            <button class="nav-link dropdown-toggle" type="button">
-              Products
-              <span class="dropdown-arrow">▼</span>
-            </button>
-            <div class="dropdown-menu" *ngIf="showProductsDropdown">
-              <a routerLink="/truviz" class="dropdown-item">TruViz</a>
-              <a routerLink="/audit" class="dropdown-item">TruViz Audit</a>
-              <a routerLink="/products" class="dropdown-item">Compare</a>
-            </div>
-          </div>
-          
+          <a routerLink="/" class="nav-link">Home</a>
+          <a routerLink="/how-it-works" class="nav-link">How It Works</a>
+          <a routerLink="/use-cases" class="nav-link">Use Cases</a>
+          <a routerLink="/technology" class="nav-link">Technology</a>
           <a routerLink="/pricing" class="nav-link">Pricing</a>
-          <a routerLink="/verify" class="nav-link">Verify</a>
+          <a routerLink="/investors" class="nav-link">Investors</a>
+          <a routerLink="/verify/tool" class="btn-launch">Launch App</a>
         </div>
       </nav>
     </header>
@@ -70,16 +63,12 @@ import { RouterModule } from '@angular/router';
     .nav-logo {
       width: 32px;
       height: 32px;
-      border-radius: 4px;
     }
 
     .brand-name {
       font-size: 1.5rem;
       font-weight: 700;
-      background: linear-gradient(135deg, var(--teal), #2de2b5);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      color: var(--teal);
     }
 
     .nav-menu {
@@ -88,67 +77,34 @@ import { RouterModule } from '@angular/router';
       gap: 2rem;
     }
 
-    .nav-item {
-      position: relative;
-    }
-
     .nav-link {
       color: var(--text-secondary);
       text-decoration: none;
       font-weight: 500;
       padding: 0.5rem 0;
       transition: color 0.2s ease;
-      background: none;
-      border: none;
-      font-size: 1rem;
-      cursor: pointer;
-      font-family: inherit;
+      white-space: nowrap;
     }
 
     .nav-link:hover {
       color: var(--teal);
     }
 
-    .dropdown-toggle {
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-    }
-
-    .dropdown-arrow {
-      font-size: 0.7em;
-      transition: transform 0.2s ease;
-    }
-
-    .nav-item:hover .dropdown-arrow {
-      transform: rotate(180deg);
-    }
-
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      background: var(--bg-2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      min-width: 200px;
-      padding: 0.5rem 0;
-      margin-top: 0.5rem;
-      z-index: 1000;
-    }
-
-    .dropdown-item {
-      display: block;
-      padding: 0.75rem 1.5rem;
-      color: var(--text-primary);
+    .btn-launch {
+      padding: 0.625rem 1.5rem;
+      background: var(--teal);
+      color: var(--bg-0);
       text-decoration: none;
-      transition: background-color 0.2s ease;
+      border-radius: var(--radius);
+      font-weight: 600;
+      transition: all 0.2s ease;
+      white-space: nowrap;
     }
 
-    .dropdown-item:hover {
-      background: var(--bg-1);
-      color: var(--teal);
+    .btn-launch:hover {
+      background: #13c4bc;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(20, 212, 201, 0.3);
     }
 
     @media (max-width: 768px) {
