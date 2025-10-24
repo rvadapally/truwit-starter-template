@@ -114,9 +114,11 @@ try
     builder.Services.AddScoped<IUrlCanonicalizer, UrlCanonicalizer>();
     builder.Services.AddSingleton<IVerificationStatusTracker, VerificationStatusTracker>();
     
-    // Register Settings and YouTube Video Hasher services
+    // Register Settings service
     builder.Services.AddScoped<ISettingsService, SettingsService>();
-    builder.Services.AddScoped<IYouTubeVideoHasher, YouTubeVideoHasher>();
+    
+    // Note: YouTubeVideoHasher (yt-dlp based) not registered for MVP
+    // Using thumbnail-only mode for YouTube URLs (no yt-dlp dependency)
 
     // Configure C2PA options
     builder.Services.Configure<C2paOptions>(builder.Configuration.GetSection("C2pa"));

@@ -12,16 +12,13 @@ namespace HumanProof.Api.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly ISettingsService _settingsService;
-    private readonly IYouTubeVideoHasher _youtubeHasher;
     private readonly ILogger<AdminController> _logger;
 
     public AdminController(
         ISettingsService settingsService,
-        IYouTubeVideoHasher youtubeHasher,
         ILogger<AdminController> logger)
     {
         _settingsService = settingsService;
-        _youtubeHasher = youtubeHasher;
         _logger = logger;
     }
 
@@ -73,9 +70,10 @@ public class AdminController : ControllerBase
         // Validate specific settings
         if (key == "YOUTUBE_VERIFICATION_MODE")
         {
-            if (request.Value != "thumbnail" && request.Value != "full_video")
+            // MVP: Only thumbnail mode is supported (no yt-dlp dependency)
+            if (request.Value != "thumbnail")
             {
-                return BadRequest(new { message = "YOUTUBE_VERIFICATION_MODE must be 'thumbnail' or 'full_video'" });
+                return BadRequest(new { message = "YOUTUBE_VERIFICATION_MODE must be 'thumbnail' (full_video mode disabled for MVP)" });
             }
         }
 
@@ -89,55 +87,22 @@ public class AdminController : ControllerBase
 
     /// <summary>
     /// Test if YouTube cookies are valid by attempting to get duration of a public video
+    /// MVP: Disabled - YouTube thumbnail mode doesn't require cookies
     /// </summary>
     [HttpPost("youtube/test-cookies")]
     [ProducesResponseType(typeof(TestCookiesResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<TestCookiesResult>> TestYouTubeCookies()
+    public Task<ActionResult<TestCookiesResult>> TestYouTubeCookies()
     {
-        _logger.LogInformation("Admin: Testing YouTube cookies");
+        _logger.LogInformation("Admin: YouTube cookies test skipped (MVP: thumbnail-only mode)");
 
-        // Use a known public YouTube video for testing (Rick Astley - Never Gonna Give You Up)
-        const string TEST_VIDEO_ID = "dQw4w9WgXcQ";
-
-        try
+        return Task.FromResult<ActionResult<TestCookiesResult>>(Ok(new TestCookiesResult
         {
-            // Just try to get the duration - this will validate cookies without downloading
-            var result = await _youtubeHasher.HashVideoAsync(TEST_VIDEO_ID);
-            
-            // If we got here, cookies work
-            _logger.LogInformation("✅ YouTube cookies test passed");
-            
-            return Ok(new TestCookiesResult
-            {
-                Success = true,
-                Message = "Cookies are valid and working",
-                TestVideoId = TEST_VIDEO_ID,
-                Duration = result.DurationSeconds
-            });
-        }
-        catch (YouTubeCookieException ex)
-        {
-            _logger.LogWarning(ex, "❌ YouTube cookies test failed - authentication error");
-            
-            return Ok(new TestCookiesResult
-            {
-                Success = false,
-                Message = "Cookies are invalid or expired",
-                Error = ex.Message
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "❌ YouTube cookies test failed - unexpected error");
-            
-            return Ok(new TestCookiesResult
-            {
-                Success = false,
-                Message = "Test failed with unexpected error",
-                Error = ex.Message
-            });
-        }
+            Success = true,
+            Message = "MVP: YouTube thumbnail mode doesn't require cookies - test not applicable",
+            TestVideoId = null,
+            Duration = null
+        }));
     }
 }
 
