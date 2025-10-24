@@ -1,7 +1,12 @@
 import { Component, type OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { VerificationFormComponent } from './verification-form.component';
+import { VerificationResultComponent } from './verification-result.component';
 
 @Component({
   selector: 'app-verify-page',
+  standalone: true,
+  imports: [CommonModule, VerificationFormComponent, VerificationResultComponent],
   template: `
     <div class="verification-page">
       <!-- Feature Showcase Section -->

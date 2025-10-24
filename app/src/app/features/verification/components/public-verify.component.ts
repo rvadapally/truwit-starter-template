@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Title, Meta } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -10,6 +11,8 @@ import { UnifiedBadgeService } from '../../../core/services/unified-badge.servic
 
 @Component({
   selector: 'app-public-verify',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './public-verify.component.html',
   styleUrls: ['./public-verify.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush

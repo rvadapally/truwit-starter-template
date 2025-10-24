@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, type OnInit, type OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
@@ -10,6 +11,8 @@ import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-verification-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './verification-form.component.html',
   styleUrls: ['./verification-form.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
