@@ -7,35 +7,153 @@ import { Title, Meta } from '@angular/platform-browser';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="page">
+    <div class="pricing-page">
       <section class="hero">
         <div class="container">
-          <h1>Pricing</h1>
-          <p class="subtitle">Choose the plan that fits your needs</p>
+          <p class="section-label">PRICING</p>
+          <h1>Simple for launch</h1>
         </div>
       </section>
-      <section class="content">
+      
+      <section class="pricing-content">
         <div class="container">
-          <p>Simple, transparent pricing for content verification.</p>
+          <div class="pricing-grid">
+            <div class="pricing-card">
+              <h3>Early Access — Free</h3>
+              <p>Sign and verify media at no cost while we scale the network of trusted content.</p>
+              <ul class="features-list">
+                <li>Proof generation for creators</li>
+                <li>Instant verification for anyone</li>
+                <li>Downloadable manifest</li>
+              </ul>
+            </div>
+            
+            <div class="pricing-card coming-soon">
+              <h3>Coming Soon</h3>
+              <p class="muted">Creator Pro, Team seats, and API plans for newsrooms and platforms.</p>
+            </div>
+          </div>
         </div>
       </section>
     </div>
   `,
   styles: [`
-    .page { min-height: 100vh; background: var(--bg-0); color: var(--text-primary); }
-    .hero { padding: 3rem 0; text-align: center; background: var(--bg-1); }
-    .container { max-width: var(--w-container); margin: 0 auto; padding: 0 1.5rem; }
-    .hero h1 { font-size: 2.5rem; margin: 0 0 1rem; background: linear-gradient(135deg, var(--teal), #2de2b5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .subtitle { font-size: 1.125rem; color: var(--text-secondary); margin: 0; }
-    .content { padding: 4rem 0; }
-    .content p { color: var(--text-secondary); line-height: 1.6; }
+    .pricing-page {
+      min-height: 100vh;
+      background: var(--bg-0);
+      color: var(--text-primary);
+    }
+    
+    .hero {
+      padding: 3rem 0 2rem;
+      text-align: center;
+    }
+    
+    .section-label {
+      color: var(--teal);
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    
+    .container {
+      max-width: var(--w-container);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    
+    h1 {
+      font-size: clamp(2rem, 4vw, 2.5rem);
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-primary);
+    }
+    
+    .pricing-content {
+      padding: 3rem 0;
+    }
+    
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .pricing-card {
+      padding: 2.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius);
+      transition: all 0.3s ease;
+    }
+    
+    .pricing-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(14, 165, 233, 0.3);
+      box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1);
+    }
+    
+    .pricing-card h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--teal);
+      margin: 0 0 1rem 0;
+    }
+    
+    .pricing-card p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 1.5rem 0;
+    }
+    
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .features-list li {
+      padding: 0.75rem 0;
+      color: var(--text-secondary);
+      position: relative;
+      padding-left: 1.75rem;
+      font-size: 0.95rem;
+    }
+    
+    .features-list li::before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: var(--teal);
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+    
+    .coming-soon {
+      opacity: 0.7;
+    }
+    
+    .muted {
+      color: var(--text-secondary);
+      opacity: 0.8;
+    }
+    
+    @media (max-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   `]
 })
 export class PricingPageComponent implements OnInit {
   constructor(private title: Title, private meta: Meta) {}
   ngOnInit(): void {
-    this.title.setTitle('Pricing - TruWit');
-    this.meta.updateTag({ name: 'description', content: 'TruWit pricing plans' });
+    this.title.setTitle('Pricing — Free during Early Access - TruWit');
+    this.meta.updateTag({ name: 'description', content: 'Simple pricing for launch. Free early access for creators to sign and verify media.' });
   }
 }
 
