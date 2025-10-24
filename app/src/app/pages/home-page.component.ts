@@ -19,7 +19,7 @@ import { Title, Meta } from '@angular/platform-browser';
               cryptographic provenance, consent, and authenticity to AI-generated or user-created content.
             </p>
             <div class="hero-actions">
-              <a routerLink="/verify/tool" class="btn-primary">Start Verification</a>
+              <a routerLink="/verify" class="btn-primary">Start Verification</a>
             </div>
           </div>
           <div class="hero-visual">

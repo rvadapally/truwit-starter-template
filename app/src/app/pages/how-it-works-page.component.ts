@@ -75,7 +75,7 @@ import { Title, Meta } from '@angular/platform-browser';
         <div class="container">
           <h2>Ready to try TruWit?</h2>
           <p>Sign your video or image and get a verifiable proof in seconds.</p>
-          <a routerLink="/verify/tool" class="btn-primary">Launch App</a>
+          <a routerLink="/verify" class="btn-primary">Launch App</a>
         </div>
       </section>
     </div>

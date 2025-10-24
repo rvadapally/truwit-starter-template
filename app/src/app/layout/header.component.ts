@@ -24,7 +24,7 @@ import { RouterModule } from '@angular/router';
           <a routerLink="/technology" class="nav-link">Technology</a>
           <a routerLink="/pricing" class="nav-link">Pricing</a>
           <a routerLink="/products" class="nav-link">Products</a>
-          <a routerLink="/verify/tool" class="btn-launch">Launch App</a>
+          <a routerLink="/verify" class="btn-launch">Launch App</a>
         </div>
       </nav>
     </header>

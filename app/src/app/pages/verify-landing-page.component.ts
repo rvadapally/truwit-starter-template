@@ -65,6 +65,6 @@ export class VerifyLandingPageComponent implements OnInit {
   }
 
   openVerifier(): void {
-    this.router.navigate(['/verify/tool']);
+    this.router.navigate(['/verify']);
   }
 }

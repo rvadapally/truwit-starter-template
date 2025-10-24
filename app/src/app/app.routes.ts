@@ -27,16 +27,16 @@ export const routes: Routes = [
   { path: 'audit', component: AuditPageComponent },
   { path: 'pricing', component: PricingPageComponent },
   { path: 'investors', component: InvestorsPageComponent },
-  { path: 'verify', component: VerifyLandingPageComponent },
   { path: 'legal/privacy', component: PrivacyPageComponent },
   { path: 'legal/terms', component: TermsPageComponent },
   
   // App routes (dynamic)
-  { path: 'verify/tool', component: VerifyPageComponent },
+  { path: 'verify', component: VerifyPageComponent }, // Main verify tool (was /verify/tool)
+  { path: 'verify/tool', redirectTo: '/verify', pathMatch: 'full' }, // Redirect old path
   { path: 't/:id', component: PublicVerifyComponent },
   
   // Legacy redirects
-  { path: 'app/verify', redirectTo: '/verify/tool', pathMatch: 'full' },
+  { path: 'app/verify', redirectTo: '/verify', pathMatch: 'full' },
   { path: 'app/t/:id', redirectTo: '/t/:id', pathMatch: 'full' },
   { path: 'app', redirectTo: '/', pathMatch: 'full' },
   

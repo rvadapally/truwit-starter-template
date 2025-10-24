@@ -104,7 +104,7 @@ import { Title, Meta } from '@angular/platform-browser';
         <div class="container">
           <h2>Experience the Technology</h2>
           <p>Try TruWit's verification platform and see how cryptographic proof works</p>
-          <a routerLink="/verify/tool" class="btn-primary">Start Verification</a>
+          <a routerLink="/verify" class="btn-primary">Start Verification</a>
         </div>
       </section>
     </div>
