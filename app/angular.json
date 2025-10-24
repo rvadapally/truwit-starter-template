@@ -116,10 +116,14 @@
           "options": {
             "routes": [
               "/",
+              "/how-it-works",
+              "/use-cases",
+              "/technology",
               "/products",
               "/truviz",
               "/audit",
               "/pricing",
+              "/investors",
               "/verify",
               "/legal/privacy",
               "/legal/terms"

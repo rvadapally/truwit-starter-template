@@ -4,10 +4,14 @@ import { VerifyPageComponent } from './features/verification/components/verify-p
 
 // Marketing pages
 import { HomePageComponent } from './pages/home-page.component';
+import { HowItWorksPageComponent } from './pages/how-it-works-page.component';
+import { UseCasesPageComponent } from './pages/use-cases-page.component';
+import { TechnologyPageComponent } from './pages/technology-page.component';
 import { ProductsPageComponent } from './pages/products-page.component';
 import { TruVizPageComponent } from './pages/truviz-page.component';
 import { AuditPageComponent } from './pages/audit-page.component';
 import { PricingPageComponent } from './pages/pricing-page.component';
+import { InvestorsPageComponent } from './pages/investors-page.component';
 import { VerifyLandingPageComponent } from './pages/verify-landing-page.component';
 import { PrivacyPageComponent } from './pages/privacy-page.component';
 import { TermsPageComponent } from './pages/terms-page.component';
@@ -15,10 +19,14 @@ import { TermsPageComponent } from './pages/terms-page.component';
 export const routes: Routes = [
   // Marketing routes (prerendered)
   { path: '', component: HomePageComponent },
+  { path: 'how-it-works', component: HowItWorksPageComponent },
+  { path: 'use-cases', component: UseCasesPageComponent },
+  { path: 'technology', component: TechnologyPageComponent },
   { path: 'products', component: ProductsPageComponent },
   { path: 'truviz', component: TruVizPageComponent },
   { path: 'audit', component: AuditPageComponent },
   { path: 'pricing', component: PricingPageComponent },
+  { path: 'investors', component: InvestorsPageComponent },
   { path: 'verify', component: VerifyLandingPageComponent },
   { path: 'legal/privacy', component: PrivacyPageComponent },
   { path: 'legal/terms', component: TermsPageComponent },
