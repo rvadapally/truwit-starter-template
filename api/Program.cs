@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.Google;
+using AspNet.Security.OAuth.Twitter;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -196,7 +197,15 @@ try
        options.ClientSecret = oauthConfig["Google:ClientSecret"] ?? "YOUR_GOOGLE_CLIENT_SECRET_HERE";
        options.CallbackPath = "/v1/auth/callback/google";
        options.SaveTokens = true;
-   });
+   })
+    .AddTwitter(options =>
+    {
+        options.ConsumerKey = oauthConfig["Twitter:ConsumerKey"] ?? "YOUR_TWITTER_CONSUMER_KEY_HERE";
+        options.ConsumerSecret = oauthConfig["Twitter:ConsumerSecret"] ?? "YOUR_TWITTER_CONSUMER_SECRET_HERE";
+        options.CallbackPath = "/v1/auth/callback/twitter";
+        options.SaveTokens = true;
+        options.RetrieveUserDetails = true;
+    });
 
    // Configure Rate Limiting (Phase 6)
    builder.Services.AddRateLimiter(options =>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
+using AspNet.Security.OAuth.Twitter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -18,6 +19,7 @@ namespace HumanProof.Api.Controllers;
 public class OAuthOptions
 {
     public GoogleOptions Google { get; set; } = new();
+    public TwitterOptions Twitter { get; set; } = new();
     public string JwtSecret { get; set; } = string.Empty;
     public int JwtExpirationMinutes { get; set; } = 15;
     
@@ -25,6 +27,12 @@ public class OAuthOptions
     {
         public string ClientId { get; set; } = string.Empty;
         public string ClientSecret { get; set; } = string.Empty;
+    }
+    
+    public class TwitterOptions
+    {
+        public string ConsumerKey { get; set; } = string.Empty;
+        public string ConsumerSecret { get; set; } = string.Empty;
     }
 }
 
@@ -116,6 +124,77 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during Google OAuth callback");
+            return StatusCode(500, new { error = "Internal server error during authentication" });
+        }
+    }
+
+    /// <summary>
+    /// Start Twitter (X) OAuth login flow
+    /// </summary>
+    [HttpGet("login/twitter")]
+    public IActionResult LoginTwitter([FromQuery] string? returnUrl = null)
+    {
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action(nameof(CallbackTwitter), new { returnUrl })
+        };
+        
+        return Challenge(properties, TwitterAuthenticationDefaults.AuthenticationScheme);
+    }
+
+    /// <summary>
+    /// Handle Twitter (X) OAuth callback
+    /// </summary>
+    [HttpGet("callback/twitter")]
+    public async Task<IActionResult> CallbackTwitter([FromQuery] string? returnUrl = null)
+    {
+        try
+        {
+            var authenticateResult = await HttpContext.AuthenticateAsync(TwitterAuthenticationDefaults.AuthenticationScheme);
+            
+            if (!authenticateResult.Succeeded)
+            {
+                _logger.LogWarning("Twitter authentication failed");
+                return BadRequest(new { error = "Authentication failed" });
+            }
+
+            var principal = authenticateResult.Principal;
+            if (principal == null)
+            {
+                return BadRequest(new { error = "No principal found" });
+            }
+
+            // Extract user information from Twitter claims
+            var twitterId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var username = principal.FindFirstValue(ClaimTypes.Name) ?? principal.FindFirstValue("screen_name");
+            var email = principal.FindFirstValue(ClaimTypes.Email); // May be null if user didn't grant email permission
+
+            if (string.IsNullOrEmpty(twitterId))
+            {
+                return BadRequest(new { error = "Missing required claims from Twitter" });
+            }
+
+            // Create or update identity (use twitterId as handle since it's unique)
+            var identity = await UpsertIdentityAsync("twitter", twitterId, username, email);
+
+            // Generate JWT token
+            var token = GenerateJwtToken(identity);
+
+            _logger.LogInformation("Twitter authentication successful for identity {IdentityId}", identity.IdentityId);
+
+            // Return token (in production, redirect to frontend with token in query or use secure cookie)
+            return Ok(new
+            {
+                identity_token = token,
+                identity_id = identity.IdentityId,
+                provider = identity.Provider,
+                handle = identity.Handle,
+                display_name = identity.DisplayName
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Twitter OAuth callback");
             return StatusCode(500, new { error = "Internal server error during authentication" });
         }
     }
