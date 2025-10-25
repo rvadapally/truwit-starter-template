@@ -355,7 +355,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
         license: receipt.license || 'public'
       },
       timestamp: verifyResult.createdAt || receipt.timestamp,
-      verificationUrl: `https://truwit.ai/app/t/${trustmarkId}`,
+      verificationUrl: `https://truwit.ai/t/${trustmarkId}`,
       badgeUrl: `${environment.apiUrl || 'https://api.truwit.ai'}/assets/proof/${trustmarkId}-800.png`
     };
   }
