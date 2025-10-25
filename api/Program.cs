@@ -200,8 +200,9 @@ try
    })
    .AddTwitter(options =>
    {
-       options.ConsumerKey = oauthConfig["Twitter:ConsumerKey"] ?? "YOUR_TWITTER_CONSUMER_KEY_HERE";
-       options.ConsumerSecret = oauthConfig["Twitter:ConsumerSecret"] ?? "YOUR_TWITTER_CONSUMER_SECRET_HERE";
+       // Twitter uses ClientId and ClientSecret for OAuth properties
+       options.ClientId = oauthConfig["Twitter:ConsumerKey"] ?? "YOUR_TWITTER_CONSUMER_KEY_HERE";
+       options.ClientSecret = oauthConfig["Twitter:ConsumerSecret"] ?? "YOUR_TWITTER_CONSUMER_SECRET_HERE";
        options.CallbackPath = "/v1/auth/callback/twitter";
        options.SaveTokens = true;
    });
