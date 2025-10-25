@@ -198,14 +198,13 @@ try
        options.CallbackPath = "/v1/auth/callback/google";
        options.SaveTokens = true;
    })
-    .AddTwitter(options =>
-    {
-        options.ConsumerKey = oauthConfig["Twitter:ConsumerKey"] ?? "YOUR_TWITTER_CONSUMER_KEY_HERE";
-        options.ConsumerSecret = oauthConfig["Twitter:ConsumerSecret"] ?? "YOUR_TWITTER_CONSUMER_SECRET_HERE";
-        options.CallbackPath = "/v1/auth/callback/twitter";
-        options.SaveTokens = true;
-        options.RetrieveUserDetails = true;
-    });
+   .AddTwitter(options =>
+   {
+       options.ConsumerAPIKey = oauthConfig["Twitter:ConsumerKey"] ?? "YOUR_TWITTER_CONSUMER_KEY_HERE";
+       options.ConsumerSecret = oauthConfig["Twitter:ConsumerSecret"] ?? "YOUR_TWITTER_CONSUMER_SECRET_HERE";
+       options.CallbackPath = "/v1/auth/callback/twitter";
+       options.SaveTokens = true;
+   });
 
    // Configure Rate Limiting (Phase 6)
    builder.Services.AddRateLimiter(options =>
