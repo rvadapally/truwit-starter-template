@@ -29,10 +29,10 @@
             (No new verification was performed - showing existing proof)
           </span>
           <div class="success-actions" *ngIf="createdProof || existingProof">
-            <button class="btn-primary" (click)="visitVerificationPage()">
+            <button type="button" class="btn-primary" (click)="visitVerificationPage()">
               View Verification Details
             </button>
-            <button class="btn-secondary" (click)="resetForm()">
+            <button type="button" class="btn-secondary" (click)="resetForm()">
               Create Another Proof
             </button>
           </div>
