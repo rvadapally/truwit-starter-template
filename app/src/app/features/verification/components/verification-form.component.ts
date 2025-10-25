@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { VerificationService } from '../../../core/services/verification.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import type { VerificationRequest, VerificationMetadata, CreateProofResponse, VerificationResult } from '../../../core/models';
+import type { VerificationRequest, VerificationMetadata, CreateProofResponse } from '../../../core/models';
 import { LicenseType } from '../../../core/models';
 import { environment } from '../../../../environments/environment';
 
@@ -26,7 +26,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
   successMessage: string | null = null;
   verificationStep: string = '';
   createdProof: CreateProofResponse | null = null;
-  existingProof: VerificationResult | null = null;
+  existingProof: CreateProofResponse | null = null; // Changed from VerificationResult to CreateProofResponse
   
   private destroy$ = new Subject<void>();
   private verificationTimeout?: ReturnType<typeof setTimeout>;
@@ -337,26 +337,18 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
       });
   }
 
-  private convertToVerificationResult(verifyResult: any, url: string): VerificationResult {
+  private convertToVerificationResult(verifyResult: any, url: string): CreateProofResponse {
     // Handle trustmark verification response structure
+    // Convert VerifyResponse to CreateProofResponse format (same as Generate Proof returns)
     const receipt = verifyResult.receipt?.json || {};
     const proofId = receipt.proofId || verifyResult.proofId;
     const trustmarkId = verifyResult.trustmarkId || receipt.trustmarkId;
     
     return {
       proofId: proofId,
-      trustmarkId: trustmarkId,
-      contentHash: verifyResult.origin?.sha256 || receipt.sha256 || '',
-      perceptualHash: verifyResult.origin?.sha256 || receipt.sha256 || '', // Use contentHash as fallback
-      metadata: {
-        prompt: receipt.prompt || '',
-        toolName: receipt.toolName || '',
-        toolVersion: '',
-        license: receipt.license || 'public'
-      },
-      timestamp: verifyResult.createdAt || receipt.timestamp,
-      verificationUrl: `https://truwit.ai/t/${trustmarkId}`,
-      badgeUrl: `${environment.apiUrl || 'https://api.truwit.ai'}/assets/proof/${trustmarkId}-800.png`
+      verifyUrl: `/t/${trustmarkId}`, // Use relative path for Angular routing (same as Generate Proof)
+      badgeUrl: `${environment.apiUrl || 'https://api.truwit.ai'}/assets/proof/${trustmarkId}-800.png`,
+      deduped: true // Mark as deduped since it's an existing proof
     };
   }
 
@@ -406,20 +398,14 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
           }
 
           visitVerificationPage(): void {
-            let verifyUrl: string | undefined;
+            // Both createdProof and existingProof are now CreateProofResponse with verifyUrl
+            const proof = this.createdProof || this.existingProof;
             
-            if (this.createdProof && this.createdProof.verifyUrl) {
-              verifyUrl = this.createdProof.verifyUrl;
-            } else if (this.existingProof && this.existingProof.verificationUrl) {
-              verifyUrl = this.existingProof.verificationUrl;
-            } else if (this.existingProof && this.existingProof.trustmarkId) {
-              // Fallback: construct URL from trustmarkId
-              verifyUrl = `/t/${this.existingProof.trustmarkId}`;
-            }
-            
-            if (verifyUrl) {
-              // Navigate to verification page using the URL string
-              this.router.navigateByUrl(verifyUrl);
+            if (proof && proof.verifyUrl) {
+              console.log('🚀 Navigating to:', proof.verifyUrl);
+              this.router.navigateByUrl(proof.verifyUrl);
+            } else {
+              console.error('❌ No valid verification URL found');
             }
           }
 
