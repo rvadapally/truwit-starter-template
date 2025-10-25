@@ -306,6 +306,7 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
                   this.isVerifying = false;
                   // Convert VerifyResponse to VerificationResult
                   this.existingProof = this.convertToVerificationResult(verifyResult, url);
+                  this.successMessage = 'Proof found! View details below or click "View Verification Details" to see the full proof page.';
                   this.cdr.markForCheck();
                 },
                 error: (error) => {
