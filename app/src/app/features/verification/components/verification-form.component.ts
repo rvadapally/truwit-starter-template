@@ -405,9 +405,20 @@ export class VerificationFormComponent implements OnInit, OnDestroy {
           }
 
           visitVerificationPage(): void {
+            let verifyUrl: string | undefined;
+            
             if (this.createdProof && this.createdProof.verifyUrl) {
+              verifyUrl = this.createdProof.verifyUrl;
+            } else if (this.existingProof && this.existingProof.verificationUrl) {
+              verifyUrl = this.existingProof.verificationUrl;
+            } else if (this.existingProof && this.existingProof.trustmarkId) {
+              // Fallback: construct URL from trustmarkId
+              verifyUrl = `/t/${this.existingProof.trustmarkId}`;
+            }
+            
+            if (verifyUrl) {
               // Navigate to verification page using the URL string
-              this.router.navigateByUrl(this.createdProof.verifyUrl);
+              this.router.navigateByUrl(verifyUrl);
             }
           }
 

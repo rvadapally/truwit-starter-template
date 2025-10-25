@@ -18,17 +18,17 @@
     <div class="status-message success" *ngIf="successMessage">
       <div class="success-content">
         <div class="success-icon">
-          <span *ngIf="createdProof?.deduped">ℹ️</span>
-          <span *ngIf="!createdProof?.deduped">🎉</span>
+          <span *ngIf="createdProof?.deduped || existingProof">ℹ️</span>
+          <span *ngIf="!createdProof?.deduped && !existingProof">🎉</span>
         </div>
         <div class="success-text">
-          <span class="success-title" *ngIf="!createdProof?.deduped">Proof Created Successfully!</span>
-          <span class="success-title" *ngIf="createdProof?.deduped">Existing Proof Found!</span>
+          <span class="success-title" *ngIf="!createdProof?.deduped && !existingProof">Proof Created Successfully!</span>
+          <span class="success-title" *ngIf="createdProof?.deduped || existingProof">Existing Proof Found!</span>
           <span class="success-subtitle">{{ successMessage }}</span>
-          <span *ngIf="createdProof?.deduped" class="dedup-note">
+          <span *ngIf="createdProof?.deduped || existingProof" class="dedup-note">
             (No new verification was performed - showing existing proof)
           </span>
-          <div class="success-actions" *ngIf="createdProof">
+          <div class="success-actions" *ngIf="createdProof || existingProof">
             <button class="btn-primary" (click)="visitVerificationPage()">
               View Verification Details
             </button>
