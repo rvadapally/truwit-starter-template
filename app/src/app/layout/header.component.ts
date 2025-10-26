@@ -33,7 +33,7 @@ import { AuthService } from '../core/services/auth.service';
             <button (click)="signOut()" class="btn-signout">Sign Out</button>
           </div>
           
-          <a routerLink="/verify" class="btn-launch">Launch App</a>
+          <a routerLink="/verify" class="btn-launch">Try It Free</a>
         </div>
       </nav>
     </header>
