@@ -15,6 +15,7 @@ import { InvestorsPageComponent } from './pages/investors-page.component';
 import { VerifyLandingPageComponent } from './pages/verify-landing-page.component';
 import { PrivacyPageComponent } from './pages/privacy-page.component';
 import { TermsPageComponent } from './pages/terms-page.component';
+import { LoginPageComponent } from './pages/login-page.component';
 
 export const routes: Routes = [
   // Marketing routes (prerendered)
@@ -31,6 +32,7 @@ export const routes: Routes = [
   { path: 'legal/terms', component: TermsPageComponent },
   
   // App routes (dynamic)
+  { path: 'login', component: LoginPageComponent }, // Login page
   { path: 'verify', component: VerifyPageComponent }, // Main verify tool (was /verify/tool)
   { path: 'verify/tool', redirectTo: '/verify', pathMatch: 'full' }, // Redirect old path
   { path: 't/:id', component: PublicVerifyComponent },
