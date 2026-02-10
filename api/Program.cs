@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 using NLog.Web;
 
@@ -334,6 +335,12 @@ try
     });
 
     // app.UseHttpsRedirection(); // Disabled for local Docker testing
+    
+    // Enable forwarded headers for Railway/proxy HTTPS detection
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
     
     // CORS must be before static files to apply headers to static content
     app.UseCors("AllowAll");
