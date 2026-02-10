@@ -198,6 +198,21 @@ try
        options.ClientSecret = oauthConfig["Google:ClientSecret"] ?? "YOUR_GOOGLE_CLIENT_SECRET_HERE";
        options.CallbackPath = "/v1/auth/callback/google";
        options.SaveTokens = true;
+       // Force HTTPS for Railway deployment
+       options.Events.OnRedirectToAuthorizationEndpoint = context =>
+       {
+           var uri = new UriBuilder(context.RedirectUri);
+           // Replace the redirect_uri parameter to use HTTPS
+           var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+           var redirectUri = query["redirect_uri"];
+           if (!string.IsNullOrEmpty(redirectUri) && redirectUri.StartsWith("http://"))
+           {
+               query["redirect_uri"] = redirectUri.Replace("http://", "https://");
+               uri.Query = query.ToString();
+           }
+           context.Response.Redirect(uri.ToString());
+           return Task.CompletedTask;
+       };
    })
    .AddTwitter(options =>
    {
@@ -206,6 +221,23 @@ try
        options.ClientSecret = oauthConfig["Twitter:ConsumerSecret"] ?? "YOUR_TWITTER_CONSUMER_SECRET_HERE";
        options.CallbackPath = "/v1/auth/callback/twitter";
        options.SaveTokens = true;
+       // Force HTTPS for Railway deployment
+       options.Events.OnRedirectToAuthorizationEndpoint = context =>
+       {
+           var uri = new UriBuilder(context.RedirectUri);
+           var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+           var redirectUri = query["redirect_uri"] ?? query["oauth_callback"];
+           if (!string.IsNullOrEmpty(redirectUri) && redirectUri.StartsWith("http://"))
+           {
+               if (query["redirect_uri"] != null)
+                   query["redirect_uri"] = redirectUri.Replace("http://", "https://");
+               if (query["oauth_callback"] != null)
+                   query["oauth_callback"] = redirectUri.Replace("http://", "https://");
+               uri.Query = query.ToString();
+           }
+           context.Response.Redirect(uri.ToString());
+           return Task.CompletedTask;
+       };
    });
 
    // Configure Rate Limiting (Phase 6)
