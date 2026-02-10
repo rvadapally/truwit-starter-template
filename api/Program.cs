@@ -72,13 +72,12 @@ try
     builder.Services.AddHttpClient();
     builder.Services.AddHttpClient<HostedC2paVerifier>();
 
-    // Configure session cookies for OAuth (SameSite=None for cross-domain redirects)
+    // Configure session cookies for OAuth
     builder.Services.AddSession(options =>
     {
         options.Cookie.HttpOnly = true;
-        // Use SameAsRequest for Railway's SSL termination
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-        options.Cookie.SameSite = SameSiteMode.None; // Important for OAuth cross-site redirects!
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax; // Lax works for OAuth redirects
         options.Cookie.IsEssential = true;
     });
 
@@ -193,9 +192,10 @@ try
     .AddCookie(options =>
     {
         options.Cookie.HttpOnly = true;
-        // Use SameAsRequest for Railway's SSL termination - the proxy handles HTTPS
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-        options.Cookie.SameSite = SameSiteMode.None; // Required for cross-site OAuth redirects
+        // Always use Secure for production (Railway handles SSL at edge)
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        // Lax allows the cookie to be sent on top-level navigations (like OAuth redirects)
+        options.Cookie.SameSite = SameSiteMode.Lax;
         options.Cookie.IsEssential = true;
     })
     .AddJwtBearer(options =>
