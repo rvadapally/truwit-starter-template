@@ -9,7 +9,6 @@ using HumanProof.Api.Controllers;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using AspNet.Security.OAuth.Twitter;
 using Microsoft.AspNetCore.RateLimiting;
@@ -71,15 +70,6 @@ try
     // Add HttpClient
     builder.Services.AddHttpClient();
     builder.Services.AddHttpClient<HostedC2paVerifier>();
-
-    // Configure session cookies for OAuth
-    builder.Services.AddSession(options =>
-    {
-        options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Lax; // Lax works for OAuth redirects
-        options.Cookie.IsEssential = true;
-    });
 
     // Allow large file uploads
     builder.Services.Configure<FormOptions>(o =>
@@ -187,16 +177,6 @@ try
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    })
-    .AddCookie(options =>
-    {
-        options.Cookie.HttpOnly = true;
-        // Always use Secure for production (Railway handles SSL at edge)
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        // Lax allows the cookie to be sent on top-level navigations (like OAuth redirects)
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.IsEssential = true;
     })
     .AddJwtBearer(options =>
     {
@@ -429,7 +409,6 @@ try
     
     app.UseRequestId();
     app.UseGlobalExceptionHandler();
-    app.UseSession(); // Required for OAuth state/correlation
     app.UseAuthentication(); // Add authentication middleware
     app.UseAuthorization();
     app.UseRateLimiter(); // Add rate limiting middleware
@@ -483,20 +462,6 @@ try
             ok = true,
             timestamp = DateTime.Now,
             tools = toolVersions
-        });
-    }).AllowAnonymous();
-
-    // Debug endpoint to check OAuth config (TEMPORARY - remove in production)
-    app.MapGet("/debug/oauth-config", (IConfiguration config) =>
-    {
-        var oauthSection = config.GetSection("OAuth");
-        return Results.Ok(new
-        {
-            googleClientId = oauthSection["Google:ClientId"]?.Substring(0, Math.Min(20, oauthSection["Google:ClientId"]?.Length ?? 0)) + "...",
-            googleClientIdFull = oauthSection["Google:ClientId"],
-            hasGoogleSecret = !string.IsNullOrEmpty(oauthSection["Google:ClientSecret"]),
-            twitterKey = oauthSection["Twitter:ConsumerKey"]?.Substring(0, Math.Min(10, oauthSection["Twitter:ConsumerKey"]?.Length ?? 0)) + "...",
-            allKeys = oauthSection.GetChildren().Select(c => c.Key).ToList()
         });
     }).AllowAnonymous();
 
