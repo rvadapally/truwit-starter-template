@@ -9,6 +9,7 @@ using HumanProof.Api.Controllers;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using AspNet.Security.OAuth.Twitter;
 using Microsoft.AspNetCore.RateLimiting;
@@ -70,6 +71,15 @@ try
     // Add HttpClient
     builder.Services.AddHttpClient();
     builder.Services.AddHttpClient<HostedC2paVerifier>();
+
+    // Configure session cookies for OAuth (SameSite=Lax for cross-domain redirects)
+    builder.Services.AddSession(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax; // Important for OAuth!
+        options.Cookie.IsEssential = true;
+    });
 
     // Allow large file uploads
     builder.Services.Configure<FormOptions>(o =>
@@ -177,6 +187,14 @@ try
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Lax; // Required for OAuth redirects
+        options.Cookie.IsEssential = true;
     })
     .AddJwtBearer(options =>
     {
@@ -409,6 +427,7 @@ try
     
     app.UseRequestId();
     app.UseGlobalExceptionHandler();
+    app.UseSession(); // Required for OAuth state/correlation
     app.UseAuthentication(); // Add authentication middleware
     app.UseAuthorization();
     app.UseRateLimiter(); // Add rate limiting middleware
