@@ -484,6 +484,20 @@ try
         });
     }).AllowAnonymous();
 
+    // Debug endpoint to check OAuth config (TEMPORARY - remove in production)
+    app.MapGet("/debug/oauth-config", (IConfiguration config) =>
+    {
+        var oauthSection = config.GetSection("OAuth");
+        return Results.Ok(new
+        {
+            googleClientId = oauthSection["Google:ClientId"]?.Substring(0, Math.Min(20, oauthSection["Google:ClientId"]?.Length ?? 0)) + "...",
+            googleClientIdFull = oauthSection["Google:ClientId"],
+            hasGoogleSecret = !string.IsNullOrEmpty(oauthSection["Google:ClientSecret"]),
+            twitterKey = oauthSection["Twitter:ConsumerKey"]?.Substring(0, Math.Min(10, oauthSection["Twitter:ConsumerKey"]?.Length ?? 0)) + "...",
+            allKeys = oauthSection.GetChildren().Select(c => c.Key).ToList()
+        });
+    }).AllowAnonymous();
+
     // Tools health check endpoint
     app.MapGet("/health/tools", () =>
     {
