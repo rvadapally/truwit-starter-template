@@ -9,6 +9,7 @@ using HumanProof.Api.Controllers;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using AspNet.Security.OAuth.Twitter;
 using Microsoft.AspNetCore.RateLimiting;
@@ -177,7 +178,9 @@ try
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
+    .AddCookie() // Required for OAuth state/correlation
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
