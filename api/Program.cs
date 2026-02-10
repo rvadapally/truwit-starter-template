@@ -337,10 +337,14 @@ try
     // app.UseHttpsRedirection(); // Disabled for local Docker testing
     
     // Enable forwarded headers for Railway/proxy HTTPS detection
-    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    var forwardedHeadersOptions = new ForwardedHeadersOptions
     {
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-    });
+    };
+    // Trust all proxies (Railway edge network)
+    forwardedHeadersOptions.KnownNetworks.Clear();
+    forwardedHeadersOptions.KnownProxies.Clear();
+    app.UseForwardedHeaders(forwardedHeadersOptions);
     
     // CORS must be before static files to apply headers to static content
     app.UseCors("AllowAll");
