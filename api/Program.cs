@@ -206,8 +206,9 @@ try
     {
        options.ClientId = oauthConfig["Google:ClientId"] ?? "YOUR_GOOGLE_CLIENT_ID_HERE";
        options.ClientSecret = oauthConfig["Google:ClientSecret"] ?? "YOUR_GOOGLE_CLIENT_SECRET_HERE";
-       // Use signin-google as internal OAuth handler path (different from controller)
-       options.CallbackPath = "/signin-google";
+       // Use the same path as Google Console redirect URI
+       // The controller endpoint at this path has been removed - only middleware handles it
+       options.CallbackPath = "/v1/auth/callback/google";
        options.SaveTokens = true;
        // Force HTTPS for Railway deployment
        options.Events.OnRedirectToAuthorizationEndpoint = context =>
