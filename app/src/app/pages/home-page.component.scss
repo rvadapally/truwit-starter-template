@@ -185,6 +185,187 @@
   margin: 0;
 }
 
+// New styles for updated homepage
+
+.hero h1 .highlight {
+  background: linear-gradient(135deg, #f7931a, #ffb347);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-trust {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
+.trust-badge {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.proof-card-preview {
+  max-width: 400px;
+  margin: 2rem auto;
+  
+  img {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.problem {
+  padding: 4rem 0;
+  text-align: center;
+  background: var(--bg-1);
+  
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+  }
+  
+  .problem-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+.bitcoin-section {
+  padding: 4rem 0;
+  text-align: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  
+  .bitcoin-badge {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    background: linear-gradient(135deg, #f7931a, #ffb347);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 1rem 0;
+  }
+  
+  .bitcoin-text {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    
+    strong {
+      color: #f7931a;
+    }
+  }
+}
+
+.use-cases {
+  padding: 4rem 0;
+  text-align: center;
+  
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin: 0 0 2rem 0;
+  }
+}
+
+.use-cases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.use-case-card {
+  background: var(--bg-1);
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
+  h3 {
+    font-size: 1.125rem;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.btn-large {
+  padding: 1rem 2.5rem !important;
+  font-size: 1.125rem !important;
+}
+
+.email-capture {
+  padding: 3rem 0;
+  text-align: center;
+  background: var(--bg-1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  
+  h3 {
+    font-size: 1.25rem;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  p {
+    color: var(--text-secondary);
+    margin: 0 0 1rem 0;
+  }
+}
+
+.email-form {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 400px;
+  margin: 0 auto;
+  
+  input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: var(--bg-0);
+    color: var(--text-primary);
+    font-size: 1rem;
+    
+    &::placeholder {
+      color: var(--text-secondary);
+    }
+  }
+  
+  button {
+    padding: 0.75rem 1.5rem;
+  }
+}
+
+.email-note {
+  color: #2de2b5 !important;
+  font-size: 0.9rem;
+  margin-top: 0.5rem !important;
+}
+
 @media (max-width: 768px) {
   .hero-actions {
     flex-direction: column;
@@ -193,6 +374,15 @@
 
   .features-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .hero-trust {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .email-form {
+    flex-direction: column;
   }
 }
 
