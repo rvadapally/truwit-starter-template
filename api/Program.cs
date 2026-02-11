@@ -232,6 +232,13 @@ try
            context.HandleResponse();
            return Task.CompletedTask;
        };
+       // Explicitly redirect to our completion endpoint after successful OAuth
+       options.Events.OnTicketReceived = context =>
+       {
+           // Force redirect to our completion endpoint
+           context.ReturnUri = "/v1/auth/complete/google";
+           return Task.CompletedTask;
+       };
    })
    .AddTwitter(options =>
    {
