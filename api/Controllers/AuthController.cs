@@ -103,7 +103,7 @@ public class AuthController : ControllerBase
             // Create or update identity and return JWT
             var identity = await UpsertIdentityAsync("google", googleId, name, email);
             var jwt = GenerateJwtToken(identity);
-            return Ok(new { token = jwt, identity = new { identity.Id, identity.Provider, identity.DisplayName, identity.Email } });
+            return Ok(new { token = jwt, identity = new { identity.IdentityId, identity.Provider, identity.DisplayName } });
         }
         catch (Exception ex)
         {
