@@ -28,6 +28,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<Identity> Identities { get; set; } = null!;
     public DbSet<Signature> Signatures { get; set; } = null!;
     public DbSet<ManifestEvent> ManifestEvents { get; set; } = null!;
+    
+    // Waitlist
+    public DbSet<Subscriber> Subscribers { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -226,6 +229,19 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             
             entity.HasIndex(e => e.GroupId);
+        });
+        
+        // Configure Subscriber (waitlist)
+        modelBuilder.Entity<Subscriber>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
+            entity.Property(e => e.Source).HasMaxLength(50);
+            entity.Property(e => e.ReferralCode).HasMaxLength(50);
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.CreatedAt);
         });
     }
 }
