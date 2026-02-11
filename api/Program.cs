@@ -20,6 +20,7 @@ using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
 using NLog.Web;
+using HumanProof.Api.Application.Services;
 
 var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 logger.Debug("init main");
@@ -118,6 +119,9 @@ try
     builder.Services.AddScoped<IProcessRunner, ProcessRunner>();
     builder.Services.AddScoped<IUrlCanonicalizer, UrlCanonicalizer>();
     builder.Services.AddSingleton<IVerificationStatusTracker, VerificationStatusTracker>();
+    
+    // OpenTimestamps for Bitcoin anchoring (free, no API key)
+    builder.Services.AddOpenTimestamps();
     
     // Register Settings service
     builder.Services.AddScoped<ISettingsService, SettingsService>();

@@ -18,6 +18,11 @@ public class VerificationProof
     public string? ProofCardSmallUrl { get; set; }  // 640x640 card
     public string? ProofCardLargeUrl { get; set; }  // 1024x1024 card
     
+    // OpenTimestamps Bitcoin anchoring
+    public byte[]? OtsProof { get; set; }  // Binary OTS proof file
+    public DateTime? OtsCreatedAt { get; set; }  // When OTS was submitted
+    public DateTime? OtsConfirmedAt { get; set; }  // When Bitcoin confirmation received
+    
     // Navigation properties
     public VerificationMetadata Metadata { get; set; } = null!;
     public Guid MetadataId { get; set; }
