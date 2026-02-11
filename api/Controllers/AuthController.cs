@@ -64,30 +64,69 @@ public class AuthController : ControllerBase
     [HttpGet("login/google")]
     public IActionResult LoginGoogle([FromQuery] string? returnUrl = null)
     {
+        // After OAuth completes on /signin-google, redirect to our controller
         var properties = new AuthenticationProperties
         {
-            RedirectUri = Url.Action(nameof(CallbackGoogle), new { returnUrl })
+            RedirectUri = "/v1/auth/complete/google" + (string.IsNullOrEmpty(returnUrl) ? "" : $"?returnUrl={Uri.EscapeDataString(returnUrl)}")
         };
         
         return Challenge(properties, GoogleDefaults.AuthenticationScheme);
     }
 
     /// <summary>
-    /// Handle Google OAuth callback - called after OAuth middleware processes the callback
+    /// Complete Google OAuth - called after OAuth middleware has signed in the user with cookies
+    /// </summary>
+    [HttpGet("complete/google")]
+    public async Task<IActionResult> CompleteGoogle([FromQuery] string? returnUrl = null)
+    {
+        try
+        {
+            // User should already be authenticated via cookie (set by OAuth middleware on /signin-google)
+            var cookieResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (!cookieResult.Succeeded || cookieResult.Principal == null)
+            {
+                _logger.LogWarning("Cookie authentication failed after OAuth");
+                return BadRequest(new { error = "Authentication failed - no cookie" });
+            }
+
+            // Extract claims from the cookie
+            var principal = cookieResult.Principal;
+            var googleId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = principal.FindFirstValue(ClaimTypes.Email);
+            var name = principal.FindFirstValue(ClaimTypes.Name);
+            
+            if (string.IsNullOrEmpty(googleId) || string.IsNullOrEmpty(email))
+            {
+                return BadRequest(new { error = "Missing required claims from Google" });
+            }
+            
+            // Create or update identity and return JWT
+            var identity = await UpsertIdentityAsync("google", googleId, name, email);
+            var jwt = GenerateJwtToken(identity);
+            return Ok(new { token = jwt, identity = new { identity.Id, identity.Provider, identity.DisplayName, identity.Email } });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error completing Google authentication");
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Legacy callback endpoint - for backwards compatibility with Google Console redirect URI
     /// </summary>
     [HttpGet("callback/google")]
     public async Task<IActionResult> CallbackGoogle([FromQuery] string? returnUrl = null, [FromQuery] string? state = null, [FromQuery] string? code = null)
     {
         try
         {
-            // If state and code are present, let the OAuth middleware handle it
-            // This endpoint is called AFTER the middleware redirects here
+            // This endpoint exists for backwards compatibility
+            // New flow uses /signin-google (internal) -> /complete/google (controller)
             
-            // First, try to get the user from the Cookie authentication (set by OAuth middleware)
+            // If user is already authenticated via cookie, complete the flow
             var cookieResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             if (cookieResult.Succeeded && cookieResult.Principal != null)
             {
-                // User is already authenticated via cookie - extract claims
                 var principal = cookieResult.Principal;
                 var googleId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
                 var email = principal.FindFirstValue(ClaimTypes.Email);
@@ -95,14 +134,19 @@ public class AuthController : ControllerBase
                 
                 if (!string.IsNullOrEmpty(googleId) && !string.IsNullOrEmpty(email))
                 {
-                    // Create or update identity and return JWT
                     var identity = await UpsertIdentityAsync("google", googleId, name, email);
                     var jwt = GenerateJwtToken(identity);
                     return Ok(new { token = jwt, identity = new { identity.Id, identity.Provider, identity.DisplayName, identity.Email } });
                 }
             }
             
-            // If no cookie auth, try Google scheme (for direct OAuth flow)
+            // If no cookie auth and no OAuth params, redirect to login
+            if (string.IsNullOrEmpty(state) || string.IsNullOrEmpty(code))
+            {
+                return Redirect("/v1/auth/login/google");
+            }
+            
+            // Try Google scheme directly
             var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
             
             if (!authenticateResult.Succeeded)
