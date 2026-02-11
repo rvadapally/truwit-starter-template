@@ -224,6 +224,13 @@ try
            context.Response.Redirect(uri.ToString());
            return Task.CompletedTask;
        };
+       // Handle OAuth errors gracefully (don't throw exceptions)
+       options.Events.OnRemoteFailure = context =>
+       {
+           context.Response.Redirect("/v1/auth/login/google?error=auth_failed");
+           context.HandleResponse();
+           return Task.CompletedTask;
+       };
    })
    .AddTwitter(options =>
    {
