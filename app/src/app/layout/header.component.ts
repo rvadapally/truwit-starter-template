@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -11,29 +12,37 @@ import { AuthService } from '../core/services/auth.service';
   template: `
     <header class="header">
       <nav class="nav">
-        <div class="nav-brand">
-          <a routerLink="/" class="logo-link">
-            <img src="/assets/logo.svg" alt="TruWit Logo" class="nav-logo">
-            <span class="brand-name">TruWit</span>
-          </a>
-        </div>
-        
-        <div class="nav-menu">
-          <a routerLink="/" class="nav-link">Home</a>
-          <a routerLink="/how-it-works" class="nav-link">How It Works</a>
-          <a routerLink="/use-cases" class="nav-link">Use Cases</a>
-          <a routerLink="/technology" class="nav-link">Technology</a>
-          <a routerLink="/pricing" class="nav-link">Pricing</a>
-          <a routerLink="/products" class="nav-link">Products</a>
-          
-          <!-- Show Login or User Info -->
-          <a *ngIf="!currentUser" routerLink="/login" class="btn-login">Sign In</a>
-          <div *ngIf="currentUser" class="user-menu">
-            <span class="user-info">{{ getUserDisplay() }}</span>
-            <button (click)="signOut()" class="btn-signout">Sign Out</button>
+        <div class="nav-top">
+          <div class="nav-brand">
+            <a routerLink="/" class="logo-link" (click)="closeMenu()">
+              <img src="/assets/logo.svg" alt="TruWit Logo" class="nav-logo">
+              <span class="brand-name">TruWit</span>
+            </a>
           </div>
           
-          <a routerLink="/verify" class="btn-launch">Try It Free</a>
+          <button class="hamburger" (click)="toggleMenu()" [class.active]="menuOpen" aria-label="Toggle menu">
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+            <span class="hamburger-line"></span>
+          </button>
+        </div>
+        
+        <div class="nav-menu" [class.open]="menuOpen">
+          <a routerLink="/" class="nav-link" (click)="closeMenu()">Home</a>
+          <a routerLink="/how-it-works" class="nav-link" (click)="closeMenu()">How It Works</a>
+          <a routerLink="/use-cases" class="nav-link" (click)="closeMenu()">Use Cases</a>
+          <a routerLink="/technology" class="nav-link" (click)="closeMenu()">Technology</a>
+          <a routerLink="/pricing" class="nav-link" (click)="closeMenu()">Pricing</a>
+          <a routerLink="/products" class="nav-link" (click)="closeMenu()">Products</a>
+          
+          <!-- Show Login or User Info -->
+          <a *ngIf="!currentUser" routerLink="/login" class="btn-login" (click)="closeMenu()">Sign In</a>
+          <div *ngIf="currentUser" class="user-menu">
+            <span class="user-info">{{ getUserDisplay() }}</span>
+            <button (click)="signOut(); closeMenu()" class="btn-signout">Sign Out</button>
+          </div>
+          
+          <a routerLink="/verify" class="btn-launch" (click)="closeMenu()">Try It Free</a>
         </div>
       </nav>
     </header>
@@ -86,13 +95,38 @@ import { AuthService } from '../core/services/auth.service';
 })
 export class HeaderComponent implements OnInit {
   private authService = inject(AuthService);
+  private router = inject(Router);
   currentUser = this.authService.getCurrentUser();
+  menuOpen = false;
 
   ngOnInit() {
     // Subscribe to auth changes
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });
+
+    // Close menu on route change
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.closeMenu();
+    });
+  }
+
+  toggleMenu(): void {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu(): void {
+    this.menuOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.nav') && this.menuOpen) {
+      this.closeMenu();
+    }
   }
 
   getUserDisplay(): string {
