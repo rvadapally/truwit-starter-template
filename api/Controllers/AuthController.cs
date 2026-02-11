@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using AspNet.Security.OAuth.Twitter;
 using Microsoft.AspNetCore.Mvc;
@@ -72,13 +73,36 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Handle Google OAuth callback
+    /// Handle Google OAuth callback - called after OAuth middleware processes the callback
     /// </summary>
     [HttpGet("callback/google")]
-    public async Task<IActionResult> CallbackGoogle([FromQuery] string? returnUrl = null)
+    public async Task<IActionResult> CallbackGoogle([FromQuery] string? returnUrl = null, [FromQuery] string? state = null, [FromQuery] string? code = null)
     {
         try
         {
+            // If state and code are present, let the OAuth middleware handle it
+            // This endpoint is called AFTER the middleware redirects here
+            
+            // First, try to get the user from the Cookie authentication (set by OAuth middleware)
+            var cookieResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (cookieResult.Succeeded && cookieResult.Principal != null)
+            {
+                // User is already authenticated via cookie - extract claims
+                var principal = cookieResult.Principal;
+                var googleId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+                var email = principal.FindFirstValue(ClaimTypes.Email);
+                var name = principal.FindFirstValue(ClaimTypes.Name);
+                
+                if (!string.IsNullOrEmpty(googleId) && !string.IsNullOrEmpty(email))
+                {
+                    // Create or update identity and return JWT
+                    var identity = await UpsertIdentityAsync("google", googleId, name, email);
+                    var jwt = GenerateJwtToken(identity);
+                    return Ok(new { token = jwt, identity = new { identity.Id, identity.Provider, identity.DisplayName, identity.Email } });
+                }
+            }
+            
+            // If no cookie auth, try Google scheme (for direct OAuth flow)
             var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
             
             if (!authenticateResult.Succeeded)
