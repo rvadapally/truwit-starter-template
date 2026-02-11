@@ -180,7 +180,14 @@ try
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     })
-    .AddCookie() // Required for OAuth state/correlation
+    .AddCookie(options =>
+    {
+        // Railway terminates SSL at edge, so internal requests are HTTP
+        // Use SameAsRequest to allow cookies over both HTTP and HTTPS
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.HttpOnly = true;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
