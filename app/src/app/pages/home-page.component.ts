@@ -113,17 +113,7 @@ import { Title, Meta } from '@angular/platform-browser';
         <p class="privacy-note">Free forever. No crypto wallet needed. Your files are never stored.</p>
       </section>
 
-      <section class="email-capture">
-        <div class="container">
-          <h3>Stay Updated</h3>
-          <p>Get notified about new features and content provenance news.</p>
-          <form class="email-form" (submit)="onEmailSubmit($event)">
-            <input type="email" placeholder="your@email.com" [(ngModel)]="email" name="email" required />
-            <button type="submit" class="btn-primary">Subscribe</button>
-          </form>
-          <p class="email-note" *ngIf="emailSubmitted">Thanks! We'll keep you posted.</p>
-        </div>
-      </section>
+      <!-- Email capture removed for launch - keeping it frictionless -->
     </div>
   `
 })
