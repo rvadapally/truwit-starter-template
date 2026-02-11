@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Title, Meta } from '@angular/platform-browser';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, HttpClientModule],
   styleUrls: ['./home-page.component.scss'],
   template: `
     <div class="home-page">
@@ -113,13 +115,42 @@ import { Title, Meta } from '@angular/platform-browser';
         <p class="privacy-note">Free forever. No crypto wallet needed. Your files are never stored.</p>
       </section>
 
-      <!-- Email capture removed for launch - keeping it frictionless -->
+      <section class="email-capture">
+        <div class="container">
+          <h2>Stay Updated</h2>
+          <p>Get notified about new features and updates.</p>
+          <form (submit)="onEmailSubmit($event)" class="email-form" *ngIf="!emailSubmitted">
+            <input 
+              type="email" 
+              [(ngModel)]="email" 
+              name="email"
+              placeholder="Enter your email" 
+              required
+              [disabled]="isSubmitting"
+            />
+            <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+              {{ isSubmitting ? 'Subscribing...' : 'Subscribe' }}
+            </button>
+          </form>
+          <div class="email-success" *ngIf="emailSubmitted">
+            <span class="success-icon">✓</span>
+            <p>{{ successMessage }}</p>
+          </div>
+          <p class="email-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+          <p class="email-note" *ngIf="!emailSubmitted">No spam, ever. Unsubscribe anytime.</p>
+        </div>
+      </section>
     </div>
   `
 })
 export class HomePageComponent implements OnInit {
+  private http = inject(HttpClient);
+  
   email = '';
   emailSubmitted = false;
+  isSubmitting = false;
+  successMessage = '';
+  errorMessage = '';
 
   constructor(
     private title: Title,
@@ -140,12 +171,26 @@ export class HomePageComponent implements OnInit {
 
   onEmailSubmit(event: Event): void {
     event.preventDefault();
-    if (this.email) {
-      // TODO: Send to backend email list
-      console.log('Email submitted:', this.email);
-      this.emailSubmitted = true;
-      this.email = '';
-    }
+    if (!this.email || this.isSubmitting) return;
+    
+    this.isSubmitting = true;
+    this.errorMessage = '';
+    
+    this.http.post<{ message: string; success?: boolean; alreadySubscribed?: boolean; resubscribed?: boolean }>(
+      `${environment.apiUrl}/v1/subscribe`,
+      { email: this.email, source: 'homepage' }
+    ).subscribe({
+      next: (response) => {
+        this.emailSubmitted = true;
+        this.successMessage = response.message;
+        this.email = '';
+        this.isSubmitting = false;
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.error || 'Something went wrong. Please try again.';
+        this.isSubmitting = false;
+      }
+    });
   }
 }
 
