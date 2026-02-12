@@ -16,6 +16,7 @@ import { VerifyLandingPageComponent } from './pages/verify-landing-page.componen
 import { PrivacyPageComponent } from './pages/privacy-page.component';
 import { TermsPageComponent } from './pages/terms-page.component';
 import { LoginPageComponent } from './pages/login-page.component';
+import { OpenClawMcpPageComponent } from './pages/openclaw-mcp-page.component';
 
 export const routes: Routes = [
   // Marketing routes (prerendered)
@@ -28,6 +29,7 @@ export const routes: Routes = [
   { path: 'audit', component: AuditPageComponent },
   { path: 'pricing', component: PricingPageComponent },
   { path: 'investors', component: InvestorsPageComponent },
+  { path: 'openclaw-mcp', component: OpenClawMcpPageComponent },
   { path: 'legal/privacy', component: PrivacyPageComponent },
   { path: 'legal/terms', component: TermsPageComponent },
   

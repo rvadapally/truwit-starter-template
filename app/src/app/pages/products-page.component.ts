@@ -29,6 +29,11 @@ import { Title, Meta } from '@angular/platform-browser';
               <p>Comprehensive audit trails for verified content</p>
               <a routerLink="/audit" class="btn">Learn More</a>
             </div>
+            <div class="product-card highlight">
+              <h2>TruWit OpenClaw MCP</h2>
+              <p>Continuous compliance evidence + security questionnaire autopilot</p>
+              <a routerLink="/openclaw-mcp" class="btn">Learn More</a>
+            </div>
           </div>
         </div>
       </section>

@@ -24,6 +24,7 @@ import { environment } from '../../environments/environment';
             <div class="hero-actions">
               <a routerLink="/verify" class="btn-primary">Create Your Proof</a>
               <a routerLink="/how-it-works" class="btn-secondary">See How It Works</a>
+              <a routerLink="/openclaw-mcp" class="btn-secondary">Compliance Autopilot (New)</a>
             </div>
             <div class="hero-trust">
               <span class="trust-badge">⚡ Bitcoin Anchored</span>
