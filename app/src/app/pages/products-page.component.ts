@@ -34,6 +34,11 @@ import { Title, Meta } from '@angular/platform-browser';
               <p>Continuous compliance evidence + security questionnaire autopilot</p>
               <a routerLink="/openclaw-mcp" class="btn">Learn More</a>
             </div>
+            <div class="product-card highlight">
+              <h2>MedLine AI</h2>
+              <p>AI-powered front office for GI practices — live call handling, EHR integration, 24/7 availability</p>
+              <a routerLink="/medline-ai" class="btn">Learn More</a>
+            </div>
           </div>
         </div>
       </section>
