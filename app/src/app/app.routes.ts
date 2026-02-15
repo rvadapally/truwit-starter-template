@@ -17,6 +17,7 @@ import { PrivacyPageComponent } from './pages/privacy-page.component';
 import { TermsPageComponent } from './pages/terms-page.component';
 import { LoginPageComponent } from './pages/login-page.component';
 import { OpenClawMcpPageComponent } from './pages/openclaw-mcp-page.component';
+import { MedlineAiPageComponent } from './pages/medline-ai-page.component';
 
 export const routes: Routes = [
   // Marketing routes (prerendered)
@@ -30,6 +31,7 @@ export const routes: Routes = [
   { path: 'pricing', component: PricingPageComponent },
   { path: 'investors', component: InvestorsPageComponent },
   { path: 'openclaw-mcp', component: OpenClawMcpPageComponent },
+  { path: 'medline-ai', component: MedlineAiPageComponent },
   { path: 'legal/privacy', component: PrivacyPageComponent },
   { path: 'legal/terms', component: TermsPageComponent },
   
